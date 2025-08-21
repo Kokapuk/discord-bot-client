@@ -1,13 +1,16 @@
-import { Button, Card, Field, Fieldset, Input, Link, Stack } from '@chakra-ui/react';
+import { Button, Card, Field, Fieldset, Link, Stack } from '@chakra-ui/react';
 import { useState } from 'react';
+import { useNavigate } from 'react-router';
 import z from 'zod';
-import ipcRendererDiscordApiFunctions from '../../api/discord';
+import { ipcRendererDiscordApiFunctions } from '../../api/discord';
+import { PasswordInput } from '../../ui/password-input';
 
 export const AuthFormData = z.object({ token: z.string().min(1, { error: 'Token is required' }) });
 
 export default function Auth() {
   const [formIssues, setFormIssues] = useState<Record<string, string>>({});
   const [isAuthorizing, setAuthorizing] = useState(false);
+  const navigate = useNavigate();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -18,7 +21,7 @@ export default function Auth() {
       const response = await ipcRendererDiscordApiFunctions.authorize(formdata.token);
 
       if (response.success) {
-        console.log(await ipcRendererDiscordApiFunctions.getAllGuilds());
+        navigate('/');
       } else {
         setFormIssues({ token: response.error });
       }
@@ -53,7 +56,10 @@ export default function Auth() {
           <Fieldset.Content>
             <Field.Root invalid={Object.keys(formIssues).includes('token')}>
               <Field.Label>Token</Field.Label>
-              <Input name="token" type="password" autoFocus />
+              <PasswordInput
+                name="token"
+                autoFocus
+              />
               <Field.ErrorText>{formIssues['token']}</Field.ErrorText>
             </Field.Root>
           </Fieldset.Content>

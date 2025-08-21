@@ -1,8 +1,8 @@
 import { app, BrowserWindow, shell } from 'electron';
 import { createRequire } from 'node:module';
-import { fileURLToPath } from 'node:url';
 import path from 'node:path';
-import bindIpcDiscordApi from './api/discord';
+import { fileURLToPath } from 'node:url';
+import { bindIpcDiscordApiEvents, bindIpcDiscordApiFunctions } from './api/discord';
 
 const require = createRequire(import.meta.url);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -26,8 +26,8 @@ const createWindow = () => {
       symbolColor: 'white',
       height: 30,
     },
-    width: 900,
-    height: 600,
+    width: 1100,
+    height: 700,
     backgroundMaterial: 'mica',
     webPreferences: {
       preload: path.join(__dirname, 'preload.mjs'),
@@ -35,7 +35,7 @@ const createWindow = () => {
   });
 
   if (VITE_DEV_SERVER_URL) {
-    win.loadURL(`${VITE_DEV_SERVER_URL}`);
+    win.loadURL(`${VITE_DEV_SERVER_URL}#auth`);
   } else {
     win.loadFile(path.join(RENDERER_DIST, 'index.html'), { hash: 'auth' });
   }
@@ -49,7 +49,8 @@ const createWindow = () => {
     return { action: 'allow' };
   });
 
-  bindIpcDiscordApi();
+  bindIpcDiscordApiFunctions();
+  bindIpcDiscordApiEvents(win.webContents);
 };
 
 app.on('window-all-closed', () => {

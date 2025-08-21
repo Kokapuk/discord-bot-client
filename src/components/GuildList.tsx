@@ -1,10 +1,14 @@
-import { Avatar, Stack } from '@chakra-ui/react';
-import { useLayoutEffect, useRef, useState } from 'react';
+import { Stack } from '@chakra-ui/react';
+import { useEffect, useRef, useState } from 'react';
+import useAppStore from '../stores/app';
+import Guild from './Guild';
+import { handleIpcRendererDiscordApiEvents } from '../api/discord';
 
-export default function ServerList() {
-  const serverList = useRef<HTMLDivElement>(null);
+export default function GuildList() {
+  const guildList = useRef<HTMLDivElement>(null);
   const [showTopShadow, setShowTopShadow] = useState(false);
   const [showBottomShadow, setShowBottomShadow] = useState(false);
+  const { guilds, pullGuilds } = useAppStore();
 
   const recalcShadows = (target: HTMLDivElement) => {
     const scrollBottom = Math.floor(target.scrollHeight - target.scrollTop - target.clientHeight);
@@ -12,11 +16,23 @@ export default function ServerList() {
     setShowBottomShadow(scrollBottom > 0);
   };
 
-  useLayoutEffect(() => {
-    if (serverList.current) {
-      recalcShadows(serverList.current);
+  useEffect(() => {
+    if (!guilds.length) {
+      pullGuilds();
     }
+
+    const unsubscribe = handleIpcRendererDiscordApiEvents(['guildUpdate'], pullGuilds);
+
+    return () => {
+      unsubscribe();
+    };
   }, []);
+
+  useEffect(() => {
+    if (guildList.current) {
+      recalcShadows(guildList.current);
+    }
+  }, [guilds]);
 
   const handleScroll = (event: React.UIEvent<HTMLDivElement>) => {
     recalcShadows(event.currentTarget);
@@ -24,13 +40,13 @@ export default function ServerList() {
 
   return (
     <Stack
-      ref={serverList}
+      ref={guildList}
       onScroll={handleScroll}
       overflow="auto"
       maxHeight="100%"
       width="fit-content"
       scrollbar="hidden"
-      paddingLeft="10px"
+      paddingInline="10px"
       paddingBottom="10px"
       gap="15px"
       flexShrink="0"
@@ -41,11 +57,8 @@ export default function ServerList() {
         ${showBottomShadow ? 'transparent' : 'black'} 100%
       );`}
     >
-      {Array.from({ length: 50 }).map((_, index) => (
-        <Avatar.Root size="2xl" key={index}>
-          <Avatar.Fallback name="Sunny Dragons" />
-          {/* <Avatar.Image src="https://bit.ly/sage-adebayo" /> */}
-        </Avatar.Root>
+      {guilds.map((guild) => (
+        <Guild key={guild.id} guild={guild} />
       ))}
     </Stack>
   );

@@ -8,6 +8,8 @@ import { Provider } from './ui/provider';
 const Auth = lazy(() => import('./routes/Auth'));
 const AppLayout = lazy(() => import('./components/AppLayout'));
 const Home = lazy(() => import('./routes/Home'));
+const GuildLayout = lazy(() => import('./components/GuildLayout'));
+const Guild = lazy(() => import('./routes/Home/Guild'));
 
 const router = createHashRouter([
   {
@@ -24,6 +26,16 @@ const router = createHashRouter([
           {
             index: true,
             element: <Home />,
+          },
+          {
+            path: '/guilds/:guildId',
+            element: <GuildLayout />,
+            children: [
+              {
+                index: true,
+                element: <Guild />,
+              },
+            ],
           },
         ],
       },
