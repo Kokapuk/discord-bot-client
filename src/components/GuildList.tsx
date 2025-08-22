@@ -1,14 +1,17 @@
-import { Stack } from '@chakra-ui/react';
-import { useEffect, useRef, useState } from 'react';
-import useAppStore from '../stores/app';
+import { Stack, StackProps } from '@chakra-ui/react';
+import useAppStore from '@renderer/stores/app';
+import debounce from 'lodash/debounce';
+import { RefAttributes, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import Guild from './Guild';
-import { handleIpcRendererDiscordApiEvents } from '../api/discord';
 
-export default function GuildList() {
+export type GuildListProps = StackProps & RefAttributes<HTMLDivElement>;
+
+export default function GuildList({ ref, ...props }: GuildListProps) {
   const guildList = useRef<HTMLDivElement>(null);
   const [showTopShadow, setShowTopShadow] = useState(false);
   const [showBottomShadow, setShowBottomShadow] = useState(false);
-  const { guilds, pullGuilds } = useAppStore();
+  const { guilds } = useAppStore();
+  useImperativeHandle(ref, () => guildList.current!, []);
 
   const recalcShadows = (target: HTMLDivElement) => {
     const scrollBottom = Math.floor(target.scrollHeight - target.scrollTop - target.clientHeight);
@@ -17,22 +20,26 @@ export default function GuildList() {
   };
 
   useEffect(() => {
-    if (!guilds.length) {
-      pullGuilds();
-    }
-
-    const unsubscribe = handleIpcRendererDiscordApiEvents(['guildUpdate'], pullGuilds);
-
-    return () => {
-      unsubscribe();
-    };
-  }, []);
-
-  useEffect(() => {
     if (guildList.current) {
       recalcShadows(guildList.current);
     }
   }, [guilds]);
+
+  useEffect(() => {
+    const handleRecalc = debounce(() => {
+      if (guildList.current) {
+        recalcShadows(guildList.current);
+      }
+    }, 250);
+
+    const debouncedRecalc = debounce(handleRecalc, 250);
+
+    window.addEventListener('resize', debouncedRecalc);
+
+    return () => {
+      window.removeEventListener('resize', debouncedRecalc);
+    };
+  }, []);
 
   const handleScroll = (event: React.UIEvent<HTMLDivElement>) => {
     recalcShadows(event.currentTarget);
@@ -56,6 +63,7 @@ export default function GuildList() {
         black calc(100% - 75px),
         ${showBottomShadow ? 'transparent' : 'black'} 100%
       );`}
+      {...props}
     >
       {guilds.map((guild) => (
         <Guild key={guild.id} guild={guild} />

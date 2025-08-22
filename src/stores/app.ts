@@ -1,6 +1,6 @@
+import { Channel, Guild, Message, Role, User } from '@main/api/types';
+import { ipcRendererDiscordApiFunctions } from '@renderer/api/discord';
 import { create } from 'zustand';
-import { Channel, Guild, User } from '../../electron/api/types';
-import { ipcRendererDiscordApiFunctions } from '../api/discord';
 
 interface AppState {
   guilds: Guild[];
@@ -9,6 +9,10 @@ interface AppState {
   pullChannels(guildId: string): Promise<void>;
   members: Record<string, User[]>;
   pullMembers(guildId: string): Promise<void>;
+  roles: Record<string, Role[]>;
+  pullRoles(guildId: string): Promise<void>;
+  messages: Record<string, Message[]>;
+  fetchMessages(channelId: string): Promise<void>;
 }
 
 const useAppStore = create<AppState>()((set) => ({
@@ -47,6 +51,30 @@ const useAppStore = create<AppState>()((set) => ({
     }
 
     set((prev) => ({ ...prev, members: { ...prev.members, [guildId]: response.payload } }));
+  },
+  roles: {},
+  pullRoles: async (guildId) => {
+    const response = await ipcRendererDiscordApiFunctions.getGuildRoles(guildId);
+
+    if (!response.success) {
+      set((prev) => ({ ...prev, roles: { ...prev.roles, [guildId]: [] } }));
+      console.error(`Failed to pull roles: ${response.error}`);
+      return;
+    }
+
+    set((prev) => ({ ...prev, roles: { ...prev.roles, [guildId]: response.payload } }));
+  },
+  messages: {},
+  fetchMessages: async (channelId) => {
+    const response = await ipcRendererDiscordApiFunctions.fetchChannelsMessages(channelId);
+
+    if (!response.success) {
+      set((prev) => ({ ...prev, messages: { ...prev.messages, [channelId]: [] } }));
+      console.error(`Failed to fetch messages: ${response.error}`);
+      return;
+    }
+
+    set((prev) => ({ ...prev, messages: { ...prev.messages, [channelId]: response.payload } }));
   },
 }));
 

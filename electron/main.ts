@@ -2,7 +2,7 @@ import { app, BrowserWindow, shell } from 'electron';
 // import { createRequire } from 'node:module';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { bindIpcDiscordApiEvents, bindIpcDiscordApiFunctions } from './api/discord';
+import { bindIpcDiscordApiEvents, bindIpcDiscordApiFunctions, logout } from './api/discord';
 
 // const require = createRequire(import.meta.url);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -58,6 +58,10 @@ app.on('window-all-closed', () => {
     app.quit();
     win = null;
   }
+});
+
+app.on('before-quit', () => {
+  logout();
 });
 
 app.on('activate', () => {

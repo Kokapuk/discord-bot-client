@@ -34,4 +34,10 @@ export default defineConfig({
           : {},
     }),
   ],
+  resolve: {
+    alias: {
+      '@main': path.resolve(__dirname, './electron'),
+      '@renderer': path.resolve(__dirname, './src'),
+    },
+  },
 });

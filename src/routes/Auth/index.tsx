@@ -1,9 +1,9 @@
 import { Button, Card, Field, Fieldset, Link, Stack } from '@chakra-ui/react';
+import { ipcRendererDiscordApiFunctions } from '@renderer/api/discord';
+import { PasswordInput } from '@renderer/ui/password-input';
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import z from 'zod';
-import { ipcRendererDiscordApiFunctions } from '../../api/discord';
-import { PasswordInput } from '../../ui/password-input';
 
 export const AuthFormData = z.object({ token: z.string().min(1, { error: 'Token is required' }) });
 

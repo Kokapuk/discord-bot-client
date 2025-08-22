@@ -1,11 +1,11 @@
 import { Stack, StackProps } from '@chakra-ui/react';
-import { useEffect } from 'react';
+import { handleIpcRendererDiscordApiEvents } from '@renderer/api/discord';
+import useAppStore from '@renderer/stores/app';
+import { RefAttributes, useEffect } from 'react';
 import { useParams } from 'react-router';
-import { handleIpcRendererDiscordApiEvents } from '../api/discord';
-import useAppStore from '../stores/app';
 import User from './User';
 
-export type MemberListProps = StackProps & React.RefAttributes<HTMLDivElement>;
+export type MemberListProps = StackProps & RefAttributes<HTMLDivElement>;
 
 export default function MemberList(props: MemberListProps) {
   const { guildId } = useParams();
@@ -33,7 +33,7 @@ export default function MemberList(props: MemberListProps) {
   }
 
   return (
-    <Stack overflow="auto" paddingInline="5px" paddingBottom="10px" gap="15px" {...props}>
+    <Stack overflow="auto" paddingInline="10px" paddingBottom="10px" gap="15px" {...props}>
       {members[guildId].map((member) => (
         <User key={member.id} user={member} />
       ))}

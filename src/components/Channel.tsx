@@ -1,13 +1,10 @@
 import { Button, Text } from '@chakra-ui/react';
+import { SupportedChannelType, type Channel } from '@main/api/types';
 import { useMemo } from 'react';
-import { FaVolumeDown } from 'react-icons/fa';
-import { FaCodeBranch, FaHashtag } from 'react-icons/fa6';
+import { FaCodeBranch, FaHashtag, FaVolumeLow } from 'react-icons/fa6';
 import { NavLink, useParams } from 'react-router';
-import { SupportedChannelType, type Channel } from '../../electron/api/types';
 
-export interface ChannelProps {
-  channel: Channel;
-}
+export type ChannelProps = { channel: Channel };
 
 export default function Channel({ channel }: ChannelProps) {
   const { channelId } = useParams();
@@ -18,7 +15,7 @@ export default function Channel({ channel }: ChannelProps) {
       case SupportedChannelType.GuildText:
         return <FaHashtag />;
       case SupportedChannelType.GuildVoice:
-        return <FaVolumeDown />;
+        return <FaVolumeLow />;
       case SupportedChannelType.PublicThread:
       case SupportedChannelType.PrivateThread:
         return <FaCodeBranch />;

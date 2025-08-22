@@ -1,7 +1,7 @@
 import { Avatar } from '@chakra-ui/react';
+import { type Guild } from '@main/api/types';
+import { Tooltip } from '@renderer/ui/tooltip';
 import { NavLink } from 'react-router';
-import { type Guild } from '../../electron/api/types';
-import { Tooltip } from '../ui/tooltip';
 
 export interface GuildProps {
   guild: Guild;

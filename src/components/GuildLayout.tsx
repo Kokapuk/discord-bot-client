@@ -1,7 +1,8 @@
 import { Box, Heading } from '@chakra-ui/react';
-import { Suspense } from 'react';
-import { Outlet, useParams } from 'react-router';
-import useAppStore from '../stores/app';
+import { handleIpcRendererDiscordApiEvents } from '@renderer/api/discord';
+import useAppStore from '@renderer/stores/app';
+import { Suspense, useEffect, useMemo } from 'react';
+import { Outlet, useNavigate, useParams } from 'react-router';
 import ChannelList from './ChannelList';
 import MemberList from './MemberList';
 import RouteSpinner from './RouteSpinner';
@@ -9,6 +10,49 @@ import RouteSpinner from './RouteSpinner';
 export default function GuildLayout() {
   const { guildId } = useParams();
   const { guilds } = useAppStore();
+  const activeGuild = useMemo(() => guilds.find((guild) => guild.id === guildId), [guilds, guildId]);
+  const { pullChannels, pullMembers, pullRoles } = useAppStore();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!guilds.some((guild) => guild.id === guildId)) {
+      navigate('/');
+    }
+  }, [guilds, guildId]);
+
+  useEffect(() => {
+    if (!guildId) {
+      return;
+    }
+
+    pullChannels(guildId);
+    pullMembers(guildId);
+    pullRoles(guildId);
+
+    const unsubscribeChannelUpdates = handleIpcRendererDiscordApiEvents(
+      ['channelUpdate', 'channelCreate', 'channelDelete', 'threadUpdate', 'threadCreate', 'threadDelete'],
+      () => pullChannels(guildId)
+    );
+
+    const unsubscribeMemberUpdates = handleIpcRendererDiscordApiEvents(
+      ['guildMemberUpdate', 'guildMemberAdd', 'guildMemberRemove', 'presenceUpdate'],
+      () => pullMembers(guildId)
+    );
+
+    const unsubscribeRoleUpdates = handleIpcRendererDiscordApiEvents(['roleUpdate', 'roleCreate', 'roleDelete'], () =>
+      pullRoles(guildId)
+    );
+
+    return () => {
+      unsubscribeChannelUpdates();
+      unsubscribeMemberUpdates();
+      unsubscribeRoleUpdates();
+    };
+  }, [guildId]);
+
+  if (!activeGuild) {
+    return <RouteSpinner />;
+  }
 
   return (
     <Box height="100%" display="flex">
@@ -23,9 +67,9 @@ export default function GuildLayout() {
           textOverflow="ellipsis"
           whiteSpace="nowrap"
         >
-          {guilds.find((guild) => guild.id === guildId)?.name}
+          {activeGuild.name}
         </Heading>
-        <ChannelList height="100%" width="100%" minHeight="0" flexGrow="0" />
+        <ChannelList height="100%" width="100%" minHeight="0" />
       </Box>
       <Box height="100%" width="100%" overflow="auto">
         <Suspense fallback={<RouteSpinner />}>

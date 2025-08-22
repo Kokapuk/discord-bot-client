@@ -1,5 +1,5 @@
 import { Avatar, Box, Stack, Status, Text } from '@chakra-ui/react';
-import { type User } from '../../electron/api/types';
+import { type User } from '@main/api/types';
 import { useMemo } from 'react';
 
 export interface UserProps {
