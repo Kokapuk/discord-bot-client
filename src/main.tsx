@@ -10,6 +10,7 @@ const AppLayout = lazy(() => import('./components/AppLayout'));
 const Home = lazy(() => import('./routes/Home'));
 const GuildLayout = lazy(() => import('./components/GuildLayout'));
 const Guild = lazy(() => import('./routes/Home/Guild'));
+const Channel = lazy(() => import('./routes/Home/Guild/Channel'));
 
 const router = createHashRouter([
   {
@@ -28,12 +29,16 @@ const router = createHashRouter([
             element: <Home />,
           },
           {
-            path: '/guilds/:guildId',
+            path: 'guilds/:guildId',
             element: <GuildLayout />,
             children: [
               {
                 index: true,
                 element: <Guild />,
+              },
+              {
+                path: ':channelId',
+                element: <Channel />,
               },
             ],
           },

@@ -1,10 +1,10 @@
 import { app, BrowserWindow, shell } from 'electron';
-import { createRequire } from 'node:module';
+// import { createRequire } from 'node:module';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { bindIpcDiscordApiEvents, bindIpcDiscordApiFunctions } from './api/discord';
 
-const require = createRequire(import.meta.url);
+// const require = createRequire(import.meta.url);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 process.env.APP_ROOT = path.join(__dirname, '..');

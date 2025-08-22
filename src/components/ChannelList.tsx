@@ -18,8 +18,9 @@ export default function ChannelList(props: ChannelListProps) {
 
     pullChannels(guildId);
 
-    const unsubscribe = handleIpcRendererDiscordApiEvents(['channelUpdate', 'channelCreate', 'channelDelete'], () =>
-      pullChannels(guildId)
+    const unsubscribe = handleIpcRendererDiscordApiEvents(
+      ['channelUpdate', 'channelCreate', 'channelDelete', 'threadUpdate', 'threadCreate', 'threadDelete'],
+      () => pullChannels(guildId)
     );
 
     return () => {

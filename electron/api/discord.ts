@@ -1,7 +1,7 @@
 import { Client, ClientEvents, GatewayIntentBits } from 'discord.js';
 import { ipcMain, IpcMainInvokeEvent, WebContents } from 'electron';
 import { IpcMainEventHandlersToRendererFunctions } from '../utils';
-import { Channel, Guild, SupportedChannelType } from './types';
+import { Channel, Guild, SupportedChannelType, User } from './types';
 
 export type IpcApiResponse<T = void> =
   | (T extends void ? { success: true } : { success: true; payload: T })
@@ -58,7 +58,44 @@ const getGuildChannels = (_: IpcMainInvokeEvent, guildId: string): IpcApiRespons
   }
 };
 
-const ipcMainDiscordApiFunctions = { authorize, getGuilds, getGuildChannels };
+const getGuildMembers = (_: IpcMainInvokeEvent, guildId: string): IpcApiResponse<User[]> => {
+  try {
+    const guild = client.guilds.cache.find((guild) => guild.id === guildId);
+
+    if (!guild) {
+      return { success: false, error: 'Guild does not exist' };
+    }
+
+    const priorityStatuses = ['online', 'dnd', 'idle'];
+    const members: User[] = guild.members.cache
+      .map((member) => ({
+        id: member.id,
+        displayHexColor: member.displayHexColor === '#000000' ? '#fff' : member.displayHexColor,
+        displayName: member.displayName,
+        displayAvatarUrl: member.displayAvatarURL({ size: 64 }),
+        status: member.presence?.status,
+      }))
+      .sort((memberA, memberB) => {
+        let result = 0;
+
+        if (priorityStatuses.includes(memberA.status as any)) {
+          result--;
+        }
+
+        if (priorityStatuses.includes(memberB.status as any)) {
+          result++;
+        }
+
+        return result;
+      });
+
+    return { success: true, payload: members };
+  } catch (err: any) {
+    return { success: false, error: err.message };
+  }
+};
+
+const ipcMainDiscordApiFunctions = { authorize, getGuilds, getGuildChannels, getGuildMembers };
 export type IpcMainDiscordApiFunctions = IpcMainEventHandlersToRendererFunctions<typeof ipcMainDiscordApiFunctions>;
 
 export const bindIpcDiscordApiFunctions = () => {
@@ -72,6 +109,13 @@ const ipcMainDiscordApiEvents = [
   'channelUpdate',
   'channelCreate',
   'channelDelete',
+  'threadUpdate',
+  'threadCreate',
+  'threadDelete',
+  'guildMemberUpdate',
+  'guildMemberAdd',
+  'guildMemberRemove',
+  'presenceUpdate',
 ] as const satisfies readonly (keyof ClientEvents)[];
 export type IpcMainDiscordApiEvents = (typeof ipcMainDiscordApiEvents)[number];
 

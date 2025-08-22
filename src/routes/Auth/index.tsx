@@ -21,6 +21,7 @@ export default function Auth() {
       const response = await ipcRendererDiscordApiFunctions.authorize(formdata.token);
 
       if (response.success) {
+        localStorage.setItem('token', formdata.token);
         navigate('/');
       } else {
         setFormIssues({ token: response.error });
@@ -56,10 +57,7 @@ export default function Auth() {
           <Fieldset.Content>
             <Field.Root invalid={Object.keys(formIssues).includes('token')}>
               <Field.Label>Token</Field.Label>
-              <PasswordInput
-                name="token"
-                autoFocus
-              />
+              <PasswordInput defaultValue={localStorage.getItem('token') ?? undefined} name="token" autoFocus />
               <Field.ErrorText>{formIssues['token']}</Field.ErrorText>
             </Field.Root>
           </Fieldset.Content>

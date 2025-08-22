@@ -2,6 +2,14 @@ export enum SupportedChannelType {
   GuildText = 0,
   GuildVoice = 2,
   GuildAnnouncement = 5,
+  PublicThread = 11,
+  PrivateThread = 12,
+}
+
+export interface Guild {
+  id: string;
+  name: string;
+  iconUrl: string | null;
 }
 
 export interface Channel {
@@ -10,8 +18,10 @@ export interface Channel {
   type: SupportedChannelType;
 }
 
-export interface Guild {
+export interface User {
   id: string;
-  name: string;
-  iconUrl: string | null;
+  displayHexColor?: `#${string}`;
+  displayName: string;
+  displayAvatarUrl: string;
+  status: 'online' | 'idle' | 'dnd' | 'invisible' | 'offline' | undefined;
 }

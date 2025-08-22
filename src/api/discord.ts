@@ -7,7 +7,12 @@ const completedDiscordApiFunctionKeys = <T extends (keyof IpcMainDiscordApiFunct
       : [never, Exclude<keyof IpcMainDiscordApiFunctions, T[number]>])
 ) => arr;
 
-const ipcMainDiscordApiFunctionsKeys = completedDiscordApiFunctionKeys(['authorize', 'getGuilds', 'getGuildChannels']);
+const ipcMainDiscordApiFunctionsKeys = completedDiscordApiFunctionKeys([
+  'authorize',
+  'getGuilds',
+  'getGuildChannels',
+  'getGuildMembers',
+]);
 
 export const ipcRendererDiscordApiFunctions = Object.fromEntries(
   ipcMainDiscordApiFunctionsKeys.map((key) => [
@@ -17,7 +22,9 @@ export const ipcRendererDiscordApiFunctions = Object.fromEntries(
 ) as unknown as IpcMainDiscordApiFunctions;
 
 export const handleIpcRendererDiscordApiEvents = (keys: IpcMainDiscordApiEvents[], callback: () => void) => {
-  keys.forEach((key) => window.ipcRenderer.on(key, callback));
+  const unsubscribes = keys.map((key) => window.ipcRenderer.on(key, callback));
 
-  return () => keys.forEach((key) => window.ipcRenderer.off(key, callback));
+  return () => {
+    unsubscribes.forEach((fn) => fn());
+  };
 };
