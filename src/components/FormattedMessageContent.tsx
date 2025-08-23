@@ -1,4 +1,4 @@
-import { Link, Text, TextProps } from '@chakra-ui/react';
+import { Box, Link, Text, TextProps } from '@chakra-ui/react';
 import useAppStore from '@renderer/stores/app';
 import { ReactNode, RefAttributes, useMemo } from 'react';
 import { useParams } from 'react-router';
@@ -18,7 +18,7 @@ export default function FormattedMessageContent({ rawContent, ...props }: Format
       tokenized,
       /(https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*))/g,
       (url, index) => (
-        <Link key={`link-${index}`} href={url} target="_blank">
+        <Link key={`link-${index}`} href={url} target="_blank" wordBreak="break-word">
           {url}
         </Link>
       )
@@ -30,25 +30,33 @@ export default function FormattedMessageContent({ rawContent, ...props }: Format
       ));
       tokenized = reactStringReplace(tokenized, /<#(\d+?)>/g, (channelId, index) => (
         <Mention key={`channel-${index}`}>
-          #{channels[guildId].find((channel) => channel.id === channelId)?.name}
+          #{channels[guildId]?.find((channel) => channel.id === channelId)?.name}
         </Mention>
       ));
       tokenized = reactStringReplace(tokenized, /<@(\d+?)>/g, (userId, index) => (
         <Mention key={`member-${index}`}>
-          @{members[guildId].find((member) => member.id === userId)?.displayName}
+          @{members[guildId]?.find((member) => member.id === userId)?.displayName}
         </Mention>
       ));
       tokenized = reactStringReplace(tokenized, /<@&(\d+?)>/g, (roleId, index) => (
-        <Mention key={`role-${index}`}>@{roles[guildId].find((role) => role.id === roleId)?.name}</Mention>
+        <Mention key={`role-${index}`}>@{roles[guildId]?.find((role) => role.id === roleId)?.name}</Mention>
       ));
     }
+
+    tokenized = tokenized.filter(Boolean);
+
+    tokenized = tokenized.map((token, index) =>
+      typeof token === 'string' ? (
+        <Text key={`text-${index}`} as="span" fontSize="16px" whiteSpace="pre-wrap" {...props}>
+          {token}
+        </Text>
+      ) : (
+        token
+      )
+    );
 
     return tokenized;
   }, [rawContent, channels, members, roles]);
 
-  return (
-    <Text fontSize="16px" {...props}>
-      {formattedContent}
-    </Text>
-  );
+  return <Box>{formattedContent}</Box>;
 }

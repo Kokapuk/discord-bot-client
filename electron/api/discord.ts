@@ -103,7 +103,7 @@ const getGuildRoles = (_: IpcMainInvokeEvent, guildId: string): IpcApiResponse<R
       return { success: false, error: 'Guild does not exist' };
     }
 
-    const roles = guild.roles.cache.map((role) => ({ id: role.id, name: role.name, hexColor: role.hexColor }));
+    const roles: Role[] = guild.roles.cache.map((role) => ({ id: role.id, name: role.name, hexColor: role.hexColor }));
 
     return { success: true, payload: roles };
   } catch (err: any) {
@@ -124,13 +124,22 @@ const fetchChannelsMessages = async (_: IpcMainInvokeEvent, channelId: string): 
     }
 
     const messageCollection = await channel.messages.fetch({ cache: true, limit: 50 });
-    const messages = messageCollection
+    const messages: Message[] = messageCollection
       .filter((message) => (Object.values(SupportedMessageType) as number[]).includes(message.type))
       .map((message) => ({
         id: message.id,
         authorId: message.author.id,
         content: message.content,
         createdTimestamp: message.createdTimestamp,
+        attachments: message.attachments.map((attachment) => ({
+          id: attachment.id,
+          url: attachment.url,
+          name: attachment.name,
+          contentType: attachment.contentType,
+          width: attachment.width,
+          height: attachment.height,
+          size: attachment.size,
+        })),
       }));
 
     return { success: true, payload: messages };

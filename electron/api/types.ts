@@ -37,9 +37,20 @@ export enum SupportedMessageType {
   Reply = 19,
 }
 
+export interface Attachment {
+  id: string;
+  url: string;
+  name: string;
+  contentType: string | null;
+  width: number | null;
+  height: number | null;
+  size: number;
+}
+
 export interface Message {
   id: string;
   authorId: string;
   content: string;
   createdTimestamp: number;
+  attachments: Attachment[];
 }

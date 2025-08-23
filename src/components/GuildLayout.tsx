@@ -10,12 +10,12 @@ import RouteSpinner from './RouteSpinner';
 export default function GuildLayout() {
   const { guildId } = useParams();
   const { guilds } = useAppStore();
-  const activeGuild = useMemo(() => guilds.find((guild) => guild.id === guildId), [guilds, guildId]);
+  const activeGuild = useMemo(() => guilds?.find((guild) => guild.id === guildId), [guilds, guildId]);
   const { pullChannels, pullMembers, pullRoles } = useAppStore();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!guilds.some((guild) => guild.id === guildId)) {
+    if (!guilds?.some((guild) => guild.id === guildId)) {
       navigate('/');
     }
   }, [guilds, guildId]);

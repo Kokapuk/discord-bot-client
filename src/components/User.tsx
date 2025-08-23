@@ -33,9 +33,14 @@ export default function User({ user }: UserProps) {
         <Box
           maskImage="radial-gradient(circle 9px at calc(100% - 5px) calc(100% - 5px), transparent 99%, black 100%)"
           maskRepeat="no-repeat"
+          position="absolute"
+          inset={0}
         >
-          <Avatar.Fallback name={user.displayName} />
-          <Avatar.Image src={user.displayAvatarUrl} />
+          <img
+            loading="lazy"
+            src={user.displayAvatarUrl}
+            style={{ position: 'absolute', inset: 0, borderRadius: '50%' }}
+          />
         </Box>
         <Status.Root position="absolute" right="0" bottom="0" size="lg">
           <Status.Indicator style={{ backgroundColor: statusColorPalette }} />

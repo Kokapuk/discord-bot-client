@@ -3,25 +3,25 @@ import { ipcRendererDiscordApiFunctions } from '@renderer/api/discord';
 import { create } from 'zustand';
 
 interface AppState {
-  guilds: Guild[];
+  guilds: Guild[] | null;
   pullGuilds(): Promise<void>;
-  channels: Record<string, Channel[]>;
+  channels: Record<string, Channel[] | null | undefined>;
   pullChannels(guildId: string): Promise<void>;
-  members: Record<string, User[]>;
+  members: Record<string, User[] | null | undefined>;
   pullMembers(guildId: string): Promise<void>;
-  roles: Record<string, Role[]>;
+  roles: Record<string, Role[] | null | undefined>;
   pullRoles(guildId: string): Promise<void>;
-  messages: Record<string, Message[]>;
+  messages: Record<string, Message[] | null | undefined>;
   fetchMessages(channelId: string): Promise<void>;
 }
 
 const useAppStore = create<AppState>()((set) => ({
-  guilds: [],
+  guilds: null,
   pullGuilds: async () => {
     const response = await ipcRendererDiscordApiFunctions.getGuilds();
 
     if (!response.success) {
-      set({ guilds: [] });
+      set({ guilds: null });
       console.error(`Failed to pull guilds: ${response.error}`);
       return;
     }

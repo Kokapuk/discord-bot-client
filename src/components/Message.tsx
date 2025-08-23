@@ -4,6 +4,7 @@ import useAppStore from '@renderer/stores/app';
 import dayjs from 'dayjs';
 import { RefAttributes, useMemo } from 'react';
 import { useParams } from 'react-router';
+import Attachments from './Attachments';
 import FormattedMessageContent from './FormattedMessageContent';
 
 export type MessageProps = { message: Message; chain?: boolean } & StackProps & RefAttributes<HTMLDivElement>;
@@ -17,7 +18,7 @@ export default function Message({ message, chain, ...props }: MessageProps) {
       return;
     }
 
-    return members[guildId].find((member) => member.id === message.authorId);
+    return members[guildId]?.find((member) => member.id === message.authorId);
   }, [members, message.authorId, guildId]);
 
   const createdAtFormatted = useMemo(
@@ -37,8 +38,13 @@ export default function Message({ message, chain, ...props }: MessageProps) {
         visibility={chain ? 'hidden' : undefined}
         height={chain ? 0 : undefined}
       >
-        <Avatar.Fallback name={author.displayName} />
-        {!chain && <Avatar.Image src={author.displayAvatarUrl} />}
+        {!chain && (
+          <img
+            loading="lazy"
+            src={author.displayAvatarUrl}
+            style={{ position: 'absolute', inset: 0, borderRadius: '50%' }}
+          />
+        )}
       </Avatar.Root>
       <Stack gap="0" width="100%" minWidth="0">
         {!chain && (
@@ -52,6 +58,7 @@ export default function Message({ message, chain, ...props }: MessageProps) {
           </Stack>
         )}
         <FormattedMessageContent rawContent={message.content} />
+        <Attachments attachments={message.attachments} />
       </Stack>
     </Stack>
   );

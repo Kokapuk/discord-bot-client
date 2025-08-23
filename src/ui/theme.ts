@@ -8,8 +8,11 @@ const config = defineConfig({
     },
     '*': {
       scrollbarWidth: 'thin',
-      scrollbarColor: 'var(--chakra-colors-gray-700) transparent',
+      scrollbarColor: 'transparent transparent',
       boxSizing: 'border-box',
+    },
+    '*:hover': {
+      scrollbarColor: 'var(--chakra-colors-gray-700) transparent',
     },
   },
 });

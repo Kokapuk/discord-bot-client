@@ -12,8 +12,11 @@ export default function Guild({ guild }: GuildProps) {
     <Tooltip content={guild.name} positioning={{ placement: 'right' }}>
       <NavLink to={`/guilds/${guild.id}`}>
         <Avatar.Root size="xl">
-          <Avatar.Fallback name={guild.name} />
-          {!!guild.iconUrl && <Avatar.Image src={guild.iconUrl} />}
+          {!!guild.iconUrl ? (
+            <img loading="lazy" src={guild.iconUrl} style={{ position: 'absolute', inset: 0, borderRadius: '50%' }} />
+          ) : (
+            <Avatar.Fallback name={guild.name} />
+          )}
         </Avatar.Root>
       </NavLink>
     </Tooltip>
