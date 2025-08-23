@@ -6,6 +6,7 @@ import { RefAttributes, useMemo } from 'react';
 import { useParams } from 'react-router';
 import Attachments from './Attachments';
 import FormattedMessageContent from './FormattedMessageContent';
+import Embeds from './Embeds';
 
 export type MessageProps = { message: Message; chain?: boolean } & StackProps & RefAttributes<HTMLDivElement>;
 
@@ -55,10 +56,17 @@ export default function Message({ message, chain, ...props }: MessageProps) {
             <Text color="gray.400" fontSize="12px">
               {createdAtFormatted}
             </Text>
+            {message.editedTimestamp !== null && (
+              <Text fontSize="10px" color="gray.500">
+                (edited)
+              </Text>
+            )}
           </Stack>
         )}
         <FormattedMessageContent rawContent={message.content} />
+
         <Attachments attachments={message.attachments} />
+        <Embeds embeds={message.embeds} />
       </Stack>
     </Stack>
   );

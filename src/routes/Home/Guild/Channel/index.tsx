@@ -1,27 +1,25 @@
 import { Box, Heading } from '@chakra-ui/react';
+import { handleIpcRendererDiscordApiEventWithPayload } from '@renderer/api/discord';
 import MessageList from '@renderer/components/MessageList';
-import RouteSpinner from '@renderer/components/RouteSpinner';
 import useAppStore from '@renderer/stores/app';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useParams } from 'react-router';
 
 export default function Channel() {
   const { guildId, channelId } = useParams();
-  const { channels, messages, fetchMessages } = useAppStore();
-  const [isFetchingMessages, setFetchingMessages] = useState(false);
+  const { channels, messages, topReachedChannels, fetchMessages, updateMessage, addMessage, removeMessage } =
+    useAppStore();
 
   useEffect(() => {
-    if (!channelId) {
-      return;
-    }
+    const unsubscribeMessageUpdate = handleIpcRendererDiscordApiEventWithPayload('messageUpdate', updateMessage);
+    const unsubscribeMessageCreate = handleIpcRendererDiscordApiEventWithPayload('messageCreate', addMessage);
+    const unsubscribeMessageDelete = handleIpcRendererDiscordApiEventWithPayload('messageDelete', removeMessage);
 
-    if (!messages[channelId]?.length) {
-      (async () => {
-        setFetchingMessages(true);
-        await fetchMessages(channelId);
-        setFetchingMessages(false);
-      })();
-    }
+    return () => {
+      unsubscribeMessageUpdate();
+      unsubscribeMessageCreate();
+      unsubscribeMessageDelete();
+    };
   }, [channelId]);
 
   if (!guildId || !channelId) {
@@ -34,16 +32,19 @@ export default function Channel() {
     return null;
   }
 
+  console.log(messages[channelId])
+
   return (
     <Box height="100%" display="flex" flexDirection="column">
       <Box as="header" paddingBottom="10px" flexShrink="0">
         <Heading as="h2">{activeChannel.name}</Heading>
       </Box>
-      {isFetchingMessages ? (
-        <RouteSpinner />
-      ) : (
-        <MessageList height="100%" minHeight="0" messages={messages[channelId] ?? []} />
-      )}
+      <MessageList
+        height="100%"
+        minHeight="0"
+        messages={messages[channelId] ?? []}
+        onPaginate={topReachedChannels[channelId] ? undefined : () => fetchMessages(channelId)}
+      />
     </Box>
   );
 }

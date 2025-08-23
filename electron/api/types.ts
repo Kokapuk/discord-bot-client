@@ -14,7 +14,7 @@ export enum SupportedChannelType {
 
 export interface Channel {
   id: string;
-  name: string;
+  name: string | null;
   type: SupportedChannelType;
 }
 
@@ -47,10 +47,19 @@ export interface Attachment {
   size: number;
 }
 
+export interface Embed {
+  hexColor?: string;
+  title?: string;
+  description?: string;
+}
+
 export interface Message {
   id: string;
   authorId: string;
+  channelId: string;
   content: string;
   createdTimestamp: number;
+  editedTimestamp: number | null;
   attachments: Attachment[];
+  embeds: Embed[];
 }

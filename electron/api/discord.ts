@@ -1,6 +1,7 @@
 import { IpcMainEventHandlersToRendererFunctions } from '@main/utils';
 import { Client, ClientEvents, GatewayIntentBits } from 'discord.js';
 import { ipcMain, IpcMainInvokeEvent, WebContents } from 'electron';
+import { structChannel, structGuild, structMember, structMessage, structRole } from './struct';
 import { Channel, Guild, Message, Role, SupportedChannelType, SupportedMessageType, User } from './types';
 
 export type IpcApiResponse<T = void> =
@@ -23,11 +24,7 @@ const authorize = async (_: IpcMainInvokeEvent, token: string): Promise<IpcApiRe
 
 const getGuilds = (): IpcApiResponse<Guild[]> => {
   try {
-    const guilds: Guild[] = client.guilds.cache.map((guild) => ({
-      id: guild.id,
-      name: guild.name,
-      iconUrl: guild.iconURL({ extension: 'webp', size: 64 }),
-    }));
+    const guilds: Guild[] = client.guilds.cache.map(structGuild);
 
     return { success: true, payload: guilds };
   } catch (err: any) {
@@ -46,11 +43,7 @@ const getGuildChannels = (_: IpcMainInvokeEvent, guildId: string): IpcApiRespons
     const channels: Channel[] = guild.channels.cache
       .filter((channel) => (Object.values(SupportedChannelType) as number[]).includes(channel.type))
       .sort((channelA, channelB) => channelA.type - channelB.type)
-      .map((channel) => ({
-        id: channel.id,
-        name: channel.name,
-        type: channel.type as unknown as SupportedChannelType,
-      }));
+      .map(structChannel);
 
     return { success: true, payload: channels };
   } catch (err: any) {
@@ -67,27 +60,19 @@ const getGuildMembers = (_: IpcMainInvokeEvent, guildId: string): IpcApiResponse
     }
 
     const priorityStatuses = ['online', 'dnd', 'idle'];
-    const members: User[] = guild.members.cache
-      .map((member) => ({
-        id: member.id,
-        displayHexColor: member.displayHexColor === '#000000' ? '#fff' : member.displayHexColor,
-        displayName: member.displayName,
-        displayAvatarUrl: member.displayAvatarURL({ size: 64 }),
-        status: member.presence?.status,
-      }))
-      .sort((memberA, memberB) => {
-        let result = 0;
+    const members: User[] = guild.members.cache.map(structMember).sort((memberA, memberB) => {
+      let result = 0;
 
-        if (priorityStatuses.includes(memberA.status as any)) {
-          result--;
-        }
+      if (priorityStatuses.includes(memberA.status as any)) {
+        result--;
+      }
 
-        if (priorityStatuses.includes(memberB.status as any)) {
-          result++;
-        }
+      if (priorityStatuses.includes(memberB.status as any)) {
+        result++;
+      }
 
-        return result;
-      });
+      return result;
+    });
 
     return { success: true, payload: members };
   } catch (err: any) {
@@ -103,7 +88,7 @@ const getGuildRoles = (_: IpcMainInvokeEvent, guildId: string): IpcApiResponse<R
       return { success: false, error: 'Guild does not exist' };
     }
 
-    const roles: Role[] = guild.roles.cache.map((role) => ({ id: role.id, name: role.name, hexColor: role.hexColor }));
+    const roles: Role[] = guild.roles.cache.map(structRole);
 
     return { success: true, payload: roles };
   } catch (err: any) {
@@ -111,7 +96,13 @@ const getGuildRoles = (_: IpcMainInvokeEvent, guildId: string): IpcApiResponse<R
   }
 };
 
-const fetchChannelsMessages = async (_: IpcMainInvokeEvent, channelId: string): Promise<IpcApiResponse<Message[]>> => {
+const MESSAGES_PER_PAGE = 50;
+
+const fetchChannelsMessages = async (
+  _: IpcMainInvokeEvent,
+  channelId: string,
+  beforeMessageId?: string
+): Promise<IpcApiResponse<{ messages: Message[]; topReached: boolean }>> => {
   try {
     const channel = client.channels.cache.find((channel) => channel.id === channelId);
 
@@ -123,26 +114,17 @@ const fetchChannelsMessages = async (_: IpcMainInvokeEvent, channelId: string): 
       return { success: false, error: 'Channel is not text based' };
     }
 
-    const messageCollection = await channel.messages.fetch({ cache: true, limit: 50 });
+    const messageCollection = await channel.messages.fetch({
+      cache: true,
+      limit: MESSAGES_PER_PAGE,
+      before: beforeMessageId,
+    });
     const messages: Message[] = messageCollection
       .filter((message) => (Object.values(SupportedMessageType) as number[]).includes(message.type))
-      .map((message) => ({
-        id: message.id,
-        authorId: message.author.id,
-        content: message.content,
-        createdTimestamp: message.createdTimestamp,
-        attachments: message.attachments.map((attachment) => ({
-          id: attachment.id,
-          url: attachment.url,
-          name: attachment.name,
-          contentType: attachment.contentType,
-          width: attachment.width,
-          height: attachment.height,
-          size: attachment.size,
-        })),
-      }));
+      .map(structMessage);
+    const topReached = messageCollection.size < MESSAGES_PER_PAGE;
 
-    return { success: true, payload: messages };
+    return { success: true, payload: { messages, topReached } };
   } catch (err: any) {
     return { success: false, error: err.message };
   }
@@ -164,28 +146,39 @@ export const bindIpcDiscordApiFunctions = () => {
   );
 };
 
-const ipcMainDiscordApiEvents = [
-  'guildUpdate',
-  'guildCreate',
-  'guildDelete',
-  'channelUpdate',
-  'channelCreate',
-  'channelDelete',
-  'threadUpdate',
-  'threadCreate',
-  'threadDelete',
-  'guildMemberUpdate',
-  'guildMemberAdd',
-  'guildMemberRemove',
-  'presenceUpdate',
-  'roleUpdate',
-  'roleCreate',
-  'roleDelete',
-] as const satisfies readonly (keyof ClientEvents)[];
-export type IpcMainDiscordApiEvents = (typeof ipcMainDiscordApiEvents)[number];
+const ipcMainDiscordApiEvents = {
+  guildUpdate: null,
+  guildCreate: null,
+  guildDelete: null,
+  channelUpdate: null,
+  channelCreate: null,
+  channelDelete: null,
+  threadUpdate: null,
+  threadCreate: null,
+  threadDelete: null,
+  guildMemberUpdate: null,
+  guildMemberAdd: null,
+  guildMemberRemove: null,
+  presenceUpdate: null,
+  roleUpdate: null,
+  roleCreate: null,
+  roleDelete: null,
+  messageUpdate: (_, message) => [structMessage(message)] as const,
+  messageCreate: (message) => [structMessage(message)] as const,
+  messageDelete: (message) => [{ id: message.id, channelId: message.channelId }] as const,
+} as const satisfies Partial<{ [K in keyof ClientEvents]: ((...args: ClientEvents[K]) => readonly any[]) | null }>;
+
+export type IpcMainDiscordApiEvents<T = typeof ipcMainDiscordApiEvents> = {
+  [K in keyof T]: T[K] extends (...args: any[]) => any ? ReturnType<T[K]> : never;
+};
 
 export const bindIpcDiscordApiEvents = (webContents: WebContents) => {
-  ipcMainDiscordApiEvents.forEach((key) => client.on(key, () => webContents.send(key)));
+  Object.keys(ipcMainDiscordApiEvents).forEach((key) =>
+    client.on(key, (...args: ClientEvents[keyof IpcMainDiscordApiEvents]) =>
+      // @ts-ignore
+      webContents.send(key, ...(ipcMainDiscordApiEvents[key as keyof typeof ipcMainDiscordApiEvents]?.(...args) ?? []))
+    )
+  );
 };
 
 export const logout = async () => {

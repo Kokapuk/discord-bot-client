@@ -58,5 +58,5 @@ export default function FormattedMessageContent({ rawContent, ...props }: Format
     return tokenized;
   }, [rawContent, channels, members, roles]);
 
-  return <Box>{formattedContent}</Box>;
+  return <Box as='span'>{formattedContent}</Box>;
 }

@@ -12,10 +12,17 @@ interface AppState {
   roles: Record<string, Role[] | null | undefined>;
   pullRoles(guildId: string): Promise<void>;
   messages: Record<string, Message[] | null | undefined>;
+  topReachedChannels: Record<string, boolean>;
+  isFetchingMessages: boolean;
   fetchMessages(channelId: string): Promise<void>;
+  addMessage(message: Message): void;
+  removeMessage(message: { id: string; channelId: string }): void;
+  updateMessage(message: Message): void;
+  mediaVolume: number;
+  setMediaVolume(volume: number): void;
 }
 
-const useAppStore = create<AppState>()((set) => ({
+const useAppStore = create<AppState>()((set, get) => ({
   guilds: null,
   pullGuilds: async () => {
     const response = await ipcRendererDiscordApiFunctions.getGuilds();
@@ -65,8 +72,20 @@ const useAppStore = create<AppState>()((set) => ({
     set((prev) => ({ ...prev, roles: { ...prev.roles, [guildId]: response.payload } }));
   },
   messages: {},
+  topReachedChannels: {},
+  isFetchingMessages: false,
   fetchMessages: async (channelId) => {
-    const response = await ipcRendererDiscordApiFunctions.fetchChannelsMessages(channelId);
+    const state = get();
+
+    if (state.topReachedChannels[channelId] || state.isFetchingMessages) {
+      return;
+    }
+
+    const lastChannelMessageId = state.messages[channelId]?.[state.messages[channelId].length - 1].id;
+
+    set({ isFetchingMessages: true });
+    const response = await ipcRendererDiscordApiFunctions.fetchChannelsMessages(channelId, lastChannelMessageId);
+    set({ isFetchingMessages: false });
 
     if (!response.success) {
       set((prev) => ({ ...prev, messages: { ...prev.messages, [channelId]: [] } }));
@@ -74,8 +93,54 @@ const useAppStore = create<AppState>()((set) => ({
       return;
     }
 
-    set((prev) => ({ ...prev, messages: { ...prev.messages, [channelId]: response.payload } }));
+    set((prev) => ({
+      ...prev,
+      messages: {
+        ...prev.messages,
+        [channelId]: [...(prev.messages[channelId] ?? []), ...response.payload.messages],
+      },
+      topReachedChannels: { ...prev.topReachedChannels, [channelId]: response.payload.topReached },
+    }));
   },
+  addMessage: (message) => {
+    set((prev) => ({
+      ...prev,
+      messages: { ...prev.messages, [message.channelId]: [message, ...(prev.messages[message.channelId] ?? [])] },
+    }));
+  },
+  removeMessage(removeMessage) {
+    set((prev) => ({
+      ...prev,
+      messages: {
+        ...prev.messages,
+        [removeMessage.channelId]: (prev.messages[removeMessage.channelId] ?? []).filter(
+          (message) => message.id !== removeMessage.id
+        ),
+      },
+    }));
+  },
+  updateMessage: (updateMessage) => {
+    set((prev) => {
+      const clonedPrev: typeof prev = JSON.parse(JSON.stringify(prev));
+      const channelMessages = clonedPrev.messages[updateMessage.channelId];
+
+      if (!channelMessages) {
+        return prev;
+      }
+
+      const messageToUpdateIndex = channelMessages.findIndex((message) => message.id === updateMessage.id);
+
+      if (messageToUpdateIndex === -1) {
+        return prev;
+      }
+
+      channelMessages[messageToUpdateIndex] = updateMessage;
+
+      return clonedPrev;
+    });
+  },
+  mediaVolume: 0.3,
+  setMediaVolume: (mediaVolume) => set({ mediaVolume }),
 }));
 
 export default useAppStore;
