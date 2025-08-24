@@ -26,7 +26,7 @@ const createWindow = () => {
       symbolColor: 'white',
       height: 30,
     },
-    width: 1100,
+    width: 1200,
     height: 700,
     backgroundMaterial: 'mica',
     webPreferences: {

@@ -53,19 +53,19 @@ export default function GuildList({ ref, ...props }: GuildListProps) {
       maxHeight="100%"
       width="fit-content"
       scrollbar="hidden"
-      paddingInline="10px"
-      paddingBottom="10px"
-      gap="15px"
+      paddingInline="2.5"
+      paddingBottom="2.5"
+      gap="4"
       flexShrink="0"
       mask={`linear-gradient(180deg, 
         ${showTopShadow ? 'transparent' : 'black'} 0%,
-        black 75px,
-        black calc(100% - 75px),
+        black 18rem,
+        black calc(100% - 18rem),
         ${showBottomShadow ? 'transparent' : 'black'} 100%
       );`}
       {...props}
     >
-      {guilds.map((guild) => (
+      {guilds?.map((guild) => (
         <Guild key={guild.id} guild={guild} />
       ))}
     </Stack>

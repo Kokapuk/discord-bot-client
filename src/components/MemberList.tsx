@@ -33,7 +33,7 @@ export default function MemberList(props: MemberListProps) {
   }
 
   return (
-    <Stack overflow="auto" paddingInline="10px" paddingBottom="10px" gap="15px" {...props}>
+    <Stack overflow="auto" paddingInline="2.5" paddingBottom="2.5" gap="4" {...props}>
       {members[guildId].map((member) => (
         <User key={member.id} user={member} />
       ))}

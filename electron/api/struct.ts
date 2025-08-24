@@ -1,13 +1,31 @@
 import {
+  APIEmbedField,
   Attachment as DiscordAttachment,
   Channel as DiscordChannel,
+  Embed as DiscordEmbed,
+  EmbedAssetData as DiscordEmbedAssetData,
   Guild as DiscordGuild,
   Message as DiscordMessage,
   Role as DiscordRole,
-  Embed as DiscordEmbed,
+  EmbedAuthorData,
+  EmbedFooterData,
   GuildMember,
+  User as DiscordUser,
 } from 'discord.js';
-import { Attachment, Channel, Embed, Guild, Message, Role, SupportedChannelType, User } from './types';
+import {
+  Attachment,
+  Channel,
+  Embed,
+  EmbedAssetData,
+  EmbedAuthor,
+  EmbedField,
+  EmbedFooter,
+  Guild,
+  Message,
+  Role,
+  SupportedChannelType,
+  User,
+} from './types';
 
 export const structGuild = (guild: DiscordGuild): Guild => ({
   id: guild.id,
@@ -29,12 +47,15 @@ export const structChannel = (channel: DiscordChannel): Channel => {
   };
 };
 
-export const structMember = (member: GuildMember): User => ({
+export const structMember = (member: GuildMember | DiscordUser): User => ({
   id: member.id,
-  displayHexColor: member.displayHexColor === '#000000' ? '#fff' : member.displayHexColor,
+  displayHexColor:
+    !(member as GuildMember).displayHexColor || (member as GuildMember).displayHexColor === '#000000'
+      ? '#fff'
+      : (member as GuildMember).displayHexColor,
   displayName: member.displayName,
   displayAvatarUrl: member.displayAvatarURL({ size: 64 }),
-  status: member.presence?.status,
+  status: (member as GuildMember).presence?.status,
 });
 
 export const structRole = (role: DiscordRole): Role => ({
@@ -53,15 +74,49 @@ export const structAttachment = (attachment: DiscordAttachment): Attachment => (
   size: attachment.size,
 });
 
+export const structEmbedAuthor = (author: EmbedAuthorData): EmbedAuthor => ({
+  name: author.name,
+  url: author.url,
+  iconURL: author.iconURL,
+});
+
+export const structEmbedAssetData = (assetData: DiscordEmbedAssetData): EmbedAssetData => ({
+  url: assetData.url,
+  width: assetData.width,
+  height: assetData.height,
+});
+
+export const structEmbedField = (field: APIEmbedField): EmbedField => ({
+  name: field.name,
+  value: field.value,
+  inline: field.inline,
+});
+
+export const structEmbedFooter = (footer: EmbedFooterData): EmbedFooter => ({
+  text: footer.text,
+  iconURL: footer.iconURL,
+});
+
 export const structEmbed = (embed: DiscordEmbed): Embed => ({
-  hexColor: embed.data.color ? `#${embed.data.color.toString(16).padStart(6, '0')}` : undefined,
-  title: embed.data.title,
-  description: embed.data.description,
+  type: embed.data.type,
+  hexColor: embed.color ? `#${embed.color.toString(16).padStart(6, '0')}` : null,
+  title: embed.title,
+  description: embed.description,
+  url: embed.url,
+  author: embed.author ? structEmbedAuthor(embed.author) : null,
+  thumbnail: embed.thumbnail ? structEmbedAssetData(embed.thumbnail) : null,
+  fields: embed.fields.map(structEmbedField),
+  image: embed.image ? structEmbedAssetData(embed.image) : null,
+  video: embed.video ? structEmbedAssetData(embed.video) : null,
+  timestamp: embed.timestamp,
+  footer: embed.footer ? structEmbedFooter(embed.footer) : null,
+  provider: embed.provider?.name ?? null,
 });
 
 export const structMessage = (message: DiscordMessage): Message => ({
   id: message.id,
   authorId: message.author.id,
+  fallbackAuthor: structMember(message.author),
   channelId: message.channelId,
   content: message.content,
   createdTimestamp: message.createdTimestamp,

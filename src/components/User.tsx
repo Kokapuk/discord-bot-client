@@ -1,4 +1,4 @@
-import { Avatar, Box, Stack, Status, Text } from '@chakra-ui/react';
+import { Avatar, Box, Image, Stack, Status, Text } from '@chakra-ui/react';
 import { type User } from '@main/api/types';
 import { useMemo } from 'react';
 
@@ -26,21 +26,17 @@ export default function User({ user }: UserProps) {
     <Stack
       direction="row"
       alignItems="center"
-      gap="15px"
+      gap="4"
       opacity={['online', 'idle', 'dnd'].includes(user.status as any) ? 1 : 0.25}
     >
       <Avatar.Root size="md" backgroundColor="transparent">
         <Box
-          maskImage="radial-gradient(circle 9px at calc(100% - 5px) calc(100% - 5px), transparent 99%, black 100%)"
+          maskImage="radial-gradient(circle 0.5625rem at calc(100% - 0.3125rem) calc(100% - 0.3125rem), transparent 99%, black 100%)"
           maskRepeat="no-repeat"
           position="absolute"
-          inset={0}
+          inset="0"
         >
-          <img
-            loading="lazy"
-            src={user.displayAvatarUrl}
-            style={{ position: 'absolute', inset: 0, borderRadius: '50%' }}
-          />
+          <Image loading="lazy" src={user.displayAvatarUrl} position="absolute" inset="0" borderRadius="full" />
         </Box>
         <Status.Root position="absolute" right="0" bottom="0" size="lg">
           <Status.Indicator style={{ backgroundColor: statusColorPalette }} />
@@ -49,7 +45,7 @@ export default function User({ user }: UserProps) {
       <Text
         color={user.displayHexColor}
         fontWeight="600"
-        fontSize="16px"
+        fontSize="md"
         width="100%"
         overflow="hidden"
         textOverflow="ellipsis"

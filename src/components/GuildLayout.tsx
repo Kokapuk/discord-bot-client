@@ -56,11 +56,11 @@ export default function GuildLayout() {
 
   return (
     <Box height="100%" display="flex">
-      <Box height="100%" width="250px" flexShrink="0" display="flex" flexDirection="column">
+      <Box height="100%" width="60" flexShrink="0" display="flex" flexDirection="column">
         <Heading
           as="h1"
-          paddingInline="5px"
-          marginBottom="10px"
+          paddingInline="1.5"
+          marginBottom="2.5"
           fontWeight="700"
           width="100%"
           overflow="hidden"
@@ -76,7 +76,7 @@ export default function GuildLayout() {
           <Outlet />
         </Suspense>
       </Box>
-      <MemberList height="100%" width="275px" flexShrink="0" />
+      <MemberList height="100%" width="64" flexShrink="0" />
     </Box>
   );
 }

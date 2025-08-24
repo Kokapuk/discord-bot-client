@@ -5,8 +5,8 @@ import { AttachmentProps } from './Attachment';
 
 export default function FileAttachment({ attachment }: AttachmentProps) {
   return (
-    <Card.Root variant="subtle" width="fit-content" maxWidth="100%">
-      <Card.Body gap="8px" padding="16px" flexDirection="row" alignItems="center">
+    <Card.Root variant="subtle" width="fit-content" maxWidth="32rem">
+      <Card.Body gap="2" padding="4" flexDirection="row" alignItems="center">
         <Icon size="2xl" color="colorPalette.300">
           <FaFile />
         </Icon>

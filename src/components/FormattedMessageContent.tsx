@@ -1,4 +1,4 @@
-import { Box, Link, Text, TextProps } from '@chakra-ui/react';
+import { Box, Image, Link, Text, TextProps } from '@chakra-ui/react';
 import useAppStore from '@renderer/stores/app';
 import { ReactNode, RefAttributes, useMemo } from 'react';
 import { useParams } from 'react-router';
@@ -24,22 +24,48 @@ export default function FormattedMessageContent({ rawContent, ...props }: Format
       )
     );
 
+    tokenized = reactStringReplace(tokenized, /<:.+?:(\d+?)>/, (emojiId, index) => (
+      <Image
+        key={`emoji-${index}`}
+        loading="lazy"
+        src={`https://cdn.discordapp.com/emojis/${emojiId}.png`}
+        width="1.375rem"
+        height="1.375rem"
+        objectFit="contain"
+        display='inline-block'
+      />
+    ));
+
+    tokenized = reactStringReplace(tokenized, /<a:.+?:(\d+?)>/, (emojiId, index) => (
+      <Image
+        key={`animatedEmoji-${index}`}
+        loading="lazy"
+        src={`https://cdn.discordapp.com/emojis/${emojiId}.gif`}
+        width="1.375rem"
+        height="1.375rem"
+        objectFit="contain"
+        display='inline-block'
+      />
+    ));
+
     if (guildId) {
       tokenized = reactStringReplace(tokenized, /@(everyone|here)/g, (token, index) => (
         <Mention key={`everyoneHere-${index}`}>@{token}</Mention>
       ));
       tokenized = reactStringReplace(tokenized, /<#(\d+?)>/g, (channelId, index) => (
         <Mention key={`channel-${index}`}>
-          #{channels[guildId]?.find((channel) => channel.id === channelId)?.name}
+          #{channels[guildId]?.find((channel) => channel.id === channelId)?.name ?? 'unknown-channel'}
         </Mention>
       ));
       tokenized = reactStringReplace(tokenized, /<@(\d+?)>/g, (userId, index) => (
         <Mention key={`member-${index}`}>
-          @{members[guildId]?.find((member) => member.id === userId)?.displayName}
+          @{members[guildId]?.find((member) => member.id === userId)?.displayName ?? 'unknown-user'}
         </Mention>
       ));
       tokenized = reactStringReplace(tokenized, /<@&(\d+?)>/g, (roleId, index) => (
-        <Mention key={`role-${index}`}>@{roles[guildId]?.find((role) => role.id === roleId)?.name}</Mention>
+        <Mention key={`role-${index}`}>
+          @{roles[guildId]?.find((role) => role.id === roleId)?.name ?? 'unknown-role'}
+        </Mention>
       ));
     }
 
@@ -47,7 +73,7 @@ export default function FormattedMessageContent({ rawContent, ...props }: Format
 
     tokenized = tokenized.map((token, index) =>
       typeof token === 'string' ? (
-        <Text key={`text-${index}`} as="span" fontSize="16px" whiteSpace="pre-wrap" {...props}>
+        <Text key={`text-${index}`} as="span" fontSize="md" whiteSpace="pre-wrap" {...props}>
           {token}
         </Text>
       ) : (
@@ -58,5 +84,5 @@ export default function FormattedMessageContent({ rawContent, ...props }: Format
     return tokenized;
   }, [rawContent, channels, members, roles]);
 
-  return <Box as='span'>{formattedContent}</Box>;
+  return <Box as="span">{formattedContent}</Box>;
 }

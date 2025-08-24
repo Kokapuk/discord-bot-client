@@ -1,10 +1,12 @@
 import { Image, Link } from '@chakra-ui/react';
+import { Attachment } from '@main/api/types';
 import useClampedSize from '@renderer/utils/useClampedSize';
-import { AttachmentProps } from './Attachment';
 
 const MAX_IMAGE_SIZE = 512;
 
-export default function ImageAttachment({ attachment }: AttachmentProps) {
+export type ImageAttachmentProps = { attachment: Pick<Attachment, 'width' | 'height' | 'name' | 'url'> };
+
+export default function ImageAttachment({ attachment }: ImageAttachmentProps) {
   const [clampedWidth, clampedHeight] = useClampedSize({
     width: attachment.width ?? 1,
     height: attachment.height ?? 1,
@@ -12,8 +14,8 @@ export default function ImageAttachment({ attachment }: AttachmentProps) {
   });
 
   return (
-    <Link href={attachment.url} target="_blank" display="block" width={clampedWidth} height={clampedHeight}>
-      <Image src={attachment.url} loading="lazy" alt={attachment.name} borderRadius="5px" width="100%" height="100%" />
+    <Link href={attachment.url} target="_blank" display="block" width={`${clampedWidth}px`} height={`${clampedHeight}px`}>
+      <Image src={attachment.url} loading="lazy" alt={attachment.name} borderRadius="md" width="100%" height="100%" />
     </Link>
   );
 }

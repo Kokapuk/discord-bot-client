@@ -15,7 +15,7 @@ export default function ChannelList(props: ChannelListProps) {
   }
 
   return (
-    <Stack overflow="auto" paddingInline="10px" paddingBottom="10px" {...props}>
+    <Stack overflow="auto" paddingInline="2.5" paddingBottom="2.5" {...props}>
       {channels[guildId].map((channel) => (
         <Channel key={channel.id} channel={channel} />
       ))}

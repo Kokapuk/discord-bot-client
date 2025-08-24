@@ -1,4 +1,4 @@
-import { Avatar } from '@chakra-ui/react';
+import { Avatar, Image } from '@chakra-ui/react';
 import { type Guild } from '@main/api/types';
 import { Tooltip } from '@renderer/ui/tooltip';
 import { NavLink } from 'react-router';
@@ -13,7 +13,7 @@ export default function Guild({ guild }: GuildProps) {
       <NavLink to={`/guilds/${guild.id}`}>
         <Avatar.Root size="xl">
           {!!guild.iconUrl ? (
-            <img loading="lazy" src={guild.iconUrl} style={{ position: 'absolute', inset: 0, borderRadius: '50%' }} />
+            <Image loading="lazy" src={guild.iconUrl} position="absolute" inset="0" borderRadius="full" />
           ) : (
             <Avatar.Fallback name={guild.name} />
           )}

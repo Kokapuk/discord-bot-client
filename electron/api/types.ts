@@ -47,15 +47,59 @@ export interface Attachment {
   size: number;
 }
 
+export type EmbedType =
+  | 'rich'
+  | 'image'
+  | 'video'
+  | 'gifv'
+  | 'article'
+  | 'link'
+  | 'auto_moderation_message'
+  | 'poll_result';
+
+export interface EmbedAuthor {
+  name: string;
+  url?: string;
+  iconURL?: string;
+}
+
+export interface EmbedAssetData {
+  url: string;
+  height?: number;
+  width?: number;
+}
+
+export interface EmbedField {
+  name: string;
+  value: string;
+  inline?: boolean;
+}
+
+export interface EmbedFooter {
+  text: string;
+  iconURL?: string;
+}
+
 export interface Embed {
-  hexColor?: string;
-  title?: string;
-  description?: string;
+  type?: EmbedType;
+  hexColor: string | null;
+  title: string | null;
+  description: string | null;
+  url: string | null;
+  author: EmbedAuthor | null;
+  thumbnail: EmbedAssetData | null;
+  fields: EmbedField[];
+  image: EmbedAssetData | null;
+  video: EmbedAssetData | null;
+  timestamp: string | null;
+  footer: EmbedFooter | null;
+  provider: string | null;
 }
 
 export interface Message {
   id: string;
   authorId: string;
+  fallbackAuthor: User;
   channelId: string;
   content: string;
   createdTimestamp: number;

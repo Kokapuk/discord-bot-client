@@ -43,7 +43,7 @@ export default function Auth() {
   return (
     <Card.Root width={500} variant="subtle" mx="auto" mt="15vh">
       <form onSubmit={handleSubmit} onChange={() => setFormIssues((prev) => (Object.keys.length === 0 ? prev : {}))}>
-        <Fieldset.Root size="lg" padding="25px">
+        <Fieldset.Root size="lg" padding="6">
           <Stack>
             <Fieldset.Legend>Authorization</Fieldset.Legend>
             <Fieldset.HelperText>

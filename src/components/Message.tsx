@@ -1,12 +1,12 @@
-import { Avatar, Stack, StackProps, Text } from '@chakra-ui/react';
+import { Avatar, Image, Stack, StackProps, Text } from '@chakra-ui/react';
 import { type Message } from '@main/api/types';
 import useAppStore from '@renderer/stores/app';
 import dayjs from 'dayjs';
 import { RefAttributes, useMemo } from 'react';
 import { useParams } from 'react-router';
 import Attachments from './Attachments';
-import FormattedMessageContent from './FormattedMessageContent';
 import Embeds from './Embeds';
+import FormattedMessageContent from './FormattedMessageContent';
 
 export type MessageProps = { message: Message; chain?: boolean } & StackProps & RefAttributes<HTMLDivElement>;
 
@@ -19,7 +19,7 @@ export default function Message({ message, chain, ...props }: MessageProps) {
       return;
     }
 
-    return members[guildId]?.find((member) => member.id === message.authorId);
+    return members[guildId]?.find((member) => member.id === message.authorId) ?? message.fallbackAuthor;
   }, [members, message.authorId, guildId]);
 
   const createdAtFormatted = useMemo(
@@ -32,7 +32,7 @@ export default function Message({ message, chain, ...props }: MessageProps) {
   }
 
   return (
-    <Stack direction="row" gap="15px" {...props}>
+    <Stack direction="row" gap="4" {...props}>
       <Avatar.Root
         size="md"
         backgroundColor="transparent"
@@ -40,24 +40,20 @@ export default function Message({ message, chain, ...props }: MessageProps) {
         height={chain ? 0 : undefined}
       >
         {!chain && (
-          <img
-            loading="lazy"
-            src={author.displayAvatarUrl}
-            style={{ position: 'absolute', inset: 0, borderRadius: '50%' }}
-          />
+          <Image loading="lazy" src={author.displayAvatarUrl} position="absolute" inset="0" borderRadius="full" />
         )}
       </Avatar.Root>
       <Stack gap="0" width="100%" minWidth="0">
         {!chain && (
           <Stack direction="row" alignItems="center">
-            <Text color={author.displayHexColor} fontWeight="600" fontSize="16px">
+            <Text color={author.displayHexColor} fontWeight="600" fontSize="md">
               {author.displayName}
             </Text>
-            <Text color="gray.400" fontSize="12px">
+            <Text color="gray.400" fontSize="xs">
               {createdAtFormatted}
             </Text>
             {message.editedTimestamp !== null && (
-              <Text fontSize="10px" color="gray.500">
+              <Text fontSize="2xs" color="gray.500">
                 (edited)
               </Text>
             )}
