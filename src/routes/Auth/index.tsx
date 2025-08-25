@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import z from 'zod';
 
-export const AuthFormData = z.object({ token: z.string().min(1, { error: 'Token is required' }) });
+const authFormDataSchema = z.object({ token: z.string().min(1, { error: 'Token is required' }) });
 
 export default function Auth() {
   const [formIssues, setFormIssues] = useState<Record<string, string>>({});
@@ -17,7 +17,7 @@ export default function Auth() {
 
     try {
       setAuthorizing(true);
-      const formdata = AuthFormData.parse(Object.fromEntries(new FormData(event.currentTarget).entries()));
+      const formdata = authFormDataSchema.parse(Object.fromEntries(new FormData(event.currentTarget).entries()));
       const response = await ipcRendererDiscordApiFunctions.authorize(formdata.token);
 
       if (response.success) {

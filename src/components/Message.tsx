@@ -7,6 +7,7 @@ import { useParams } from 'react-router';
 import Attachments from './Attachments';
 import Embeds from './Embeds';
 import FormattedMessageContent from './FormattedMessageContent';
+import ManageMessageActions from './ManageMessageActions';
 
 export type MessageProps = { message: Message; chain?: boolean } & StackProps & RefAttributes<HTMLDivElement>;
 
@@ -22,27 +23,48 @@ export default function Message({ message, chain, ...props }: MessageProps) {
     return members[guildId]?.find((member) => member.id === message.authorId) ?? message.fallbackAuthor;
   }, [members, message.authorId, guildId]);
 
-  const createdAtFormatted = useMemo(
+  const createdAtFormattedFull = useMemo(
     () => dayjs(message.createdTimestamp).format('DD MMM YYYY [at] HH:mm'),
     [message.createdTimestamp]
   );
 
+  const createdAtFormattedTime = useMemo(
+    () => dayjs(message.createdTimestamp).format('HH:mm'),
+    [message.createdTimestamp]
+  );
+
   if (!author) {
-    return null;
+    throw Error(`Author for message does not exist.\nMessage details: ${JSON.stringify(message, undefined, '\t')}`);
   }
 
   return (
-    <Stack direction="row" gap="4" {...props}>
-      <Avatar.Root
-        size="md"
-        backgroundColor="transparent"
-        visibility={chain ? 'hidden' : undefined}
-        height={chain ? 0 : undefined}
-      >
-        {!chain && (
+    <Stack
+      direction="row"
+      gap="4"
+      className="group"
+      position="relative"
+      _hover={{ backgroundColor: 'whiteAlpha.50' }}
+      {...props}
+    >
+      <ManageMessageActions visibility="hidden" message={message} _groupHover={{ visibility: 'visible' }} />
+      {chain ? (
+        <Text
+          color="gray.400"
+          fontSize="xs"
+          visibility="hidden"
+          width="10"
+          flexShrink="0"
+          paddingLeft="1"
+          paddingTop="1"
+          _groupHover={{ visibility: 'visible' }}
+        >
+          {createdAtFormattedTime}
+        </Text>
+      ) : (
+        <Avatar.Root size="md" backgroundColor="transparent">
           <Image loading="lazy" src={author.displayAvatarUrl} position="absolute" inset="0" borderRadius="full" />
-        )}
-      </Avatar.Root>
+        </Avatar.Root>
+      )}
       <Stack gap="0" width="100%" minWidth="0">
         {!chain && (
           <Stack direction="row" alignItems="center">
@@ -50,7 +72,7 @@ export default function Message({ message, chain, ...props }: MessageProps) {
               {author.displayName}
             </Text>
             <Text color="gray.400" fontSize="xs">
-              {createdAtFormatted}
+              {createdAtFormattedFull}
             </Text>
             {message.editedTimestamp !== null && (
               <Text fontSize="2xs" color="gray.500">

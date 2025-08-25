@@ -29,7 +29,7 @@ export default function MemberList(props: MemberListProps) {
   }, [guildId]);
 
   if (!guildId || !members[guildId]) {
-    return null;
+    throw Error(`Members for guild with id ${guildId} does not exist`);
   }
 
   return (

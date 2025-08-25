@@ -9,9 +9,8 @@ import RouteSpinner from './RouteSpinner';
 
 export default function GuildLayout() {
   const { guildId } = useParams();
-  const { guilds } = useAppStore();
+  const { guilds, channels, members, pullChannels, pullMembers, pullRoles } = useAppStore();
   const activeGuild = useMemo(() => guilds?.find((guild) => guild.id === guildId), [guilds, guildId]);
-  const { pullChannels, pullMembers, pullRoles } = useAppStore();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -30,7 +29,7 @@ export default function GuildLayout() {
     pullRoles(guildId);
 
     const unsubscribeChannelUpdates = handleIpcRendererDiscordApiEvents(
-      ['channelUpdate', 'channelCreate', 'channelDelete', 'threadUpdate', 'threadCreate', 'threadDelete'],
+      ['channelUpdate', 'channelCreate', 'channelDelete', 'threadUpdate', 'threadCreate', 'threadDelete', 'roleUpdate', 'guildMemberUpdate'],
       () => pullChannels(guildId)
     );
 
@@ -50,7 +49,7 @@ export default function GuildLayout() {
     };
   }, [guildId]);
 
-  if (!activeGuild) {
+  if (!activeGuild || !channels[activeGuild.id] || !members[activeGuild.id]) {
     return <RouteSpinner />;
   }
 

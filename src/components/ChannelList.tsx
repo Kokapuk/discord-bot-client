@@ -11,7 +11,7 @@ export default function ChannelList(props: ChannelListProps) {
   const { channels } = useAppStore();
 
   if (!guildId || !channels[guildId]) {
-    return null;
+    throw Error(`Channels for guild with id ${guildId} does not exist`);
   }
 
   return (

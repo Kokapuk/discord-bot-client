@@ -1,7 +1,7 @@
 import { Box, Heading } from '@chakra-ui/react';
 import { handleIpcRendererDiscordApiEventWithPayload } from '@renderer/api/discord';
 import MessageList from '@renderer/components/MessageList';
-import Textarea from '@renderer/components/TextArea';
+import Textarea from '@renderer/components/Textarea';
 import useAppStore from '@renderer/stores/app';
 import { useEffect } from 'react';
 import { useParams } from 'react-router';
@@ -30,7 +30,7 @@ export default function Channel() {
   const activeChannel = channels[guildId]?.find((channel) => channel.id === channelId);
 
   if (!activeChannel) {
-    return null;
+    throw Error(`Channel with id ${channelId} in guild with id ${guildId} does not exist`);
   }
 
   return (

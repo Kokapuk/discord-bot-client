@@ -9,11 +9,13 @@ const completedDiscordApiFunctionKeys = <T extends (keyof IpcMainDiscordApiFunct
 
 const ipcMainDiscordApiFunctionsKeys = completedDiscordApiFunctionKeys([
   'authorize',
+  'getClient',
   'getGuilds',
   'getGuildChannels',
   'getGuildMembers',
   'getGuildRoles',
   'fetchChannelsMessages',
+  'sendMessage',
 ]);
 
 export const ipcRendererDiscordApiFunctions = Object.fromEntries(

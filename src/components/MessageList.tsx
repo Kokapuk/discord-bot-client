@@ -50,9 +50,15 @@ export default function MessageList({ messages, onPaginate, ...props }: MessageL
   }, [onPaginate]);
 
   return (
-    <Stack overflow="auto" paddingInline="2.5" paddingBottom="2.5" gap="0" direction="column-reverse" {...props}>
+    <Stack overflow="auto" paddingBottom="2.5" gap="0" direction="column-reverse" {...props}>
       {chainedMessages.map((m) => (
-        <Message key={m.message.id} message={m.message} chain={m.chain} marginTop={m.chain ? '1' : '4.5'} />
+        <Message
+          key={m.message.id}
+          message={m.message}
+          chain={m.chain}
+          marginTop={m.chain ? '1' : '4.5'}
+          paddingInline="2.5"
+        />
       ))}
       {!!onPaginate && (
         <Center ref={paginationTrigger} height="12" flexShrink={0}>

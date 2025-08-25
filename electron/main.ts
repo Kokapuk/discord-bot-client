@@ -27,7 +27,7 @@ const createWindow = () => {
       height: 30,
     },
     width: 1200,
-    height: 700,
+    height: 750,
     backgroundMaterial: 'mica',
     webPreferences: {
       preload: path.join(__dirname, 'preload.mjs'),

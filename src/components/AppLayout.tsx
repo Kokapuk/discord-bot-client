@@ -7,12 +7,14 @@ import GuildList from './GuildList';
 import RouteSpinner from './RouteSpinner';
 
 export default function AppLayout() {
-  const { guilds, pullGuilds } = useAppStore();
+  const { pullClient, guilds, pullGuilds } = useAppStore();
 
   useEffect(() => {
-    if (!guilds) {
-      pullGuilds();
-    }
+    pullClient();
+  }, []);
+
+  useEffect(() => {
+    pullGuilds();
 
     const unsubscribe = handleIpcRendererDiscordApiEvents(['guildUpdate', 'guildCreate', 'guildDelete'], pullGuilds);
 

@@ -3,6 +3,8 @@ import { ipcRendererDiscordApiFunctions } from '@renderer/api/discord';
 import { create } from 'zustand';
 
 interface AppState {
+  client: User | null;
+  pullClient(): Promise<void>;
   guilds: Guild[] | null;
   pullGuilds(): Promise<void>;
   channels: Record<string, Channel[] | null | undefined>;
@@ -23,6 +25,18 @@ interface AppState {
 }
 
 const useAppStore = create<AppState>()((set, get) => ({
+  client: null,
+  pullClient: async () => {
+    const response = await ipcRendererDiscordApiFunctions.getClient();
+
+    if (!response.success) {
+      set({ client: null });
+      console.error(`Failed to pull client: ${response.error}`);
+      return;
+    }
+
+    set({ client: response.payload });
+  },
   guilds: null,
   pullGuilds: async () => {
     const response = await ipcRendererDiscordApiFunctions.getGuilds();

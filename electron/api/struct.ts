@@ -7,10 +7,11 @@ import {
   Guild as DiscordGuild,
   Message as DiscordMessage,
   Role as DiscordRole,
+  User as DiscordUser,
   EmbedAuthorData,
   EmbedFooterData,
   GuildMember,
-  User as DiscordUser,
+  PermissionFlagsBits,
 } from 'discord.js';
 import {
   Attachment,
@@ -35,27 +36,41 @@ export const structGuild = (guild: DiscordGuild): Guild => ({
 
 export const structChannel = (channel: DiscordChannel): Channel => {
   let name: string | null = null;
+  let sendMessagePermission: boolean = false;
+  let attachFilesPermission: boolean = false;
+  let manageMessagesPermission: boolean = false;
 
   if (!channel.isDMBased()) {
     name = channel.name;
+
+    const channelPermissions = channel.guild.members.me ? channel.permissionsFor(channel.guild.members.me) : null;
+
+    if (channelPermissions) {
+      sendMessagePermission = channelPermissions.has(PermissionFlagsBits.SendMessages);
+      attachFilesPermission = channelPermissions.has(PermissionFlagsBits.AttachFiles);
+      manageMessagesPermission = channelPermissions.has(PermissionFlagsBits.ManageMessages);
+    }
   }
 
   return {
     id: channel.id,
     name,
     type: channel.type as unknown as SupportedChannelType,
+    sendMessagePermission,
+    attachFilesPermission,
+    manageMessagesPermission,
   };
 };
 
-export const structMember = (member: GuildMember | DiscordUser): User => ({
-  id: member.id,
+export const structUser = (user: GuildMember | DiscordUser): User => ({
+  id: user.id,
   displayHexColor:
-    !(member as GuildMember).displayHexColor || (member as GuildMember).displayHexColor === '#000000'
+    !(user as GuildMember).displayHexColor || (user as GuildMember).displayHexColor === '#000000'
       ? '#fff'
-      : (member as GuildMember).displayHexColor,
-  displayName: member.displayName,
-  displayAvatarUrl: member.displayAvatarURL({ size: 64 }),
-  status: (member as GuildMember).presence?.status,
+      : (user as GuildMember).displayHexColor,
+  displayName: user.displayName,
+  displayAvatarUrl: user.displayAvatarURL({ size: 64 }),
+  status: (user as GuildMember).presence?.status,
 });
 
 export const structRole = (role: DiscordRole): Role => ({
@@ -116,7 +131,7 @@ export const structEmbed = (embed: DiscordEmbed): Embed => ({
 export const structMessage = (message: DiscordMessage): Message => ({
   id: message.id,
   authorId: message.author.id,
-  fallbackAuthor: structMember(message.author),
+  fallbackAuthor: structUser(message.author),
   channelId: message.channelId,
   content: message.content,
   createdTimestamp: message.createdTimestamp,

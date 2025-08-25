@@ -16,6 +16,9 @@ export interface Channel {
   id: string;
   name: string | null;
   type: SupportedChannelType;
+  sendMessagePermission: boolean;
+  attachFilesPermission: boolean;
+  manageMessagesPermission: boolean;
 }
 
 export interface User {
@@ -106,4 +109,14 @@ export interface Message {
   editedTimestamp: number | null;
   attachments: Attachment[];
   embeds: Embed[];
+}
+
+export interface SendMessageFileDTO {
+  name: string;
+  buffer: ArrayBuffer;
+}
+
+export interface SendMessageDTO {
+  content?: string;
+  files?: SendMessageFileDTO[];
 }
