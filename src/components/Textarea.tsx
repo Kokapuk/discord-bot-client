@@ -1,40 +1,27 @@
 import { Textarea as ChakraTextarea, FileUpload, IconButton, Stack, StackProps, useFileUpload } from '@chakra-ui/react';
 import { Channel, SendMessageDTO, SendMessageFileDTO } from '@main/api/types';
 import { ipcRendererDiscordApiFunctions } from '@renderer/api/discord';
-import useAppStore from '@renderer/stores/app';
 import fileSchema from '@renderer/utils/fileSchema';
 import dayjs from 'dayjs';
-import React, { RefAttributes, useMemo, useRef } from 'react';
+import React, { RefAttributes, useRef } from 'react';
 import { FaFileCirclePlus } from 'react-icons/fa6';
-import { useParams } from 'react-router';
 import z from 'zod';
 import FileUploadList from './FileUploadList';
 
-export type TextareaProps = StackProps & RefAttributes<HTMLDivElement>;
+export type TextareaProps = { channel: Channel } & StackProps & RefAttributes<HTMLDivElement>;
 
 export const messageFormDataSchema = z.object({
   content: z.string().max(2000, { error: (iss) => `Message must not be longer than ${iss.maximum}` }),
-  files: z.array(fileSchema),
+  files: z.array(fileSchema, { error: 'Files are invalid' }),
 });
 
-export default function Textarea(props: TextareaProps) {
-  const { guildId, channelId } = useParams();
-  const { channels } = useAppStore();
-
-  const activeChannel = useMemo<Channel | null>(() => {
-    if (!guildId || !channelId) {
-      return null;
-    }
-
-    return channels[guildId]?.find((channel) => channel.id === channelId) ?? null;
-  }, [channels, guildId, channelId]);
-
+export default function Textarea({ channel, ...props }: TextareaProps) {
   const form = useRef<HTMLFormElement>(null);
   const fileUpload = useFileUpload({
     maxFiles: 10,
     maxFileSize: 8_000_000,
     validate: (file, details) => {
-      if (!activeChannel?.attachFilesPermission) {
+      if (!channel.attachFilesPermission) {
         return ['TOO_MANY_FILES'];
       }
 
@@ -53,7 +40,7 @@ export default function Textarea(props: TextareaProps) {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (!channelId || sending.current) {
+    if (sending.current) {
       return;
     }
 
@@ -82,7 +69,7 @@ export default function Textarea(props: TextareaProps) {
       files,
     };
 
-    const response = await ipcRendererDiscordApiFunctions.sendMessage(channelId, message);
+    const response = await ipcRendererDiscordApiFunctions.sendMessage(channel.id, message);
 
     sending.current = false;
 
@@ -115,11 +102,7 @@ export default function Textarea(props: TextareaProps) {
     fileUpload.setFiles([...fileUpload.acceptedFiles, ...newFiles]);
   };
 
-  if (!activeChannel) {
-    throw Error(`Channel with id ${channelId} in guild with id ${guildId} does not exist`);
-  }
-
-  if (!activeChannel.sendMessagePermission) {
+  if (!channel.sendMessagePermission) {
     return null;
   }
 
@@ -132,7 +115,7 @@ export default function Textarea(props: TextareaProps) {
           )}
           <Stack gap="1.5" direction="row">
             <FileUpload.HiddenInput />
-            {activeChannel.attachFilesPermission && (
+            {channel.attachFilesPermission && (
               <FileUpload.Trigger asChild>
                 <IconButton
                   aria-label="Add attachment"

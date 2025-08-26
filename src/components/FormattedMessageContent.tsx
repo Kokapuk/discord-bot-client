@@ -1,15 +1,16 @@
 import { Box, Image, Link, Text, TextProps } from '@chakra-ui/react';
-import useAppStore from '@renderer/stores/app';
 import { ReactNode, RefAttributes, useMemo } from 'react';
-import { useParams } from 'react-router';
 import reactStringReplace from 'react-string-replace';
 import Mention from './Mention';
+import { useMessageContext } from './MessageContext';
 
-export type FormattedMessageContentProps = { rawContent: string } & TextProps & RefAttributes<HTMLParagraphElement>;
+export type FormattedMessageContentProps = {
+  rawContent: string;
+} & TextProps &
+  RefAttributes<HTMLParagraphElement>;
 
 export default function FormattedMessageContent({ rawContent, ...props }: FormattedMessageContentProps) {
-  const { guildId } = useParams();
-  const { channels, members, roles } = useAppStore();
+  const { channels, members, roles } = useMessageContext();
 
   const formattedContent = useMemo(() => {
     let tokenized: ReactNode[] = [rawContent];
@@ -32,7 +33,7 @@ export default function FormattedMessageContent({ rawContent, ...props }: Format
         width="1.375rem"
         height="1.375rem"
         objectFit="contain"
-        display='inline-block'
+        display="inline-block"
       />
     ));
 
@@ -44,30 +45,26 @@ export default function FormattedMessageContent({ rawContent, ...props }: Format
         width="1.375rem"
         height="1.375rem"
         objectFit="contain"
-        display='inline-block'
+        display="inline-block"
       />
     ));
 
-    if (guildId) {
-      tokenized = reactStringReplace(tokenized, /@(everyone|here)/g, (token, index) => (
-        <Mention key={`everyoneHere-${index}`}>@{token}</Mention>
-      ));
-      tokenized = reactStringReplace(tokenized, /<#(\d+?)>/g, (channelId, index) => (
-        <Mention key={`channel-${index}`}>
-          #{channels[guildId]?.find((channel) => channel.id === channelId)?.name ?? 'unknown-channel'}
-        </Mention>
-      ));
-      tokenized = reactStringReplace(tokenized, /<@(\d+?)>/g, (userId, index) => (
-        <Mention key={`member-${index}`}>
-          @{members[guildId]?.find((member) => member.id === userId)?.displayName ?? 'unknown-user'}
-        </Mention>
-      ));
-      tokenized = reactStringReplace(tokenized, /<@&(\d+?)>/g, (roleId, index) => (
-        <Mention key={`role-${index}`}>
-          @{roles[guildId]?.find((role) => role.id === roleId)?.name ?? 'unknown-role'}
-        </Mention>
-      ));
-    }
+    tokenized = reactStringReplace(tokenized, /@(everyone|here)/g, (token, index) => (
+      <Mention key={`everyoneHere-${index}`}>@{token}</Mention>
+    ));
+    tokenized = reactStringReplace(tokenized, /<#(\d+?)>/g, (channelId, index) => (
+      <Mention key={`channel-${index}`}>
+        #{channels?.find((channel) => channel.id === channelId)?.name ?? 'unknown-channel'}
+      </Mention>
+    ));
+    tokenized = reactStringReplace(tokenized, /<@(\d+?)>/g, (userId, index) => (
+      <Mention key={`member-${index}`}>
+        @{members?.find((member) => member.id === userId)?.displayName ?? 'unknown-user'}
+      </Mention>
+    ));
+    tokenized = reactStringReplace(tokenized, /<@&(\d+?)>/g, (roleId, index) => (
+      <Mention key={`role-${index}`}>@{roles?.find((role) => role.id === roleId)?.name ?? 'unknown-role'}</Mention>
+    ));
 
     tokenized = tokenized.filter(Boolean);
 

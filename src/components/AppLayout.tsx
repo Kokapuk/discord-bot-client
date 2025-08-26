@@ -27,7 +27,7 @@ export default function AppLayout() {
     <Box height="100%" display="flex">
       {!!guilds ? (
         <>
-          <GuildList />
+          <GuildList guilds={guilds} />
           <Box height="100%" width="100%" overflow="auto">
             <Suspense fallback={<RouteSpinner />}>
               <Outlet />

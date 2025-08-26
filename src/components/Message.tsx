@@ -1,27 +1,25 @@
 import { Avatar, Image, Stack, StackProps, Text } from '@chakra-ui/react';
 import { type Message } from '@main/api/types';
-import useAppStore from '@renderer/stores/app';
 import dayjs from 'dayjs';
 import { RefAttributes, useMemo } from 'react';
-import { useParams } from 'react-router';
 import Attachments from './Attachments';
 import Embeds from './Embeds';
 import FormattedMessageContent from './FormattedMessageContent';
 import ManageMessageActions from './ManageMessageActions';
+import { useMessageContext } from './MessageContext';
 
-export type MessageProps = { message: Message; chain?: boolean } & StackProps & RefAttributes<HTMLDivElement>;
+export type MessageProps = {
+  message: Message;
+  chain?: boolean;
+} & StackProps &
+  RefAttributes<HTMLDivElement>;
 
 export default function Message({ message, chain, ...props }: MessageProps) {
-  const { guildId } = useParams();
-  const { members } = useAppStore();
-
-  const author = useMemo(() => {
-    if (!guildId) {
-      return;
-    }
-
-    return members[guildId]?.find((member) => member.id === message.authorId) ?? message.fallbackAuthor;
-  }, [members, message.authorId, guildId]);
+  const { members, client, activeChannel } = useMessageContext();
+  const author = useMemo(
+    () => members?.find((member) => member.id === message.authorId) ?? message.fallbackAuthor,
+    [members, message.authorId, message.fallbackAuthor]
+  );
 
   const createdAtFormattedFull = useMemo(
     () => dayjs(message.createdTimestamp).format('DD MMM YYYY [at] HH:mm'),
@@ -33,10 +31,6 @@ export default function Message({ message, chain, ...props }: MessageProps) {
     [message.createdTimestamp]
   );
 
-  if (!author) {
-    throw Error(`Author for message does not exist.\nMessage details: ${JSON.stringify(message, undefined, '\t')}`);
-  }
-
   return (
     <Stack
       direction="row"
@@ -46,7 +40,12 @@ export default function Message({ message, chain, ...props }: MessageProps) {
       _hover={{ backgroundColor: 'whiteAlpha.50' }}
       {...props}
     >
-      <ManageMessageActions visibility="hidden" message={message} _groupHover={{ visibility: 'visible' }} />
+      <ManageMessageActions
+        onEdit={client.id === author.id ? () => {} : undefined}
+        onDelete={client.id === author.id || activeChannel.manageMessagesPermission ? () => {} : undefined}
+        visibility="hidden"
+        _groupHover={{ visibility: 'visible' }}
+      />
       {chain ? (
         <Text
           color="gray.400"

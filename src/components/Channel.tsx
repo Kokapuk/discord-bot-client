@@ -2,13 +2,11 @@ import { Button, Text } from '@chakra-ui/react';
 import { SupportedChannelType, type Channel } from '@main/api/types';
 import { useMemo } from 'react';
 import { FaCodeBranch, FaHashtag, FaVolumeLow } from 'react-icons/fa6';
-import { NavLink, useParams } from 'react-router';
+import { NavLink } from 'react-router';
 
-export type ChannelProps = { channel: Channel };
+export type ChannelProps = { channel: Channel; active?: boolean };
 
-export default function Channel({ channel }: ChannelProps) {
-  const { channelId } = useParams();
-
+export default function Channel({ channel, active }: ChannelProps) {
   const channelTypeIcon = useMemo(() => {
     switch (channel.type) {
       case SupportedChannelType.GuildAnnouncement:
@@ -24,12 +22,7 @@ export default function Channel({ channel }: ChannelProps) {
 
   return (
     <NavLink to={`${channel.id}`}>
-      <Button
-        variant="ghost"
-        justifyContent="flex-start"
-        width="100%"
-        data-hover={channelId === channel.id ? '' : undefined}
-      >
+      <Button variant="ghost" justifyContent="flex-start" width="100%" data-hover={active ? '' : undefined}>
         {channelTypeIcon}{' '}
         <Text width="100%" minWidth="0" textAlign="start" overflow="hidden" textOverflow="ellipsis">
           {channel.name}

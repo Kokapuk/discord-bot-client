@@ -1,16 +1,15 @@
 import { Stack, StackProps } from '@chakra-ui/react';
-import useAppStore from '@renderer/stores/app';
+import { Guild as GuildType } from '@main/api/types';
 import debounce from 'lodash/debounce';
 import { RefAttributes, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import Guild from './Guild';
 
-export type GuildListProps = StackProps & RefAttributes<HTMLDivElement>;
+export type GuildListProps = { guilds: GuildType[] } & StackProps & RefAttributes<HTMLDivElement>;
 
-export default function GuildList({ ref, ...props }: GuildListProps) {
+export default function GuildList({ guilds, ref, ...props }: GuildListProps) {
   const guildList = useRef<HTMLDivElement>(null);
   const [showTopShadow, setShowTopShadow] = useState(false);
   const [showBottomShadow, setShowBottomShadow] = useState(false);
-  const { guilds } = useAppStore();
   useImperativeHandle(ref, () => guildList.current!, []);
 
   const recalcShadows = (target: HTMLDivElement) => {
@@ -65,7 +64,7 @@ export default function GuildList({ ref, ...props }: GuildListProps) {
       );`}
       {...props}
     >
-      {guilds?.map((guild) => (
+      {guilds.map((guild) => (
         <Guild key={guild.id} guild={guild} />
       ))}
     </Stack>

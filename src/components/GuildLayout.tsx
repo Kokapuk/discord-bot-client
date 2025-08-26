@@ -8,9 +8,15 @@ import MemberList from './MemberList';
 import RouteSpinner from './RouteSpinner';
 
 export default function GuildLayout() {
-  const { guildId } = useParams();
+  const { guildId, channelId } = useParams();
   const { guilds, channels, members, pullChannels, pullMembers, pullRoles } = useAppStore();
   const activeGuild = useMemo(() => guilds?.find((guild) => guild.id === guildId), [guilds, guildId]);
+  const activeGuildChannels = useMemo(() => (activeGuild ? channels[activeGuild.id] : null), [activeGuild, channels]);
+  const activeGuildMembers = useMemo(() => (activeGuild ? members[activeGuild.id] : null), [activeGuild, members]);
+  const activeChannel = useMemo(
+    () => activeGuildChannels?.find((channel) => channel.id === channelId),
+    [activeGuildChannels, channelId]
+  );
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -29,7 +35,16 @@ export default function GuildLayout() {
     pullRoles(guildId);
 
     const unsubscribeChannelUpdates = handleIpcRendererDiscordApiEvents(
-      ['channelUpdate', 'channelCreate', 'channelDelete', 'threadUpdate', 'threadCreate', 'threadDelete', 'roleUpdate', 'guildMemberUpdate'],
+      [
+        'channelUpdate',
+        'channelCreate',
+        'channelDelete',
+        'threadUpdate',
+        'threadCreate',
+        'threadDelete',
+        'roleUpdate',
+        'guildMemberUpdate',
+      ],
       () => pullChannels(guildId)
     );
 
@@ -49,7 +64,7 @@ export default function GuildLayout() {
     };
   }, [guildId]);
 
-  if (!activeGuild || !channels[activeGuild.id] || !members[activeGuild.id]) {
+  if (!activeGuild || !activeGuildChannels || !activeGuildMembers) {
     return <RouteSpinner />;
   }
 
@@ -68,14 +83,14 @@ export default function GuildLayout() {
         >
           {activeGuild.name}
         </Heading>
-        <ChannelList height="100%" width="100%" minHeight="0" />
+        <ChannelList channels={activeGuildChannels} activeChannel={activeChannel} height="100%" width="100%" minHeight="0" />
       </Box>
       <Box height="100%" width="100%" overflow="auto">
         <Suspense fallback={<RouteSpinner />}>
           <Outlet />
         </Suspense>
       </Box>
-      <MemberList height="100%" width="64" flexShrink="0" />
+      <MemberList members={activeGuildMembers} height="100%" width="64" flexShrink="0" />
     </Box>
   );
 }
