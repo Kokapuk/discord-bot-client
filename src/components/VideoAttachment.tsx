@@ -13,7 +13,7 @@ export default function VideoAttachment({ attachment, gif }: VideoAttachmentProp
     height: attachment.height ?? 1,
     maxSize: MAX_VIDEO_SIZE,
   });
-  const { setMediaVolume } = useAppStore();
+  const setMediaVolume = useAppStore(st => st.setMediaVolume);
   const video = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {

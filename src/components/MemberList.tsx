@@ -1,11 +1,11 @@
 import { Stack, StackProps } from '@chakra-ui/react';
 import { User as UserType } from '@main/api/types';
-import { RefAttributes } from 'react';
+import { memo, RefAttributes } from 'react';
 import User from './User';
 
 export type MemberListProps = { members: UserType[] } & StackProps & RefAttributes<HTMLDivElement>;
 
-export default function MemberList({ members, ...props }: MemberListProps) {
+const MemberList = ({ members, ...props }: MemberListProps) => {
   return (
     <Stack overflow="auto" paddingInline="2.5" paddingBottom="2.5" gap="4" {...props}>
       {members.map((member) => (
@@ -13,4 +13,6 @@ export default function MemberList({ members, ...props }: MemberListProps) {
       ))}
     </Stack>
   );
-}
+};
+
+export default memo(MemberList);

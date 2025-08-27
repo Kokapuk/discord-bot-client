@@ -2,7 +2,7 @@ import useAppStore from '@renderer/stores/app';
 import { AttachmentProps } from './Attachment';
 
 export default function AudioAttachment({ attachment }: AttachmentProps) {
-  const { setMediaVolume } = useAppStore();
+  const setMediaVolume = useAppStore((st) => st.setMediaVolume);
 
   return (
     <audio

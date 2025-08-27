@@ -1,4 +1,4 @@
-import { IpcMainDiscordApiFunctions, IpcMainDiscordApiEvents } from '@main/api/discord';
+import { IpcMainDiscordApiEvents, IpcMainDiscordApiFunctions } from '@main/api/discord';
 
 const completedDiscordApiFunctionKeys = <T extends (keyof IpcMainDiscordApiFunctions)[]>(
   arr: T &
@@ -16,6 +16,8 @@ const ipcMainDiscordApiFunctionsKeys = completedDiscordApiFunctionKeys([
   'getGuildRoles',
   'fetchChannelsMessages',
   'sendMessage',
+  'editMessage',
+  'deleteMessage',
 ]);
 
 export const ipcRendererDiscordApiFunctions = Object.fromEntries(

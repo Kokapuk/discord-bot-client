@@ -1,12 +1,12 @@
 import { Stack, StackProps } from '@chakra-ui/react';
 import { Channel as ChannelType } from '@main/api/types';
-import { RefAttributes } from 'react';
+import { memo, RefAttributes } from 'react';
 import Channel from './Channel';
 
 export type ChannelListProps = { channels: ChannelType[]; activeChannel?: ChannelType } & StackProps &
   RefAttributes<HTMLDivElement>;
 
-export default function ChannelList({ channels, activeChannel, ...props }: ChannelListProps) {
+const ChannelList = ({ channels, activeChannel, ...props }: ChannelListProps) => {
   return (
     <Stack overflow="auto" paddingInline="2.5" paddingBottom="2.5" {...props}>
       {channels.map((channel) => (
@@ -14,4 +14,6 @@ export default function ChannelList({ channels, activeChannel, ...props }: Chann
       ))}
     </Stack>
   );
-}
+};
+
+export default memo(ChannelList);

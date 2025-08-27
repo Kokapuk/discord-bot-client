@@ -1,12 +1,12 @@
 import { Avatar, Box, Image, Stack, Status, Text } from '@chakra-ui/react';
 import { type User } from '@main/api/types';
-import { useMemo } from 'react';
+import { memo, useMemo } from 'react';
 
 export interface UserProps {
   user: User;
 }
 
-export default function User({ user }: UserProps) {
+const User = ({ user }: UserProps) => {
   const statusColorPalette = useMemo(() => {
     switch (user.status) {
       case 'online':
@@ -55,4 +55,6 @@ export default function User({ user }: UserProps) {
       </Text>
     </Stack>
   );
-}
+};
+
+export default memo(User);

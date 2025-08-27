@@ -1,4 +1,4 @@
-import { Channel, Role, User } from '@main/api/types';
+import { Channel, Message, Role, User } from '@main/api/types';
 import { createContext, useContext } from 'react';
 
 export type MessageContext = {
@@ -7,6 +7,7 @@ export type MessageContext = {
   channels?: Channel[];
   members?: User[];
   roles?: Role[];
+  onEdit?(message: Message): void;
 };
 
 const MessageContext = createContext<MessageContext | null>(null);

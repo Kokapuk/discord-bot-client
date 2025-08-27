@@ -1,11 +1,11 @@
 import { Box, Heading } from '@chakra-ui/react';
 import { handleIpcRendererDiscordApiEvents } from '@renderer/api/discord';
+import ChannelList from '@renderer/components/ChannelList';
+import MemberList from '@renderer/components/MemberList';
 import useAppStore from '@renderer/stores/app';
+import RouteSpinner from '@renderer/ui/RouteSpinner';
 import { Suspense, useEffect, useMemo } from 'react';
 import { Outlet, useNavigate, useParams } from 'react-router';
-import ChannelList from './ChannelList';
-import MemberList from './MemberList';
-import RouteSpinner from './RouteSpinner';
 
 export default function GuildLayout() {
   const { guildId, channelId } = useParams();
@@ -83,7 +83,13 @@ export default function GuildLayout() {
         >
           {activeGuild.name}
         </Heading>
-        <ChannelList channels={activeGuildChannels} activeChannel={activeChannel} height="100%" width="100%" minHeight="0" />
+        <ChannelList
+          channels={activeGuildChannels}
+          activeChannel={activeChannel}
+          height="100%"
+          width="100%"
+          minHeight="0"
+        />
       </Box>
       <Box height="100%" width="100%" overflow="auto">
         <Suspense fallback={<RouteSpinner />}>

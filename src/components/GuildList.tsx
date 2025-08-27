@@ -1,12 +1,12 @@
 import { Stack, StackProps } from '@chakra-ui/react';
 import { Guild as GuildType } from '@main/api/types';
 import debounce from 'lodash/debounce';
-import { RefAttributes, useEffect, useImperativeHandle, useRef, useState } from 'react';
+import { memo, RefAttributes, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import Guild from './Guild';
 
 export type GuildListProps = { guilds: GuildType[] } & StackProps & RefAttributes<HTMLDivElement>;
 
-export default function GuildList({ guilds, ref, ...props }: GuildListProps) {
+const GuildList = ({ guilds, ref, ...props }: GuildListProps) => {
   const guildList = useRef<HTMLDivElement>(null);
   const [showTopShadow, setShowTopShadow] = useState(false);
   const [showBottomShadow, setShowBottomShadow] = useState(false);
@@ -69,4 +69,6 @@ export default function GuildList({ guilds, ref, ...props }: GuildListProps) {
       ))}
     </Stack>
   );
-}
+};
+
+export default memo(GuildList);

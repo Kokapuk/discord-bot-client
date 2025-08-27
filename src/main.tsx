@@ -2,13 +2,13 @@ import { lazy } from 'react';
 import ReactDOM from 'react-dom/client';
 import { createHashRouter } from 'react-router';
 import { RouterProvider } from 'react-router/dom';
-import GlobalLayout from './components/GlobalLayout';
+import GlobalLayout from './layouts/GlobalLayout';
 import { Provider } from './ui/provider';
 
 const Auth = lazy(() => import('./routes/Auth'));
-const AppLayout = lazy(() => import('./components/AppLayout'));
+const AppLayout = lazy(() => import('./layouts/AppLayout'));
 const Home = lazy(() => import('./routes/Home'));
-const GuildLayout = lazy(() => import('./components/GuildLayout'));
+const GuildLayout = lazy(() => import('./layouts/GuildLayout'));
 const Guild = lazy(() => import('./routes/Home/Guild'));
 const Channel = lazy(() => import('./routes/Home/Guild/Channel'));
 

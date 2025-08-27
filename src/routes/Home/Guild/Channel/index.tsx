@@ -1,10 +1,10 @@
 import { Box, Heading } from '@chakra-ui/react';
 import { handleIpcRendererDiscordApiEventWithPayload } from '@renderer/api/discord';
-import { MessageProvider } from '@renderer/components/MessageContext';
+import { MessageContext, MessageProvider } from '@renderer/components/MessageContext';
 import MessageList from '@renderer/components/MessageList';
 import Textarea from '@renderer/components/Textarea';
 import useAppStore from '@renderer/stores/app';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useParams } from 'react-router';
 
 export default function Channel() {
@@ -20,9 +20,13 @@ export default function Channel() {
     updateMessage,
     addMessage,
     removeMessage,
+    editingMessage,
+    setEditingMessage,
   } = useAppStore();
 
   useEffect(() => {
+    setEditingMessage(null);
+
     const unsubscribeMessageUpdate = handleIpcRendererDiscordApiEventWithPayload('messageUpdate', updateMessage);
     const unsubscribeMessageCreate = handleIpcRendererDiscordApiEventWithPayload('messageCreate', addMessage);
     const unsubscribeMessageDelete = handleIpcRendererDiscordApiEventWithPayload('messageDelete', removeMessage);
@@ -63,14 +67,24 @@ export default function Channel() {
     throw Error(`Roles in guild with id ${guildId} do not exist`);
   }
 
+  const messageContext = useMemo<MessageContext>(
+    () => ({
+      client,
+      activeChannel,
+      channels: guildChannels,
+      members: guildMembers,
+      roles: guildRoles,
+      onEdit: (message) => setEditingMessage(message),
+    }),
+    [client, activeChannel, guildChannels, guildMembers, guildRoles]
+  );
+
   return (
     <Box height="100%" display="flex" flexDirection="column">
       <Box as="header" paddingBottom="2.5" flexShrink="0">
         <Heading as="h2">{activeChannel.name}</Heading>
       </Box>
-      <MessageProvider
-        value={{ client, activeChannel, channels: guildChannels, members: guildMembers, roles: guildRoles }}
-      >
+      <MessageProvider value={messageContext}>
         <MessageList
           height="100%"
           minHeight="0"
@@ -79,7 +93,13 @@ export default function Channel() {
           onPaginate={topReachedChannels[channelId] ? undefined : () => fetchMessages(channelId)}
         />
       </MessageProvider>
-      <Textarea channel={activeChannel} flexShrink="0" marginBottom="5" />
+      <Textarea
+        channel={activeChannel}
+        editingMessage={editingMessage}
+        onEditCancel={() => setEditingMessage(null)}
+        flexShrink="0"
+        marginBottom="5"
+      />
     </Box>
   );
 }

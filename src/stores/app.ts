@@ -22,6 +22,8 @@ interface AppState {
   updateMessage(message: Message): void;
   mediaVolume: number;
   setMediaVolume(volume: number): void;
+  editingMessage: Message | null;
+  setEditingMessage(editingMessage: Message | null): void;
 }
 
 const useAppStore = create<AppState>()((set, get) => ({
@@ -155,6 +157,8 @@ const useAppStore = create<AppState>()((set, get) => ({
   },
   mediaVolume: 0.3,
   setMediaVolume: (mediaVolume) => set({ mediaVolume }),
+  editingMessage: null,
+  setEditingMessage: (editingMessage) => set({ editingMessage }),
 }));
 
 export default useAppStore;

@@ -120,3 +120,7 @@ export interface SendMessageDTO {
   content?: string;
   files?: SendMessageFileDTO[];
 }
+
+export interface EditMessageDTO {
+  content: string;
+}

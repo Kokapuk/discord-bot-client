@@ -1,8 +1,8 @@
 import { Box } from '@chakra-ui/react';
+import Titlebar from '@renderer/components/Titlebar';
+import RouteSpinner from '@renderer/ui/RouteSpinner';
 import { Suspense } from 'react';
 import { Outlet } from 'react-router';
-import RouteSpinner from './RouteSpinner';
-import Titlebar from './Titlebar';
 
 export default function GlobalLayout() {
   return (

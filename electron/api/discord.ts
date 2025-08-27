@@ -4,6 +4,7 @@ import { ipcMain, IpcMainInvokeEvent, WebContents } from 'electron';
 import { structChannel, structGuild, structUser, structMessage, structRole } from './struct';
 import {
   Channel,
+  EditMessageDTO,
   Guild,
   Message,
   Role,
@@ -165,6 +166,71 @@ const sendMessage = async (
   }
 };
 
+const editMessage = async (
+  _: IpcMainInvokeEvent,
+  messageId: string,
+  channelId: string,
+  editMessage: EditMessageDTO
+): Promise<IpcApiResponse> => {
+  try {
+    const channel = client.channels.cache.find((channel) => channel.id === channelId);
+
+    if (!channel) {
+      return { success: false, error: 'Channel does not exist' };
+    }
+
+    if (!channel.isTextBased()) {
+      return { success: false, error: 'Channel is not text based' };
+    }
+
+    if (!channel.isSendable()) {
+      return { success: false, error: 'Channel is not sendable' };
+    }
+
+    const message = channel.messages.cache.find((message) => message.id === messageId);
+
+    if (!message) {
+      return { success: false, error: 'Message does not exist' };
+    }
+
+    await message.edit(editMessage);
+
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: err.message };
+  }
+};
+
+const deleteMessage = async (_: IpcMainInvokeEvent, messageId: string, channelId: string): Promise<IpcApiResponse> => {
+  try {
+    const channel = client.channels.cache.find((channel) => channel.id === channelId);
+
+    if (!channel) {
+      return { success: false, error: 'Channel does not exist' };
+    }
+
+    if (!channel.isTextBased()) {
+      return { success: false, error: 'Channel is not text based' };
+    }
+
+    if (!channel.isSendable()) {
+      return { success: false, error: 'Channel is not sendable' };
+    }
+
+    const message = channel.messages.cache.find((message) => message.id === messageId);
+
+    if (!message) {
+      return { success: false, error: 'Message does not exist' };
+    }
+
+    await message.delete();
+
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: err.message };
+  }
+};
+
 const ipcMainDiscordApiFunctions = {
   authorize,
   getClient,
@@ -174,6 +240,8 @@ const ipcMainDiscordApiFunctions = {
   getGuildRoles,
   fetchChannelsMessages,
   sendMessage,
+  editMessage,
+  deleteMessage,
 };
 export type IpcMainDiscordApiFunctions = IpcMainEventHandlersToRendererFunctions<typeof ipcMainDiscordApiFunctions>;
 

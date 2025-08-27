@@ -1,14 +1,14 @@
 import { Center, Spinner, Stack, StackProps } from '@chakra-ui/react';
 import { Message as MessageType } from '@main/api/types';
 import Message from '@renderer/components/Message';
-import { RefAttributes, useEffect, useMemo, useRef } from 'react';
+import { memo, RefAttributes, useEffect, useMemo, useRef } from 'react';
 
 export type MessageListProps = { messages: MessageType[]; onPaginate?(): void } & StackProps &
   RefAttributes<HTMLDivElement>;
 
 export const CHAIN_MESSAGES_TIME_GAP = 1000 * 60 * 5; // 5 minutes
 
-export default function MessageList({ messages, onPaginate, ...props }: MessageListProps) {
+const MessageList = ({ messages, onPaginate, ...props }: MessageListProps) => {
   const paginationTrigger = useRef<HTMLDivElement>(null);
 
   const chainedMessages = useMemo(() => {
@@ -67,4 +67,6 @@ export default function MessageList({ messages, onPaginate, ...props }: MessageL
       )}
     </Stack>
   );
-}
+};
+
+export default memo(MessageList);

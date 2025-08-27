@@ -1,7 +1,7 @@
 import { Avatar, Image, Stack, StackProps, Text } from '@chakra-ui/react';
 import { type Message } from '@main/api/types';
 import dayjs from 'dayjs';
-import { RefAttributes, useMemo } from 'react';
+import { memo, RefAttributes, useMemo } from 'react';
 import Attachments from './Attachments';
 import Embeds from './Embeds';
 import FormattedMessageContent from './FormattedMessageContent';
@@ -14,8 +14,8 @@ export type MessageProps = {
 } & StackProps &
   RefAttributes<HTMLDivElement>;
 
-export default function Message({ message, chain, ...props }: MessageProps) {
-  const { members, client, activeChannel } = useMessageContext();
+const Message = ({ message, chain, ...props }: MessageProps) => {
+  const { members } = useMessageContext();
   const author = useMemo(
     () => members?.find((member) => member.id === message.authorId) ?? message.fallbackAuthor,
     [members, message.authorId, message.fallbackAuthor]
@@ -40,12 +40,7 @@ export default function Message({ message, chain, ...props }: MessageProps) {
       _hover={{ backgroundColor: 'whiteAlpha.50' }}
       {...props}
     >
-      <ManageMessageActions
-        onEdit={client.id === author.id ? () => {} : undefined}
-        onDelete={client.id === author.id || activeChannel.manageMessagesPermission ? () => {} : undefined}
-        visibility="hidden"
-        _groupHover={{ visibility: 'visible' }}
-      />
+      <ManageMessageActions message={message} visibility="hidden" _groupHover={{ visibility: 'visible' }} />
       {chain ? (
         <Text
           color="gray.400"
@@ -84,7 +79,15 @@ export default function Message({ message, chain, ...props }: MessageProps) {
 
         <Attachments attachments={message.attachments} />
         <Embeds embeds={message.embeds} />
+
+        {chain && message.editedTimestamp !== null && (
+          <Text fontSize="2xs" color="gray.500">
+            (edited)
+          </Text>
+        )}
       </Stack>
     </Stack>
   );
-}
+};
+
+export default memo(Message);
