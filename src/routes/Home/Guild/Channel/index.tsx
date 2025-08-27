@@ -3,17 +3,18 @@ import { handleIpcRendererDiscordApiEventWithPayload } from '@renderer/api/disco
 import { MessageContext, MessageProvider } from '@renderer/components/MessageContext';
 import MessageList from '@renderer/components/MessageList';
 import Textarea from '@renderer/components/Textarea';
+import { TextareaContext, TextareaProvider } from '@renderer/components/TextareaContext';
 import useAppStore from '@renderer/stores/app';
+import useGuildsStore from '@renderer/stores/guilds';
+import useMessagesStore from '@renderer/stores/messages';
 import { useEffect, useMemo } from 'react';
 import { useParams } from 'react-router';
 
 export default function Channel() {
   const { guildId, channelId } = useParams();
+  const { client } = useAppStore();
+  const { channels, members, roles } = useGuildsStore();
   const {
-    client,
-    channels,
-    members,
-    roles,
     messages,
     topReachedChannels,
     fetchMessages,
@@ -22,10 +23,13 @@ export default function Channel() {
     removeMessage,
     editingMessage,
     setEditingMessage,
-  } = useAppStore();
+    replyingMessage,
+    setReplyingMessage,
+  } = useMessagesStore();
 
   useEffect(() => {
     setEditingMessage(null);
+    setReplyingMessage(null);
 
     const unsubscribeMessageUpdate = handleIpcRendererDiscordApiEventWithPayload('messageUpdate', updateMessage);
     const unsubscribeMessageCreate = handleIpcRendererDiscordApiEventWithPayload('messageCreate', addMessage);
@@ -48,6 +52,7 @@ export default function Channel() {
 
   const guildChannels = channels[guildId];
   const activeChannel = channels[guildId]?.find((channel) => channel.id === channelId);
+  const activeChannelMessages = messages[channelId];
   const guildMembers = members[guildId];
   const guildRoles = roles[guildId];
 
@@ -70,13 +75,27 @@ export default function Channel() {
   const messageContext = useMemo<MessageContext>(
     () => ({
       client,
-      activeChannel,
+      channel: activeChannel,
+      messages: activeChannelMessages ?? [],
       channels: guildChannels,
-      members: guildMembers,
+      users: guildMembers,
       roles: guildRoles,
       onEdit: (message) => setEditingMessage(message),
+      onReply: (message) => setReplyingMessage(message),
     }),
-    [client, activeChannel, guildChannels, guildMembers, guildRoles]
+    [client, activeChannel, activeChannelMessages, guildChannels, guildMembers, guildRoles]
+  );
+
+  const textareaContext = useMemo<TextareaContext>(
+    () => ({
+      channel: activeChannel,
+      users: guildMembers,
+      editingMessage,
+      onEditClose: () => setEditingMessage(null),
+      replyingMessage,
+      onReplyClose: () => setReplyingMessage(null),
+    }),
+    [activeChannel, guildMembers, editingMessage, replyingMessage]
   );
 
   return (
@@ -93,13 +112,9 @@ export default function Channel() {
           onPaginate={topReachedChannels[channelId] ? undefined : () => fetchMessages(channelId)}
         />
       </MessageProvider>
-      <Textarea
-        channel={activeChannel}
-        editingMessage={editingMessage}
-        onEditCancel={() => setEditingMessage(null)}
-        flexShrink="0"
-        marginBottom="5"
-      />
+      <TextareaProvider value={textareaContext}>
+        <Textarea flexShrink="0" marginBottom="5" />
+      </TextareaProvider>
     </Box>
   );
 }

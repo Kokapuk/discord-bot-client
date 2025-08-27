@@ -8,7 +8,7 @@ export type TextareaActionContextProps = { label: ReactNode; onCancel?(): void }
 export default function TextareaActionContext({ label, onCancel, ...props }: TextareaActionContextProps) {
   return (
     <Group
-      backgroundColor="gray.800"
+      backgroundColor="bg.emphasized"
       borderRadius="md"
       justifyContent="space-between"
       alignItems="center"

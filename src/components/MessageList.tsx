@@ -1,7 +1,8 @@
 import { Center, Spinner, Stack, StackProps } from '@chakra-ui/react';
 import { Message as MessageType } from '@main/api/types';
 import Message from '@renderer/components/Message';
-import { memo, RefAttributes, useEffect, useMemo, useRef } from 'react';
+import dayjs from 'dayjs';
+import { memo, ReactNode, RefAttributes, useEffect, useMemo, useRef } from 'react';
 
 export type MessageListProps = { messages: MessageType[]; onPaginate?(): void } & StackProps &
   RefAttributes<HTMLDivElement>;
@@ -12,20 +13,46 @@ const MessageList = ({ messages, onPaginate, ...props }: MessageListProps) => {
   const paginationTrigger = useRef<HTMLDivElement>(null);
 
   const chainedMessages = useMemo(() => {
-    const chainedMessages: { message: MessageType; chain?: boolean }[] = [];
+    const chainedMessages: ReactNode[] = [];
     const reversedMessages = [...messages].reverse();
+    let lastStructuredMessage: MessageType | null = null;
 
     reversedMessages.forEach((message) => {
-      const lastStructuredMessage = chainedMessages[chainedMessages.length - 1];
+      if (
+        !lastStructuredMessage ||
+        !dayjs(message.createdTimestamp).isSame(dayjs(lastStructuredMessage.createdTimestamp), 'day')
+      ) {
+        chainedMessages.push(
+          <Stack
+            direction="row"
+            flexShrink="0"
+            marginTop="4.5"
+            marginInline="2.5"
+            position="relative"
+            whiteSpace="nowrap"
+            alignItems="center"
+            fontSize="xs"
+            fontWeight="600"
+            color="fg.muted"
+            _before={{ content: '""', width: '100%', height: '1px', backgroundColor: 'bg.inverted/15' }}
+            _after={{ content: '""', width: '100%', height: '1px', backgroundColor: 'bg.inverted/15' }}
+          >
+            {dayjs(message.createdTimestamp).format('DD MMMM YYYY')}
+          </Stack>
+        );
+      }
 
       if (
-        lastStructuredMessage?.message.authorId === message.authorId &&
-        message.createdTimestamp - lastStructuredMessage.message.createdTimestamp < CHAIN_MESSAGES_TIME_GAP
+        lastStructuredMessage?.authorId === message.authorId &&
+        message.createdTimestamp - lastStructuredMessage.createdTimestamp < CHAIN_MESSAGES_TIME_GAP &&
+        !message.referenceMessageId
       ) {
-        chainedMessages.push({ message, chain: true });
+        chainedMessages.push(<Message key={message.id} message={message} chain marginTop="1" />);
       } else {
-        chainedMessages.push({ message, chain: false });
+        chainedMessages.push(<Message key={message.id} message={message} marginTop="4.5" />);
       }
+
+      lastStructuredMessage = message;
     });
 
     return chainedMessages.reverse();
@@ -51,18 +78,10 @@ const MessageList = ({ messages, onPaginate, ...props }: MessageListProps) => {
 
   return (
     <Stack overflow="auto" paddingBottom="2.5" gap="0" direction="column-reverse" {...props}>
-      {chainedMessages.map((m) => (
-        <Message
-          key={m.message.id}
-          message={m.message}
-          chain={m.chain}
-          marginTop={m.chain ? '1' : '4.5'}
-          paddingInline="2.5"
-        />
-      ))}
+      {chainedMessages}
       {!!onPaginate && (
         <Center ref={paginationTrigger} height="12" flexShrink={0}>
-          <Spinner size="md" />
+          <Spinner size="md" color="colorPalette.fg" />
         </Center>
       )}
     </Stack>

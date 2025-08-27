@@ -7,7 +7,7 @@ export type EmbedFieldProps = { field: EmbedField } & StackProps & RefAttributes
 export default function EmbedField({ field, ...props }: EmbedFieldProps) {
   return (
     <Stack display={field.inline ? 'inline-flex' : 'flex'} gap="2" {...props}>
-      <Text fontSize="xs" lineHeight="100%" color="gray.400">
+      <Text fontSize="xs" lineHeight="100%" color="fg.muted">
         {field.name}
       </Text>
       <Text fontSize="xs" lineHeight="100%">

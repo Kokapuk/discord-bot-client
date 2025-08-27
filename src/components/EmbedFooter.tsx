@@ -9,7 +9,7 @@ export default function EmbedFooter({ footer, timestamp, ...props }: EmbedFooter
   return (
     <Stack direction="row" alignItems="center" {...props}>
       {!!footer?.iconURL && <Image loading="lazy" src={footer.iconURL} height="5" width="5" borderRadius="full" />}
-      <Text fontSize="xs" color="gray.400">
+      <Text fontSize="xs" color="fg.muted">
         {[footer?.text, timestamp].filter(Boolean).join(' • ')}
       </Text>
     </Stack>

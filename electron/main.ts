@@ -1,4 +1,4 @@
-import { app, BrowserWindow, shell } from 'electron';
+import { app, BrowserWindow, nativeTheme, shell } from 'electron';
 // import { createRequire } from 'node:module';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -33,6 +33,8 @@ const createWindow = () => {
       preload: path.join(__dirname, 'preload.mjs'),
     },
   });
+
+  nativeTheme.themeSource = 'dark';
 
   if (VITE_DEV_SERVER_URL) {
     win.loadURL(`${VITE_DEV_SERVER_URL}#auth`);

@@ -11,6 +11,7 @@ export default function RouteSpinner(props: RouteSpinnerProps) {
       top="50%"
       transform="translateX(-50%) translateY(-50%)"
       size="xl"
+      color='colorPalette.fg'
       {...props}
     />
   );

@@ -3,11 +3,13 @@ import { createContext, useContext } from 'react';
 
 export type MessageContext = {
   client: User;
-  activeChannel: Channel;
+  channel: Channel;
+  messages: Message[];
   channels?: Channel[];
-  members?: User[];
+  users?: User[];
   roles?: Role[];
   onEdit?(message: Message): void;
+  onReply?(message: Message): void;
 };
 
 const MessageContext = createContext<MessageContext | null>(null);

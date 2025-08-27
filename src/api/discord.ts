@@ -18,6 +18,7 @@ const ipcMainDiscordApiFunctionsKeys = completedDiscordApiFunctionKeys([
   'sendMessage',
   'editMessage',
   'deleteMessage',
+  'replyToMessage'
 ]);
 
 export const ipcRendererDiscordApiFunctions = Object.fromEntries(

@@ -12,7 +12,7 @@ const config = defineConfig({
       boxSizing: 'border-box',
     },
     '*:hover': {
-      scrollbarColor: 'var(--chakra-colors-gray-700) transparent',
+      scrollbarColor: 'color-mix(in srgb, var(--chakra-colors-bg-inverted), transparent 85%) transparent',
     },
   },
 });

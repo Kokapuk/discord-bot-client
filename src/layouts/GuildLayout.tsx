@@ -2,14 +2,14 @@ import { Box, Heading } from '@chakra-ui/react';
 import { handleIpcRendererDiscordApiEvents } from '@renderer/api/discord';
 import ChannelList from '@renderer/components/ChannelList';
 import MemberList from '@renderer/components/MemberList';
-import useAppStore from '@renderer/stores/app';
+import useGuildsStore from '@renderer/stores/guilds';
 import RouteSpinner from '@renderer/ui/RouteSpinner';
 import { Suspense, useEffect, useMemo } from 'react';
-import { Outlet, useNavigate, useParams } from 'react-router';
+import { Navigate, Outlet, useParams } from 'react-router';
 
 export default function GuildLayout() {
   const { guildId, channelId } = useParams();
-  const { guilds, channels, members, pullChannels, pullMembers, pullRoles } = useAppStore();
+  const { guilds, channels, members, pullChannels, pullMembers, pullRoles } = useGuildsStore();
   const activeGuild = useMemo(() => guilds?.find((guild) => guild.id === guildId), [guilds, guildId]);
   const activeGuildChannels = useMemo(() => (activeGuild ? channels[activeGuild.id] : null), [activeGuild, channels]);
   const activeGuildMembers = useMemo(() => (activeGuild ? members[activeGuild.id] : null), [activeGuild, members]);
@@ -17,13 +17,6 @@ export default function GuildLayout() {
     () => activeGuildChannels?.find((channel) => channel.id === channelId),
     [activeGuildChannels, channelId]
   );
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (!guilds?.some((guild) => guild.id === guildId)) {
-      navigate('/');
-    }
-  }, [guilds, guildId]);
 
   useEffect(() => {
     if (!guildId) {
@@ -66,6 +59,14 @@ export default function GuildLayout() {
 
   if (!activeGuild || !activeGuildChannels || !activeGuildMembers) {
     return <RouteSpinner />;
+  }
+
+  if (guildId && !activeGuild) {
+    return <Navigate to="/" />;
+  }
+
+  if (channelId && (!activeChannel || !activeChannel.viewChannelPermission)) {
+    return <Navigate to={`/guilds/${activeGuild.id}`} />;
   }
 
   return (

@@ -231,6 +231,46 @@ const deleteMessage = async (_: IpcMainInvokeEvent, messageId: string, channelId
   }
 };
 
+const replyToMessage = async (
+  _: IpcMainInvokeEvent,
+  messageId: string,
+  channelId: string,
+  message: SendMessageDTO
+): Promise<IpcApiResponse> => {
+  try {
+    const channel = client.channels.cache.find((channel) => channel.id === channelId);
+
+    if (!channel) {
+      return { success: false, error: 'Channel does not exist' };
+    }
+
+    if (!channel.isTextBased()) {
+      return { success: false, error: 'Channel is not text based' };
+    }
+
+    if (!channel.isSendable()) {
+      return { success: false, error: 'Channel is not sendable' };
+    }
+
+    const referenceMessage = channel.messages.cache.find((message) => message.id === messageId);
+
+    if (!referenceMessage) {
+      return { success: false, error: 'Message does not exist' };
+    }
+
+    if (!message.content && !message.files?.length) {
+      return { success: false, error: 'At least one is required: content, files' };
+    }
+
+    const files = message.files?.map((file) => new AttachmentBuilder(Buffer.from(file.buffer), { name: file.name }));
+    await referenceMessage.reply({ content: message.content, files });
+
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: err.message };
+  }
+};
+
 const ipcMainDiscordApiFunctions = {
   authorize,
   getClient,
@@ -242,6 +282,7 @@ const ipcMainDiscordApiFunctions = {
   sendMessage,
   editMessage,
   deleteMessage,
+  replyToMessage,
 };
 export type IpcMainDiscordApiFunctions = IpcMainEventHandlersToRendererFunctions<typeof ipcMainDiscordApiFunctions>;
 

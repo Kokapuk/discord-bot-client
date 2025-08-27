@@ -1,26 +1,25 @@
-import { Group, GroupProps, IconButton, IconButtonProps } from '@chakra-ui/react';
+import { Group, GroupProps } from '@chakra-ui/react';
 import { Message } from '@main/api/types';
 import { ipcRendererDiscordApiFunctions } from '@renderer/api/discord';
 import { RefAttributes, useMemo, useState } from 'react';
-import { FaPen, FaTrash } from 'react-icons/fa6';
+import { FaPen, FaReply, FaTrash } from 'react-icons/fa6';
+import ManageMessageButton from './ManageMessageButton';
 import { useMessageContext } from './MessageContext';
 
 export type ManageMessageActionsProps = { message: Message } & GroupProps & RefAttributes<HTMLDivElement>;
 
-const BASE_ICON_BUTTON_PROPS: IconButtonProps = { size: 'xs', variant: 'subtle' };
-
 export default function ManageMessageActions({ message, ...props }: ManageMessageActionsProps) {
-  const { members, client, activeChannel, onEdit } = useMessageContext();
+  const { users, client, channel, onEdit, onReply } = useMessageContext();
   const author = useMemo(
-    () => members?.find((member) => member.id === message.authorId) ?? message.fallbackAuthor,
-    [members, message.authorId, message.fallbackAuthor]
+    () => users?.find((user) => user.id === message.authorId) ?? message.fallbackAuthor,
+    [users, message.authorId, message.fallbackAuthor]
   );
   const [deleting, setDeleting] = useState(false);
 
   const deleteMessage = async () => {
     setDeleting(true);
 
-    const response = await ipcRendererDiscordApiFunctions.deleteMessage(message.id, activeChannel.id);
+    const response = await ipcRendererDiscordApiFunctions.deleteMessage(message.id, channel.id);
 
     if (!response.success) {
       console.error(`Failed to delete message: ${response.error}`);
@@ -31,21 +30,20 @@ export default function ManageMessageActions({ message, ...props }: ManageMessag
 
   return (
     <Group attached position="absolute" top="0" right="0" transform="translate(-0.75rem, -50%)" zIndex="1" {...props}>
-      {client.id === author.id && !!onEdit && (
-        <IconButton {...BASE_ICON_BUTTON_PROPS} aria-label="Edit message" onClick={() => onEdit(message)}>
-          <FaPen />
-        </IconButton>
+      {!!onReply && (
+        <ManageMessageButton tooltip="Reply" onClick={() => onReply(message)}>
+          <FaReply />
+        </ManageMessageButton>
       )}
-      {(client.id === author.id || activeChannel.manageMessagesPermission) && (
-        <IconButton
-          {...BASE_ICON_BUTTON_PROPS}
-          aria-label="Delete message"
-          onClick={deleteMessage}
-          loading={deleting}
-          colorPalette="red"
-        >
+      {client.id === author.id && !!onEdit && (
+        <ManageMessageButton tooltip="Edit" onClick={() => onEdit(message)}>
+          <FaPen />
+        </ManageMessageButton>
+      )}
+      {(client.id === author.id || channel.manageMessagesPermission) && (
+        <ManageMessageButton tooltip="Delete" onClick={deleteMessage} loading={deleting} colorPalette="red">
           <FaTrash />
-        </IconButton>
+        </ManageMessageButton>
       )}
     </Group>
   );

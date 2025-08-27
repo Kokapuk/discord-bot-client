@@ -20,14 +20,24 @@ export default function Channel({ channel, active }: ChannelProps) {
     }
   }, [channel.type]);
 
-  return (
-    <NavLink to={`${channel.id}`}>
-      <Button variant="ghost" justifyContent="flex-start" width="100%" data-hover={active ? '' : undefined}>
-        {channelTypeIcon}{' '}
-        <Text width="100%" minWidth="0" textAlign="start" overflow="hidden" textOverflow="ellipsis">
-          {channel.name}
-        </Text>
-      </Button>
-    </NavLink>
+  const button = (
+    <Button
+      variant="ghost"
+      justifyContent="flex-start"
+      width="100%"
+      data-hover={active ? '' : undefined}
+      disabled={!channel.viewChannelPermission}
+    >
+      {channelTypeIcon}{' '}
+      <Text width="100%" minWidth="0" textAlign="start" overflow="hidden" textOverflow="ellipsis">
+        {channel.name}
+      </Text>
+    </Button>
   );
+
+  if (channel.viewChannelPermission) {
+    return <NavLink to={`${channel.id}`}>{button}</NavLink>;
+  }
+
+  return button;
 }

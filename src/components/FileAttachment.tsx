@@ -7,7 +7,7 @@ export default function FileAttachment({ attachment }: AttachmentProps) {
   return (
     <Card.Root variant="subtle" width="fit-content" maxWidth="32rem">
       <Card.Body gap="2" padding="4" flexDirection="row" alignItems="center">
-        <Icon size="2xl" color="colorPalette.300">
+        <Icon size="2xl" color="colorPalette.fg">
           <FaFile />
         </Icon>
         <Stack gap="0" width="100%" minWidth="0">
@@ -22,7 +22,7 @@ export default function FileAttachment({ attachment }: AttachmentProps) {
           >
             {attachment.name}
           </Link>
-          <Text fontSize={12} color="gray.400">
+          <Text fontSize={12} color="fg.muted">
             {formatBytes(attachment.size)}
           </Text>
         </Stack>

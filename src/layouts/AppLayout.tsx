@@ -2,12 +2,14 @@ import { Box } from '@chakra-ui/react';
 import { handleIpcRendererDiscordApiEvents } from '@renderer/api/discord';
 import GuildList from '@renderer/components/GuildList';
 import useAppStore from '@renderer/stores/app';
+import useGuildsStore from '@renderer/stores/guilds';
 import RouteSpinner from '@renderer/ui/RouteSpinner';
 import { Suspense, useEffect } from 'react';
 import { Outlet } from 'react-router';
 
 export default function AppLayout() {
-  const { pullClient, guilds, pullGuilds } = useAppStore();
+  const { pullClient } = useAppStore();
+  const { guilds, pullGuilds } = useGuildsStore();
 
   useEffect(() => {
     pullClient();

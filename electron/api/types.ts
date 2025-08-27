@@ -19,6 +19,7 @@ export interface Channel {
   sendMessagePermission: boolean;
   attachFilesPermission: boolean;
   manageMessagesPermission: boolean;
+  viewChannelPermission: boolean;
 }
 
 export interface User {
@@ -101,6 +102,7 @@ export interface Embed {
 
 export interface Message {
   id: string;
+  type: SupportedMessageType,
   authorId: string;
   fallbackAuthor: User;
   channelId: string;
@@ -109,6 +111,8 @@ export interface Message {
   editedTimestamp: number | null;
   attachments: Attachment[];
   embeds: Embed[];
+  referenceMessageId: string | null;
+  clientMentioned: boolean;
 }
 
 export interface SendMessageFileDTO {

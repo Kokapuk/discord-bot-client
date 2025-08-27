@@ -25,6 +25,7 @@ import {
   Message,
   Role,
   SupportedChannelType,
+  SupportedMessageType,
   User,
 } from './types';
 
@@ -39,6 +40,7 @@ export const structChannel = (channel: DiscordChannel): Channel => {
   let sendMessagePermission: boolean = false;
   let attachFilesPermission: boolean = false;
   let manageMessagesPermission: boolean = false;
+  let viewChannelPermission: boolean = false;
 
   if (!channel.isDMBased()) {
     name = channel.name;
@@ -49,6 +51,7 @@ export const structChannel = (channel: DiscordChannel): Channel => {
       sendMessagePermission = channelPermissions.has(PermissionFlagsBits.SendMessages);
       attachFilesPermission = channelPermissions.has(PermissionFlagsBits.AttachFiles);
       manageMessagesPermission = channelPermissions.has(PermissionFlagsBits.ManageMessages);
+      viewChannelPermission = channelPermissions.has(PermissionFlagsBits.ViewChannel);
     }
   }
 
@@ -59,6 +62,7 @@ export const structChannel = (channel: DiscordChannel): Channel => {
     sendMessagePermission,
     attachFilesPermission,
     manageMessagesPermission,
+    viewChannelPermission,
   };
 };
 
@@ -66,7 +70,7 @@ export const structUser = (user: GuildMember | DiscordUser): User => ({
   id: user.id,
   displayHexColor:
     !(user as GuildMember).displayHexColor || (user as GuildMember).displayHexColor === '#000000'
-      ? '#fff'
+      ? undefined
       : (user as GuildMember).displayHexColor,
   displayName: user.displayName,
   displayAvatarUrl: user.displayAvatarURL({ size: 64 }),
@@ -130,6 +134,7 @@ export const structEmbed = (embed: DiscordEmbed): Embed => ({
 
 export const structMessage = (message: DiscordMessage): Message => ({
   id: message.id,
+  type: message.type as unknown as SupportedMessageType,
   authorId: message.author.id,
   fallbackAuthor: structUser(message.author),
   channelId: message.channelId,
@@ -138,4 +143,6 @@ export const structMessage = (message: DiscordMessage): Message => ({
   editedTimestamp: message.editedTimestamp,
   attachments: message.attachments.map(structAttachment),
   embeds: message.embeds.map(structEmbed),
+  referenceMessageId: message.reference?.messageId ?? null,
+  clientMentioned: message.mentions.has(message.client.user),
 });

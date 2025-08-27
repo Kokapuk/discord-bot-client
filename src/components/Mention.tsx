@@ -6,8 +6,8 @@ export type MentionProps = MarkProps & RefAttributes<HTMLElement>;
 export default function Mention(props: MentionProps) {
   return (
     <Mark
-      backgroundColor="colorPalette.800"
-      color="colorPalette.300"
+      backgroundColor="colorPalette.muted"
+      color="colorPalette.fg"
       paddingInline="1.5"
       borderRadius="xs"
       {...props}

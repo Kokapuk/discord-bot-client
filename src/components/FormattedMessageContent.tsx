@@ -1,23 +1,30 @@
-import { Box, Image, Link, Text, TextProps } from '@chakra-ui/react';
-import { ReactNode, RefAttributes, useMemo } from 'react';
+import { Image, Link, Text, TextProps } from '@chakra-ui/react';
+import { Fragment, ReactNode, RefAttributes, useMemo } from 'react';
 import reactStringReplace from 'react-string-replace';
 import Mention from './Mention';
 import { useMessageContext } from './MessageContext';
 
 export type FormattedMessageContentProps = {
   rawContent: string;
+  oneLine?: boolean;
 } & TextProps &
   RefAttributes<HTMLParagraphElement>;
 
-export default function FormattedMessageContent({ rawContent, ...props }: FormattedMessageContentProps) {
-  const { channels, members, roles } = useMessageContext();
+export default function FormattedMessageContent({ rawContent, oneLine, ...props }: FormattedMessageContentProps) {
+  const { channels, users, roles } = useMessageContext();
 
   const formattedContent = useMemo(() => {
     let tokenized: ReactNode[] = [rawContent];
 
+    if (oneLine) {
+      tokenized = reactStringReplace(tokenized, /(\n)/, (url, index) => (
+        <Fragment key={`newLines-${index}`}>{url}</Fragment>
+      ));
+    }
+
     tokenized = reactStringReplace(
       tokenized,
-      /(https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*))/g,
+      /(https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*))/,
       (url, index) => (
         <Link key={`link-${index}`} href={url} target="_blank" wordBreak="break-word">
           {url}
@@ -30,8 +37,8 @@ export default function FormattedMessageContent({ rawContent, ...props }: Format
         key={`emoji-${index}`}
         loading="lazy"
         src={`https://cdn.discordapp.com/emojis/${emojiId}.png`}
-        width="1.375rem"
-        height="1.375rem"
+        width="1.375em"
+        height="1.375em"
         objectFit="contain"
         display="inline-block"
       />
@@ -42,8 +49,8 @@ export default function FormattedMessageContent({ rawContent, ...props }: Format
         key={`animatedEmoji-${index}`}
         loading="lazy"
         src={`https://cdn.discordapp.com/emojis/${emojiId}.gif`}
-        width="1.375rem"
-        height="1.375rem"
+        width="1.375em"
+        height="1.375em"
         objectFit="contain"
         display="inline-block"
       />
@@ -59,7 +66,7 @@ export default function FormattedMessageContent({ rawContent, ...props }: Format
     ));
     tokenized = reactStringReplace(tokenized, /<@(\d+?)>/g, (userId, index) => (
       <Mention key={`member-${index}`}>
-        @{members?.find((member) => member.id === userId)?.displayName ?? 'unknown-user'}
+        @{users?.find((member) => member.id === userId)?.displayName ?? 'unknown-user'}
       </Mention>
     ));
     tokenized = reactStringReplace(tokenized, /<@&(\d+?)>/g, (roleId, index) => (
@@ -70,7 +77,7 @@ export default function FormattedMessageContent({ rawContent, ...props }: Format
 
     tokenized = tokenized.map((token, index) =>
       typeof token === 'string' ? (
-        <Text key={`text-${index}`} as="span" fontSize="md" whiteSpace="pre-wrap" {...props}>
+        <Text key={`text-${index}`} as="span" whiteSpace={oneLine ? 'pre' : 'pre-wrap'}>
           {token}
         </Text>
       ) : (
@@ -79,7 +86,11 @@ export default function FormattedMessageContent({ rawContent, ...props }: Format
     );
 
     return tokenized;
-  }, [rawContent, channels, members, roles]);
+  }, [rawContent, channels, users, roles]);
 
-  return <Box as="span">{formattedContent}</Box>;
+  return (
+    <Text as="span" fontSize="md" {...props}>
+      {formattedContent}
+    </Text>
+  );
 }

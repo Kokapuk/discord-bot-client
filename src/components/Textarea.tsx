@@ -1,30 +1,30 @@
 import { BoxProps, Textarea as ChakraTextarea, FileUpload, IconButton, Stack, useFileUpload } from '@chakra-ui/react';
-import { Channel, EditMessageDTO, Message, SendMessageDTO, SendMessageFileDTO } from '@main/api/types';
+import { EditMessageDTO, SendMessageDTO, SendMessageFileDTO } from '@main/api/types';
 import { ipcRendererDiscordApiFunctions } from '@renderer/api/discord';
 import fileSchema from '@renderer/utils/fileSchema';
 import dayjs from 'dayjs';
-import React, { RefAttributes, useRef } from 'react';
+import React, { RefAttributes, useEffect, useMemo, useRef } from 'react';
 import { FaFileCirclePlus } from 'react-icons/fa6';
 import z from 'zod';
 import FileUploadList from './FileUploadList';
 import TextareaActionContext from './TextareaActionContext';
+import { useTextareaContext } from './TextareaContext';
+import TextareaReplyContext from './TextareaReplyContext';
 
-export type TextareaProps = {
-  channel: Channel;
-  editingMessage?: Message | null;
-  onEditCancel?(): void;
-} & BoxProps &
-  RefAttributes<HTMLDivElement>;
+export type TextareaProps = BoxProps & RefAttributes<HTMLDivElement>;
 
 export const messageFormDataSchema = z.object({
   content: z.string().max(2000, { error: (iss) => `Message must not be longer than ${iss.maximum}` }),
   files: z.array(fileSchema, { error: 'Files are invalid' }).optional(),
 });
 
-export default function Textarea({ channel, editingMessage, onEditCancel, ...props }: TextareaProps) {
+export default function Textarea(props: TextareaProps) {
+  const { channel, editingMessage, onEditClose, replyingMessage, onReplyClose } = useTextareaContext();
   const form = useRef<HTMLFormElement>(null);
+  const textarea = useRef<HTMLTextAreaElement>(null);
   const canAttachFiles = channel.attachFilesPermission && !editingMessage;
   const sending = useRef(false);
+  const attached = useMemo(() => !!editingMessage || !!replyingMessage, [!!editingMessage, !!replyingMessage]);
 
   const fileUpload = useFileUpload({
     maxFiles: 10,
@@ -43,6 +43,20 @@ export default function Textarea({ channel, editingMessage, onEditCancel, ...pro
       return null;
     },
   });
+
+  useEffect(() => {
+    if (!textarea.current) {
+      return;
+    }
+
+    if (editingMessage || replyingMessage) {
+      textarea.current?.focus();
+    }
+
+    if (editingMessage) {
+      textarea.current.setSelectionRange(editingMessage.content.length, editingMessage.content.length);
+    }
+  }, [!!editingMessage, !!replyingMessage]);
 
   const sendMessage = async (form: HTMLFormElement) => {
     const messageFormData = messageFormDataSchema.parse({
@@ -71,7 +85,9 @@ export default function Textarea({ channel, editingMessage, onEditCancel, ...pro
       files,
     };
 
-    const response = await ipcRendererDiscordApiFunctions.sendMessage(channel.id, message);
+    const response = replyingMessage
+      ? await ipcRendererDiscordApiFunctions.replyToMessage(replyingMessage.id, channel.id, message)
+      : await ipcRendererDiscordApiFunctions.sendMessage(channel.id, message);
 
     sending.current = false;
 
@@ -82,6 +98,10 @@ export default function Textarea({ channel, editingMessage, onEditCancel, ...pro
 
     form.reset();
     fileUpload.clearFiles();
+
+    if (replyingMessage) {
+      onReplyClose?.();
+    }
   };
 
   const editMessage = async (form: HTMLFormElement) => {
@@ -111,7 +131,7 @@ export default function Textarea({ channel, editingMessage, onEditCancel, ...pro
       return;
     }
 
-    onEditCancel?.();
+    onEditClose?.();
   };
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -158,13 +178,14 @@ export default function Textarea({ channel, editingMessage, onEditCancel, ...pro
     <FileUpload.RootProvider value={fileUpload} {...props}>
       <Stack ref={form as any} as="form" onSubmit={handleSubmit as any} width="100%" gap="0">
         {!!editingMessage && (
-          <TextareaActionContext label="Editing message" onCancel={onEditCancel} borderBottomRadius="0" />
+          <TextareaActionContext label="Editing message" onCancel={onEditClose} borderBottomRadius="0" />
         )}
+        {!!replyingMessage && <TextareaReplyContext message={replyingMessage} borderBottomRadius="0" />}
         <Stack
           gap="2.5"
-          backgroundColor="gray.900"
+          backgroundColor="bg.muted"
           borderRadius="md"
-          borderTopRadius={!!editingMessage ? '0' : undefined}
+          borderTopRadius={attached ? '0' : undefined}
           width="100%"
         >
           {!!fileUpload.acceptedFiles.length && (
@@ -187,6 +208,7 @@ export default function Textarea({ channel, editingMessage, onEditCancel, ...pro
             )}
             <ChakraTextarea
               key={editingMessage?.id ?? 'newMessage'}
+              ref={textarea}
               autoresize
               placeholder="Message"
               maxLength={2000}

@@ -1,5 +1,6 @@
 import { Avatar, Image, Stack, StackProps, Text } from '@chakra-ui/react';
 import { type Message } from '@main/api/types';
+import { useColorMode } from '@renderer/ui/color-mode';
 import dayjs from 'dayjs';
 import { memo, RefAttributes, useMemo } from 'react';
 import Attachments from './Attachments';
@@ -7,6 +8,7 @@ import Embeds from './Embeds';
 import FormattedMessageContent from './FormattedMessageContent';
 import ManageMessageActions from './ManageMessageActions';
 import { useMessageContext } from './MessageContext';
+import ReferenceMessage from './ReferenceMessage';
 
 export type MessageProps = {
   message: Message;
@@ -15,10 +17,11 @@ export type MessageProps = {
   RefAttributes<HTMLDivElement>;
 
 const Message = ({ message, chain, ...props }: MessageProps) => {
-  const { members } = useMessageContext();
+  const { users } = useMessageContext();
+  const { colorMode } = useColorMode();
   const author = useMemo(
-    () => members?.find((member) => member.id === message.authorId) ?? message.fallbackAuthor,
-    [members, message.authorId, message.fallbackAuthor]
+    () => users?.find((user) => user.id === message.authorId) ?? message.fallbackAuthor,
+    [users, message.authorId, message.fallbackAuthor]
   );
 
   const createdAtFormattedFull = useMemo(
@@ -33,58 +36,70 @@ const Message = ({ message, chain, ...props }: MessageProps) => {
 
   return (
     <Stack
-      direction="row"
-      gap="4"
       className="group"
+      gap="0"
       position="relative"
-      _hover={{ backgroundColor: 'whiteAlpha.50' }}
+      paddingInline="2.5"
+      backgroundColor={message.clientMentioned ? 'yellow.focusRing/10' : undefined}
+      _hover={{
+        backgroundColor: message.clientMentioned
+          ? 'yellow.focusRing/15'
+          : colorMode === 'light'
+          ? 'blackAlpha.50'
+          : 'whiteAlpha.50',
+      }}
       {...props}
     >
-      <ManageMessageActions message={message} visibility="hidden" _groupHover={{ visibility: 'visible' }} />
-      {chain ? (
-        <Text
-          color="gray.400"
-          fontSize="xs"
-          visibility="hidden"
-          width="10"
-          flexShrink="0"
-          paddingLeft="1"
-          paddingTop="1"
-          _groupHover={{ visibility: 'visible' }}
-        >
-          {createdAtFormattedTime}
-        </Text>
-      ) : (
-        <Avatar.Root size="md" backgroundColor="transparent">
-          <Image loading="lazy" src={author.displayAvatarUrl} position="absolute" inset="0" borderRadius="full" />
-        </Avatar.Root>
+      {!!message.referenceMessageId && (
+        <ReferenceMessage referenceMessageId={message.referenceMessageId} marginBottom="1" />
       )}
-      <Stack gap="0" width="100%" minWidth="0">
-        {!chain && (
-          <Stack direction="row" alignItems="center">
-            <Text color={author.displayHexColor} fontWeight="600" fontSize="md">
-              {author.displayName}
-            </Text>
-            <Text color="gray.400" fontSize="xs">
-              {createdAtFormattedFull}
-            </Text>
-            {message.editedTimestamp !== null && (
-              <Text fontSize="2xs" color="gray.500">
-                (edited)
-              </Text>
-            )}
-          </Stack>
-        )}
-        <FormattedMessageContent rawContent={message.content} />
-
-        <Attachments attachments={message.attachments} />
-        <Embeds embeds={message.embeds} />
-
-        {chain && message.editedTimestamp !== null && (
-          <Text fontSize="2xs" color="gray.500">
-            (edited)
+      <Stack direction="row" gap="4">
+        <ManageMessageActions message={message} visibility="hidden" _groupHover={{ visibility: 'visible' }} />
+        {chain ? (
+          <Text
+            color="fg.muted"
+            fontSize="xs"
+            visibility="hidden"
+            width="10"
+            flexShrink="0"
+            paddingLeft="1"
+            paddingTop="1"
+            _groupHover={{ visibility: 'visible' }}
+          >
+            {createdAtFormattedTime}
           </Text>
+        ) : (
+          <Avatar.Root size="md" backgroundColor="transparent">
+            <Image loading="lazy" src={author.displayAvatarUrl} position="absolute" inset="0" borderRadius="full" />
+          </Avatar.Root>
         )}
+        <Stack gap="0" width="100%" minWidth="0">
+          {!chain && (
+            <Stack direction="row" alignItems="center">
+              <Text color={author.displayHexColor} fontWeight="600" fontSize="md">
+                {author.displayName}
+              </Text>
+              <Text color="fg.muted" fontSize="xs">
+                {createdAtFormattedFull}
+              </Text>
+              {message.editedTimestamp !== null && (
+                <Text fontSize="2xs" color="fg.subtle">
+                  (edited)
+                </Text>
+              )}
+            </Stack>
+          )}
+          <FormattedMessageContent rawContent={message.content} />
+
+          <Attachments attachments={message.attachments} />
+          <Embeds embeds={message.embeds} />
+
+          {chain && message.editedTimestamp !== null && (
+            <Text fontSize="2xs" color="fg.subtle">
+              (edited)
+            </Text>
+          )}
+        </Stack>
       </Stack>
     </Stack>
   );
