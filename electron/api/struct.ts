@@ -138,6 +138,7 @@ export const structMessage = (message: DiscordMessage): Message => ({
   authorId: message.author.id,
   fallbackAuthor: structUser(message.author),
   channelId: message.channelId,
+  guildId: message.guildId,
   content: message.content,
   createdTimestamp: message.createdTimestamp,
   editedTimestamp: message.editedTimestamp,

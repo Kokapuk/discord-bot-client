@@ -65,8 +65,8 @@ export default function FormattedMessageContent({ rawContent, oneLine, ...props 
       </Mention>
     ));
     tokenized = reactStringReplace(tokenized, /<@(\d+?)>/g, (userId, index) => (
-      <Mention key={`member-${index}`}>
-        @{users?.find((member) => member.id === userId)?.displayName ?? 'unknown-user'}
+      <Mention key={`user-${index}`}>
+        @{users?.find((user) => user.id === userId)?.displayName ?? 'unknown-user'}
       </Mention>
     ));
     tokenized = reactStringReplace(tokenized, /<@&(\d+?)>/g, (roleId, index) => (

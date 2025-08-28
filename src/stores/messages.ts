@@ -14,6 +14,9 @@ interface MessagesState {
   setEditingMessage(editingMessage: Message | null): void;
   replyingMessage: Message | null;
   setReplyingMessage(replyingMessage: Message | null): void;
+  unreadChannels: string[];
+  addUnreadChannel(channelId: string): void;
+  removeUnreadChannel(channelId: string): void;
 }
 
 const useMessagesStore = create<MessagesState>()((set, get) => ({
@@ -89,6 +92,19 @@ const useMessagesStore = create<MessagesState>()((set, get) => ({
   setEditingMessage: (editingMessage) => set({ editingMessage }),
   replyingMessage: null,
   setReplyingMessage: (replyingMessage) => set({ replyingMessage }),
+  unreadChannels: [],
+  addUnreadChannel: (channelId) => {
+    if (get().unreadChannels.includes(channelId)) {
+      return;
+    }
+
+    set((prev) => ({ ...prev, unreadChannels: [...prev.unreadChannels, channelId] }));
+  },
+  removeUnreadChannel: (channelId) =>
+    set((prev) => ({
+      ...prev,
+      unreadChannels: prev.unreadChannels.filter((unreadChannelId) => unreadChannelId !== channelId),
+    })),
 }));
 
 export default useMessagesStore;

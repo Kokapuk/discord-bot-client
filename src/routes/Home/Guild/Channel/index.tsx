@@ -1,5 +1,4 @@
 import { Box, Heading } from '@chakra-ui/react';
-import { handleIpcRendererDiscordApiEventWithPayload } from '@renderer/api/discord';
 import { MessageContext, MessageProvider } from '@renderer/components/MessageContext';
 import MessageList from '@renderer/components/MessageList';
 import Textarea from '@renderer/components/Textarea';
@@ -18,28 +17,20 @@ export default function Channel() {
     messages,
     topReachedChannels,
     fetchMessages,
-    updateMessage,
-    addMessage,
-    removeMessage,
     editingMessage,
     setEditingMessage,
     replyingMessage,
     setReplyingMessage,
+    removeUnreadChannel,
   } = useMessagesStore();
 
   useEffect(() => {
     setEditingMessage(null);
     setReplyingMessage(null);
 
-    const unsubscribeMessageUpdate = handleIpcRendererDiscordApiEventWithPayload('messageUpdate', updateMessage);
-    const unsubscribeMessageCreate = handleIpcRendererDiscordApiEventWithPayload('messageCreate', addMessage);
-    const unsubscribeMessageDelete = handleIpcRendererDiscordApiEventWithPayload('messageDelete', removeMessage);
-
-    return () => {
-      unsubscribeMessageUpdate();
-      unsubscribeMessageCreate();
-      unsubscribeMessageDelete();
-    };
+    if (channelId) {
+      removeUnreadChannel(channelId);
+    }
   }, [channelId]);
 
   if (!guildId || !channelId) {
@@ -90,12 +81,13 @@ export default function Channel() {
     () => ({
       channel: activeChannel,
       users: guildMembers,
+      roles: guildRoles,
       editingMessage,
       onEditClose: () => setEditingMessage(null),
       replyingMessage,
       onReplyClose: () => setReplyingMessage(null),
     }),
-    [activeChannel, guildMembers, editingMessage, replyingMessage]
+    [activeChannel, guildMembers, guildRoles, editingMessage, replyingMessage]
   );
 
   return (

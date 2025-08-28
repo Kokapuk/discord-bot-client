@@ -24,6 +24,7 @@ const MessageList = ({ messages, onPaginate, ...props }: MessageListProps) => {
       ) {
         chainedMessages.push(
           <Stack
+            key={`timeSeparator-${message.id}`}
             direction="row"
             flexShrink="0"
             marginTop="4.5"

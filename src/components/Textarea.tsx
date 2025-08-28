@@ -7,6 +7,7 @@ import React, { RefAttributes, useEffect, useMemo, useRef } from 'react';
 import { FaFileCirclePlus } from 'react-icons/fa6';
 import z from 'zod';
 import FileUploadList from './FileUploadList';
+import MentionMenu from './MentionMenu';
 import TextareaActionContext from './TextareaActionContext';
 import { useTextareaContext } from './TextareaContext';
 import TextareaReplyContext from './TextareaReplyContext';
@@ -177,6 +178,7 @@ export default function Textarea(props: TextareaProps) {
   return (
     <FileUpload.RootProvider value={fileUpload} {...props}>
       <Stack ref={form as any} as="form" onSubmit={handleSubmit as any} width="100%" gap="0">
+        <MentionMenu textarea={textarea} />
         {!!editingMessage && (
           <TextareaActionContext label="Editing message" onCancel={onEditClose} borderBottomRadius="0" />
         )}

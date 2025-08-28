@@ -106,6 +106,7 @@ export interface Message {
   authorId: string;
   fallbackAuthor: User;
   channelId: string;
+  guildId: string | null;
   content: string;
   createdTimestamp: number;
   editedTimestamp: number | null;

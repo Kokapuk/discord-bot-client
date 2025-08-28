@@ -3,6 +3,7 @@ import { handleIpcRendererDiscordApiEvents } from '@renderer/api/discord';
 import ChannelList from '@renderer/components/ChannelList';
 import MemberList from '@renderer/components/MemberList';
 import useGuildsStore from '@renderer/stores/guilds';
+import useMessagesStore from '@renderer/stores/messages';
 import RouteSpinner from '@renderer/ui/RouteSpinner';
 import { Suspense, useEffect, useMemo } from 'react';
 import { Navigate, Outlet, useParams } from 'react-router';
@@ -10,6 +11,7 @@ import { Navigate, Outlet, useParams } from 'react-router';
 export default function GuildLayout() {
   const { guildId, channelId } = useParams();
   const { guilds, channels, members, pullChannels, pullMembers, pullRoles } = useGuildsStore();
+  const { unreadChannels } = useMessagesStore();
   const activeGuild = useMemo(() => guilds?.find((guild) => guild.id === guildId), [guilds, guildId]);
   const activeGuildChannels = useMemo(() => (activeGuild ? channels[activeGuild.id] : null), [activeGuild, channels]);
   const activeGuildMembers = useMemo(() => (activeGuild ? members[activeGuild.id] : null), [activeGuild, members]);
@@ -87,6 +89,7 @@ export default function GuildLayout() {
         <ChannelList
           channels={activeGuildChannels}
           activeChannel={activeChannel}
+          unreadChannels={unreadChannels}
           height="100%"
           width="100%"
           minHeight="0"

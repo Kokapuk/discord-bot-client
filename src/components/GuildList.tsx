@@ -4,9 +4,10 @@ import debounce from 'lodash/debounce';
 import { memo, RefAttributes, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import Guild from './Guild';
 
-export type GuildListProps = { guilds: GuildType[] } & StackProps & RefAttributes<HTMLDivElement>;
+export type GuildListProps = { guilds: GuildType[]; unreadGuilds?: string[] } & StackProps &
+  RefAttributes<HTMLDivElement>;
 
-const GuildList = ({ guilds, ref, ...props }: GuildListProps) => {
+const GuildList = ({ guilds, unreadGuilds, ref, ...props }: GuildListProps) => {
   const guildList = useRef<HTMLDivElement>(null);
   const [showTopShadow, setShowTopShadow] = useState(false);
   const [showBottomShadow, setShowBottomShadow] = useState(false);
@@ -65,7 +66,7 @@ const GuildList = ({ guilds, ref, ...props }: GuildListProps) => {
       {...props}
     >
       {guilds.map((guild) => (
-        <Guild key={guild.id} guild={guild} />
+        <Guild key={guild.id} guild={guild} unread={unreadGuilds?.includes(guild.id)} />
       ))}
     </Stack>
   );

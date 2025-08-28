@@ -1,9 +1,10 @@
-import { Channel, Message, User } from '@main/api/types';
+import { Channel, Message, Role, User } from '@main/api/types';
 import { createContext, useContext } from 'react';
 
 export type TextareaContext = {
   channel: Channel;
   users?: User[];
+  roles?: Role[];
   editingMessage?: Message | null;
   onEditClose?(): void;
   replyingMessage?: Message | null;
