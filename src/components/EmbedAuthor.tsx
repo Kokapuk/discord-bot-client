@@ -1,5 +1,5 @@
 import { Image, Link, Stack, StackProps, Text } from '@chakra-ui/react';
-import { type EmbedAuthor } from '@main/api/types';
+import { type EmbedAuthor } from '@main/api/discord/types';
 import { RefAttributes } from 'react';
 
 export type EmbedAuthorProps = { author: EmbedAuthor } & StackProps & RefAttributes<HTMLDivElement>;

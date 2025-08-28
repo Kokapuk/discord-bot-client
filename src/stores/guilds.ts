@@ -1,5 +1,5 @@
-import { Channel, Guild, Role, User } from '@main/api/types';
-import { ipcRendererDiscordApiFunctions } from '@renderer/api/discord';
+import { Channel, Guild, Role, User } from '@main/api/discord/types';
+import { ipcRendererApiFunctions } from '@renderer/api';
 import { create } from 'zustand';
 
 interface GuildsState {
@@ -16,7 +16,7 @@ interface GuildsState {
 const useGuildsStore = create<GuildsState>()((set) => ({
   guilds: null,
   pullGuilds: async () => {
-    const response = await ipcRendererDiscordApiFunctions.getGuilds();
+    const response = await ipcRendererApiFunctions.getGuilds();
 
     if (!response.success) {
       set({ guilds: null });
@@ -28,7 +28,7 @@ const useGuildsStore = create<GuildsState>()((set) => ({
   },
   channels: {},
   pullChannels: async (guildId) => {
-    const response = await ipcRendererDiscordApiFunctions.getGuildChannels(guildId);
+    const response = await ipcRendererApiFunctions.getGuildChannels(guildId);
 
     if (!response.success) {
       set((prev) => ({ ...prev, channels: { ...prev.channels, [guildId]: [] } }));
@@ -40,7 +40,7 @@ const useGuildsStore = create<GuildsState>()((set) => ({
   },
   members: {},
   pullMembers: async (guildId) => {
-    const response = await ipcRendererDiscordApiFunctions.getGuildMembers(guildId);
+    const response = await ipcRendererApiFunctions.getGuildMembers(guildId);
 
     if (!response.success) {
       set((prev) => ({ ...prev, members: { ...prev.members, [guildId]: [] } }));
@@ -52,7 +52,7 @@ const useGuildsStore = create<GuildsState>()((set) => ({
   },
   roles: {},
   pullRoles: async (guildId) => {
-    const response = await ipcRendererDiscordApiFunctions.getGuildRoles(guildId);
+    const response = await ipcRendererApiFunctions.getGuildRoles(guildId);
 
     if (!response.success) {
       set((prev) => ({ ...prev, roles: { ...prev.roles, [guildId]: [] } }));

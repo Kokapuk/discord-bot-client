@@ -1,5 +1,5 @@
 import { Button, Circle, Float, Text } from '@chakra-ui/react';
-import { SupportedChannelType, type Channel } from '@main/api/types';
+import { SupportedChannelType, type Channel } from '@main/api/discord/types';
 import { useMemo } from 'react';
 import { FaCodeBranch, FaHashtag, FaVolumeLow } from 'react-icons/fa6';
 import { NavLink } from 'react-router';

@@ -1,4 +1,4 @@
-import { type Embed } from '@main/api/types';
+import { type Embed } from '@main/api/discord/types';
 import ImageAttachment from './ImageAttachment';
 import RichEmbed from './RichEmbed';
 import VideoAttachment from './VideoAttachment';

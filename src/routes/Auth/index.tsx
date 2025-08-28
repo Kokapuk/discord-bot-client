@@ -1,5 +1,5 @@
 import { Button, Card, Field, Fieldset, Link, Stack } from '@chakra-ui/react';
-import { ipcRendererDiscordApiFunctions } from '@renderer/api/discord';
+import { ipcRendererApiFunctions } from '@renderer/api';
 import { PasswordInput } from '@renderer/ui/password-input';
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
@@ -18,7 +18,7 @@ export default function Auth() {
     try {
       setAuthorizing(true);
       const formdata = authFormDataSchema.parse(Object.fromEntries(new FormData(event.currentTarget).entries()));
-      const response = await ipcRendererDiscordApiFunctions.authorize(formdata.token);
+      const response = await ipcRendererApiFunctions.authorize(formdata.token);
 
       if (response.success) {
         localStorage.setItem('token', formdata.token);
@@ -41,7 +41,7 @@ export default function Auth() {
   };
 
   return (
-    <Card.Root width={500} variant="subtle" mx="auto" mt="15vh">
+    <Card.Root width={500} variant="outline" mx="auto" mt="15vh">
       <form onSubmit={handleSubmit} onChange={() => setFormIssues((prev) => (Object.keys.length === 0 ? prev : {}))}>
         <Fieldset.Root size="lg" padding="6">
           <Stack>

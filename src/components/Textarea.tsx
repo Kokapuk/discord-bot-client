@@ -1,6 +1,6 @@
 import { BoxProps, Textarea as ChakraTextarea, FileUpload, IconButton, Stack, useFileUpload } from '@chakra-ui/react';
-import { EditMessageDTO, SendMessageDTO, SendMessageFileDTO } from '@main/api/types';
-import { ipcRendererDiscordApiFunctions } from '@renderer/api/discord';
+import { EditMessageDTO, SendMessageDTO, SendMessageFileDTO } from '@main/api/discord/types';
+import { ipcRendererApiFunctions } from '@renderer/api';
 import fileSchema from '@renderer/utils/fileSchema';
 import dayjs from 'dayjs';
 import React, { RefAttributes, useEffect, useMemo, useRef } from 'react';
@@ -87,8 +87,8 @@ export default function Textarea(props: TextareaProps) {
     };
 
     const response = replyingMessage
-      ? await ipcRendererDiscordApiFunctions.replyToMessage(replyingMessage.id, channel.id, message)
-      : await ipcRendererDiscordApiFunctions.sendMessage(channel.id, message);
+      ? await ipcRendererApiFunctions.replyToMessage(replyingMessage.id, channel.id, message)
+      : await ipcRendererApiFunctions.sendMessage(channel.id, message);
 
     sending.current = false;
 
@@ -123,7 +123,7 @@ export default function Textarea(props: TextareaProps) {
       content: messageFormData.content,
     };
 
-    const response = await ipcRendererDiscordApiFunctions.editMessage(editingMessage.id, channel.id, message);
+    const response = await ipcRendererApiFunctions.editMessage(editingMessage.id, channel.id, message);
 
     sending.current = false;
 
@@ -185,7 +185,7 @@ export default function Textarea(props: TextareaProps) {
         {!!replyingMessage && <TextareaReplyContext message={replyingMessage} borderBottomRadius="0" />}
         <Stack
           gap="2.5"
-          backgroundColor="bg.muted"
+          backgroundColor="bg.emphasized"
           borderRadius="md"
           borderTopRadius={attached ? '0' : undefined}
           width="100%"
@@ -218,7 +218,7 @@ export default function Textarea(props: TextareaProps) {
               defaultValue={editingMessage?.content}
               onKeyDown={handleKeydown}
               onPaste={handlePaste}
-              variant="subtle"
+              backgroundColor="transparent"
               width="100%"
               minWidth="0"
               maxHeight="96"

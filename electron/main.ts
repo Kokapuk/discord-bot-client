@@ -2,7 +2,10 @@ import { app, BrowserWindow, nativeTheme, shell } from 'electron';
 // import { createRequire } from 'node:module';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { bindIpcDiscordApiEvents, bindIpcDiscordApiFunctions, logout } from './api/discord';
+import { bindIpcApiFunctions } from './api';
+import { setTheme } from './api/app';
+import { client } from './api/discord/client';
+import { bindIpcDiscordApiEvents } from './api/discord/events';
 
 // const require = createRequire(import.meta.url);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -21,11 +24,7 @@ const createWindow = () => {
   win = new BrowserWindow({
     icon: path.join(process.env.VITE_PUBLIC, 'electron-vite.svg'),
     titleBarStyle: 'hidden',
-    titleBarOverlay: {
-      color: 'rgba(0,0,0,0)',
-      symbolColor: 'white',
-      height: 30,
-    },
+    titleBarOverlay: {},
     width: 1200,
     height: 750,
     backgroundMaterial: 'mica',
@@ -33,8 +32,6 @@ const createWindow = () => {
       preload: path.join(__dirname, 'preload.mjs'),
     },
   });
-
-  nativeTheme.themeSource = 'dark';
 
   if (VITE_DEV_SERVER_URL) {
     win.loadURL(`${VITE_DEV_SERVER_URL}#auth`);
@@ -51,8 +48,23 @@ const createWindow = () => {
     return { action: 'allow' };
   });
 
-  bindIpcDiscordApiFunctions();
+  bindIpcApiFunctions();
   bindIpcDiscordApiEvents(win.webContents);
+};
+
+const subscribeToThemeUpdate = () => {
+  const handleThemeUpdate = () => {
+    win?.setTitleBarOverlay({
+      color: nativeTheme.shouldUseDarkColors ? 'rgba(0,0,0,0)' : 'rgba(255,255,255,0)',
+      symbolColor: nativeTheme.shouldUseDarkColors ? 'white' : 'black',
+      height: 30,
+    });
+  };
+
+  nativeTheme.on('updated', handleThemeUpdate);
+  handleThemeUpdate();
+
+  setTheme(undefined, 'dark');
 };
 
 app.on('window-all-closed', () => {
@@ -62,8 +74,8 @@ app.on('window-all-closed', () => {
   }
 });
 
-app.on('before-quit', () => {
-  logout();
+app.on('before-quit', async () => {
+  await client.destroy();
 });
 
 app.on('activate', () => {
@@ -72,4 +84,7 @@ app.on('activate', () => {
   }
 });
 
-app.whenReady().then(createWindow);
+app.whenReady().then(() => {
+  createWindow();
+  subscribeToThemeUpdate();
+});

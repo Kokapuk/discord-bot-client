@@ -1,6 +1,6 @@
 import { Group, GroupProps } from '@chakra-ui/react';
-import { Message } from '@main/api/types';
-import { ipcRendererDiscordApiFunctions } from '@renderer/api/discord';
+import { Message } from '@main/api/discord/types';
+import { ipcRendererApiFunctions } from '@renderer/api';
 import { RefAttributes, useMemo, useState } from 'react';
 import { FaPen, FaReply, FaTrash } from 'react-icons/fa6';
 import ManageMessageButton from './ManageMessageButton';
@@ -19,7 +19,7 @@ export default function ManageMessageActions({ message, ...props }: ManageMessag
   const deleteMessage = async () => {
     setDeleting(true);
 
-    const response = await ipcRendererDiscordApiFunctions.deleteMessage(message.id, channel.id);
+    const response = await ipcRendererApiFunctions.deleteMessage(message.id, channel.id);
 
     if (!response.success) {
       console.error(`Failed to delete message: ${response.error}`);

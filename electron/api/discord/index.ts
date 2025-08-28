@@ -1,7 +1,7 @@
-import { IpcMainEventHandlersToRendererFunctions } from '@main/utils';
-import { AttachmentBuilder, Client, ClientEvents, GatewayIntentBits } from 'discord.js';
-import { ipcMain, IpcMainInvokeEvent, WebContents } from 'electron';
-import { structChannel, structGuild, structUser, structMessage, structRole } from './struct';
+import { AttachmentBuilder } from 'discord.js';
+import { IpcMainInvokeEvent } from 'electron';
+import { IpcApiResponse } from '..';
+import { client } from './client';
 import {
   Channel,
   EditMessageDTO,
@@ -13,16 +13,9 @@ import {
   SupportedMessageType,
   User,
 } from './types';
+import { structChannel, structGuild, structMessage, structRole, structUser } from './utils';
 
-export type IpcApiResponse<T = void> =
-  | (T extends void ? { success: true } : { success: true; payload: T })
-  | { success: false; error: string };
-
-const client = new Client({
-  intents: Object.values(GatewayIntentBits) as GatewayIntentBits[],
-});
-
-const authorize = async (_: IpcMainInvokeEvent, token: string): Promise<IpcApiResponse> => {
+export const authorize = async (_: IpcMainInvokeEvent, token: string): Promise<IpcApiResponse> => {
   try {
     await client.login(token);
     await new Promise((res) => client.once('ready', res));
@@ -33,7 +26,7 @@ const authorize = async (_: IpcMainInvokeEvent, token: string): Promise<IpcApiRe
   }
 };
 
-const getClient = (): IpcApiResponse<User> => {
+export const getClient = (): IpcApiResponse<User> => {
   if (!client.user) {
     return { success: false, error: 'Client user does not exist' };
   }
@@ -41,13 +34,13 @@ const getClient = (): IpcApiResponse<User> => {
   return { success: true, payload: structUser(client.user) };
 };
 
-const getGuilds = (): IpcApiResponse<Guild[]> => {
+export const getGuilds = (): IpcApiResponse<Guild[]> => {
   const guilds: Guild[] = client.guilds.cache.map(structGuild);
 
   return { success: true, payload: guilds };
 };
 
-const getGuildChannels = (_: IpcMainInvokeEvent, guildId: string): IpcApiResponse<Channel[]> => {
+export const getGuildChannels = (_: IpcMainInvokeEvent, guildId: string): IpcApiResponse<Channel[]> => {
   const guild = client.guilds.cache.find((guild) => guild.id === guildId);
 
   if (!guild) {
@@ -62,7 +55,7 @@ const getGuildChannels = (_: IpcMainInvokeEvent, guildId: string): IpcApiRespons
   return { success: true, payload: channels };
 };
 
-const getGuildMembers = (_: IpcMainInvokeEvent, guildId: string): IpcApiResponse<User[]> => {
+export const getGuildMembers = (_: IpcMainInvokeEvent, guildId: string): IpcApiResponse<User[]> => {
   const guild = client.guilds.cache.find((guild) => guild.id === guildId);
 
   if (!guild) {
@@ -87,7 +80,7 @@ const getGuildMembers = (_: IpcMainInvokeEvent, guildId: string): IpcApiResponse
   return { success: true, payload: members };
 };
 
-const getGuildRoles = (_: IpcMainInvokeEvent, guildId: string): IpcApiResponse<Role[]> => {
+export const getGuildRoles = (_: IpcMainInvokeEvent, guildId: string): IpcApiResponse<Role[]> => {
   const guild = client.guilds.cache.find((guild) => guild.id === guildId);
 
   if (!guild) {
@@ -101,7 +94,7 @@ const getGuildRoles = (_: IpcMainInvokeEvent, guildId: string): IpcApiResponse<R
 
 const MESSAGES_PER_PAGE = 50;
 
-const fetchChannelsMessages = async (
+export const fetchChannelsMessages = async (
   _: IpcMainInvokeEvent,
   channelId: string,
   beforeMessageId?: string
@@ -133,7 +126,7 @@ const fetchChannelsMessages = async (
   }
 };
 
-const sendMessage = async (
+export const sendMessage = async (
   _: IpcMainInvokeEvent,
   channelId: string,
   message: SendMessageDTO
@@ -166,7 +159,7 @@ const sendMessage = async (
   }
 };
 
-const editMessage = async (
+export const editMessage = async (
   _: IpcMainInvokeEvent,
   messageId: string,
   channelId: string,
@@ -201,7 +194,11 @@ const editMessage = async (
   }
 };
 
-const deleteMessage = async (_: IpcMainInvokeEvent, messageId: string, channelId: string): Promise<IpcApiResponse> => {
+export const deleteMessage = async (
+  _: IpcMainInvokeEvent,
+  messageId: string,
+  channelId: string
+): Promise<IpcApiResponse> => {
   try {
     const channel = client.channels.cache.find((channel) => channel.id === channelId);
 
@@ -231,7 +228,7 @@ const deleteMessage = async (_: IpcMainInvokeEvent, messageId: string, channelId
   }
 };
 
-const replyToMessage = async (
+export const replyToMessage = async (
   _: IpcMainInvokeEvent,
   messageId: string,
   channelId: string,
@@ -269,64 +266,4 @@ const replyToMessage = async (
   } catch (err: any) {
     return { success: false, error: err.message };
   }
-};
-
-const ipcMainDiscordApiFunctions = {
-  authorize,
-  getClient,
-  getGuilds,
-  getGuildChannels,
-  getGuildMembers,
-  getGuildRoles,
-  fetchChannelsMessages,
-  sendMessage,
-  editMessage,
-  deleteMessage,
-  replyToMessage,
-};
-export type IpcMainDiscordApiFunctions = IpcMainEventHandlersToRendererFunctions<typeof ipcMainDiscordApiFunctions>;
-
-export const bindIpcDiscordApiFunctions = () => {
-  Object.keys(ipcMainDiscordApiFunctions).map((key) =>
-    ipcMain.handle(key, ipcMainDiscordApiFunctions[key as keyof typeof ipcMainDiscordApiFunctions])
-  );
-};
-
-const ipcMainDiscordApiEvents = {
-  guildUpdate: null,
-  guildCreate: null,
-  guildDelete: null,
-  channelUpdate: null,
-  channelCreate: null,
-  channelDelete: null,
-  threadUpdate: null,
-  threadCreate: null,
-  threadDelete: null,
-  guildMemberUpdate: null,
-  guildMemberAdd: null,
-  guildMemberRemove: null,
-  presenceUpdate: null,
-  roleUpdate: null,
-  roleCreate: null,
-  roleDelete: null,
-  messageUpdate: (_, message) => [structMessage(message)] as const,
-  messageCreate: (message) => [structMessage(message)] as const,
-  messageDelete: (message) => [{ id: message.id, channelId: message.channelId }] as const,
-} as const satisfies Partial<{ [K in keyof ClientEvents]: ((...args: ClientEvents[K]) => readonly any[]) | null }>;
-
-export type IpcMainDiscordApiEvents<T = typeof ipcMainDiscordApiEvents> = {
-  [K in keyof T]: T[K] extends (...args: any[]) => any ? ReturnType<T[K]> : never;
-};
-
-export const bindIpcDiscordApiEvents = (webContents: WebContents) => {
-  Object.keys(ipcMainDiscordApiEvents).forEach((key) =>
-    client.on(key, (...args: ClientEvents[keyof IpcMainDiscordApiEvents]) =>
-      // @ts-ignore
-      webContents.send(key, ...(ipcMainDiscordApiEvents[key as keyof typeof ipcMainDiscordApiEvents]?.(...args) ?? []))
-    )
-  );
-};
-
-export const logout = async () => {
-  await client.destroy();
 };

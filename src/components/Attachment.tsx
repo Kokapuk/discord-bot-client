@@ -1,4 +1,4 @@
-import { type Attachment } from '@main/api/types';
+import { type Attachment } from '@main/api/discord/types';
 import AudioAttachment from './AudioAttachment';
 import FileAttachment from './FileAttachment';
 import ImageAttachment from './ImageAttachment';

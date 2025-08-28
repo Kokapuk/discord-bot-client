@@ -1,5 +1,5 @@
 import { Avatar, Image, Stack, StackProps, Text } from '@chakra-ui/react';
-import { type Message } from '@main/api/types';
+import { type Message } from '@main/api/discord/types';
 import { useColorMode } from '@renderer/ui/color-mode';
 import dayjs from 'dayjs';
 import { memo, RefAttributes, useMemo } from 'react';

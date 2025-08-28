@@ -1,5 +1,5 @@
-import { Message } from '@main/api/types';
-import { ipcRendererDiscordApiFunctions } from '@renderer/api/discord';
+import { Message } from '@main/api/discord/types';
+import { ipcRendererApiFunctions } from '@renderer/api';
 import { create } from 'zustand';
 
 interface MessagesState {
@@ -33,7 +33,7 @@ const useMessagesStore = create<MessagesState>()((set, get) => ({
     const lastChannelMessageId = state.messages[channelId]?.[state.messages[channelId].length - 1].id;
 
     set({ isFetchingMessages: true });
-    const response = await ipcRendererDiscordApiFunctions.fetchChannelsMessages(channelId, lastChannelMessageId);
+    const response = await ipcRendererApiFunctions.fetchChannelsMessages(channelId, lastChannelMessageId);
     set({ isFetchingMessages: false });
 
     if (!response.success) {

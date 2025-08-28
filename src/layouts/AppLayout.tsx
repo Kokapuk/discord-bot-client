@@ -8,13 +8,23 @@ import RouteSpinner from '@renderer/ui/RouteSpinner';
 import { toaster } from '@renderer/ui/toaster';
 import { Suspense, useEffect, useMemo } from 'react';
 import { Outlet, useNavigate, useParams } from 'react-router';
+import { useShallow } from 'zustand/react/shallow';
 
 export default function AppLayout() {
   const { channelId } = useParams();
-  const { pullClient } = useAppStore();
-  const { guilds, pullGuilds, channels } = useGuildsStore();
-  const { unreadChannels } = useMessagesStore();
-  const { updateMessage, addMessage, removeMessage, addUnreadChannel } = useMessagesStore();
+  const pullClient = useAppStore((s) => s.pullClient);
+  const { guilds, pullGuilds, channels } = useGuildsStore(
+    useShallow((s) => ({ guilds: s.guilds, pullGuilds: s.pullGuilds, channels: s.channels }))
+  );
+  const { unreadChannels, updateMessage, addMessage, removeMessage, addUnreadChannel } = useMessagesStore(
+    useShallow((s) => ({
+      unreadChannels: s.unreadChannels,
+      updateMessage: s.updateMessage,
+      addMessage: s.addMessage,
+      removeMessage: s.removeMessage,
+      addUnreadChannel: s.addUnreadChannel,
+    }))
+  );
   const unreadGuilds = useMemo(
     () =>
       guilds
@@ -51,7 +61,7 @@ export default function AppLayout() {
         toaster.create({
           title: message.fallbackAuthor.displayName,
           description: (
-            <Text width="100%" overflow="hidden" textOverflow="ellipsis" whiteSpace='nowrap'>
+            <Text width="100%" overflow="hidden" textOverflow="ellipsis" whiteSpace="nowrap">
               {message.content}
             </Text>
           ),

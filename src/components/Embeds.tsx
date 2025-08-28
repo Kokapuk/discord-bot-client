@@ -1,5 +1,5 @@
 import { Stack, StackProps } from '@chakra-ui/react';
-import { Embed as EmbedType } from '@main/api/types';
+import { Embed as EmbedType } from '@main/api/discord/types';
 import { RefAttributes } from 'react';
 import Embed from './Embed';
 

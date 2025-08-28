@@ -1,5 +1,5 @@
-import { User } from '@main/api/types';
-import { ipcRendererDiscordApiFunctions } from '@renderer/api/discord';
+import { User } from '@main/api/discord/types';
+import { ipcRendererApiFunctions } from '@renderer/api';
 import { create } from 'zustand';
 
 interface AppState {
@@ -12,7 +12,7 @@ interface AppState {
 const useAppStore = create<AppState>()((set) => ({
   client: null,
   pullClient: async () => {
-    const response = await ipcRendererDiscordApiFunctions.getClient();
+    const response = await ipcRendererApiFunctions.getClient();
 
     if (!response.success) {
       set({ client: null });

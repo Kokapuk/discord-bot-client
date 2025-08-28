@@ -1,4 +1,4 @@
-import { Channel, Message, Role, User } from '@main/api/types';
+import { Channel, Message, Role, User } from '@main/api/discord/types';
 import { createContext, useContext } from 'react';
 
 export type MessageContext = {

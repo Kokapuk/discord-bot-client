@@ -1,5 +1,5 @@
 import { Stack, StackProps, Text } from '@chakra-ui/react';
-import { type EmbedField } from '@main/api/types';
+import { type EmbedField } from '@main/api/discord/types';
 import { RefAttributes } from 'react';
 
 export type EmbedFieldProps = { field: EmbedField } & StackProps & RefAttributes<HTMLDivElement>;

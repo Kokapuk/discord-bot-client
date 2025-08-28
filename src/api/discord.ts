@@ -1,32 +1,4 @@
-import { IpcMainDiscordApiEvents, IpcMainDiscordApiFunctions } from '@main/api/discord';
-
-const completedDiscordApiFunctionKeys = <T extends (keyof IpcMainDiscordApiFunctions)[]>(
-  arr: T &
-    ([keyof IpcMainDiscordApiFunctions] extends [T[number]]
-      ? unknown
-      : [never, Exclude<keyof IpcMainDiscordApiFunctions, T[number]>])
-) => arr;
-
-const ipcMainDiscordApiFunctionsKeys = completedDiscordApiFunctionKeys([
-  'authorize',
-  'getClient',
-  'getGuilds',
-  'getGuildChannels',
-  'getGuildMembers',
-  'getGuildRoles',
-  'fetchChannelsMessages',
-  'sendMessage',
-  'editMessage',
-  'deleteMessage',
-  'replyToMessage'
-]);
-
-export const ipcRendererDiscordApiFunctions = Object.fromEntries(
-  ipcMainDiscordApiFunctionsKeys.map((key) => [
-    key,
-    async (...args: any) => await window.ipcRenderer.invoke(key, ...args),
-  ])
-) as unknown as IpcMainDiscordApiFunctions;
+import { IpcMainDiscordApiEvents } from '@main/api/discord/events';
 
 export const handleIpcRendererDiscordApiEvents = (keys: (keyof IpcMainDiscordApiEvents)[], callback: () => void) => {
   const unsubscribes = keys.map((key) => window.ipcRenderer.on(key, callback));

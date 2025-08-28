@@ -1,5 +1,5 @@
 import { Stack, StackProps } from '@chakra-ui/react';
-import { User as UserType } from '@main/api/types';
+import { User as UserType } from '@main/api/discord/types';
 import { memo, RefAttributes } from 'react';
 import User from './User';
 

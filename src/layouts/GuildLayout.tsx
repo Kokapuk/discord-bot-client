@@ -7,11 +7,21 @@ import useMessagesStore from '@renderer/stores/messages';
 import RouteSpinner from '@renderer/ui/RouteSpinner';
 import { Suspense, useEffect, useMemo } from 'react';
 import { Navigate, Outlet, useParams } from 'react-router';
+import { useShallow } from 'zustand/react/shallow';
 
 export default function GuildLayout() {
   const { guildId, channelId } = useParams();
-  const { guilds, channels, members, pullChannels, pullMembers, pullRoles } = useGuildsStore();
-  const { unreadChannels } = useMessagesStore();
+  const { guilds, channels, members, pullChannels, pullMembers, pullRoles } = useGuildsStore(
+    useShallow((s) => ({
+      guilds: s.guilds,
+      channels: s.channels,
+      members: s.members,
+      pullChannels: s.pullChannels,
+      pullMembers: s.pullMembers,
+      pullRoles: s.pullRoles,
+    }))
+  );
+  const unreadChannels = useMessagesStore((s) => s.unreadChannels);
   const activeGuild = useMemo(() => guilds?.find((guild) => guild.id === guildId), [guilds, guildId]);
   const activeGuildChannels = useMemo(() => (activeGuild ? channels[activeGuild.id] : null), [activeGuild, channels]);
   const activeGuildMembers = useMemo(() => (activeGuild ? members[activeGuild.id] : null), [activeGuild, members]);

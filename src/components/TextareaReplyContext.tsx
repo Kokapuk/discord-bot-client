@@ -1,5 +1,5 @@
 import { Text } from '@chakra-ui/react';
-import { Message } from '@main/api/types';
+import { Message } from '@main/api/discord/types';
 import { useMemo } from 'react';
 import TextareaActionContext, { TextareaActionContextProps } from './TextareaActionContext';
 import { useTextareaContext } from './TextareaContext';

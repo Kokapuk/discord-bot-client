@@ -1,4 +1,4 @@
-import { Attachment } from '@main/api/types';
+import { Attachment } from '@main/api/discord/types';
 import useAppStore from '@renderer/stores/app';
 import useClampedSize from '@renderer/utils/useClampedSize';
 import { useEffect, useRef } from 'react';
@@ -13,7 +13,7 @@ export default function VideoAttachment({ attachment, gif }: VideoAttachmentProp
     height: attachment.height ?? 1,
     maxSize: MAX_VIDEO_SIZE,
   });
-  const setMediaVolume = useAppStore(st => st.setMediaVolume);
+  const setMediaVolume = useAppStore((s) => s.setMediaVolume);
   const video = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {

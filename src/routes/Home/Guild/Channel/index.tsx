@@ -8,11 +8,14 @@ import useGuildsStore from '@renderer/stores/guilds';
 import useMessagesStore from '@renderer/stores/messages';
 import { useEffect, useMemo } from 'react';
 import { useParams } from 'react-router';
+import { useShallow } from 'zustand/react/shallow';
 
 export default function Channel() {
   const { guildId, channelId } = useParams();
-  const { client } = useAppStore();
-  const { channels, members, roles } = useGuildsStore();
+  const client = useAppStore((s) => s.client);
+  const { channels, members, roles } = useGuildsStore(
+    useShallow((s) => ({ channels: s.channels, members: s.members, roles: s.roles }))
+  );
   const {
     messages,
     topReachedChannels,
@@ -22,7 +25,18 @@ export default function Channel() {
     replyingMessage,
     setReplyingMessage,
     removeUnreadChannel,
-  } = useMessagesStore();
+  } = useMessagesStore(
+    useShallow((s) => ({
+      messages: s.messages,
+      topReachedChannels: s.topReachedChannels,
+      fetchMessages: s.fetchMessages,
+      editingMessage: s.editingMessage,
+      setEditingMessage: s.setEditingMessage,
+      replyingMessage: s.replyingMessage,
+      setReplyingMessage: s.setReplyingMessage,
+      removeUnreadChannel: s.removeUnreadChannel,
+    }))
+  );
 
   useEffect(() => {
     setEditingMessage(null);

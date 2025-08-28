@@ -1,5 +1,5 @@
 import { Avatar, Box, Image, Stack, Status, Text } from '@chakra-ui/react';
-import { type User } from '@main/api/types';
+import { type User } from '@main/api/discord/types';
 import { memo, useMemo } from 'react';
 
 export interface UserProps {

@@ -1,5 +1,5 @@
 import { Stack, StackProps } from '@chakra-ui/react';
-import { Guild as GuildType } from '@main/api/types';
+import { Guild as GuildType } from '@main/api/discord/types';
 import debounce from 'lodash/debounce';
 import { memo, RefAttributes, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import Guild from './Guild';

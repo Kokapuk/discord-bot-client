@@ -1,5 +1,5 @@
 import { Stack, StackProps } from '@chakra-ui/react';
-import { Channel as ChannelType } from '@main/api/types';
+import { Channel as ChannelType } from '@main/api/discord/types';
 import { memo, RefAttributes } from 'react';
 import Channel from './Channel';
 

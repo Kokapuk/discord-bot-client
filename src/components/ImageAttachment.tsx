@@ -1,5 +1,5 @@
 import { Image, Link } from '@chakra-ui/react';
-import { Attachment } from '@main/api/types';
+import { Attachment } from '@main/api/discord/types';
 import useClampedSize from '@renderer/utils/useClampedSize';
 
 const MAX_IMAGE_SIZE = 512;
