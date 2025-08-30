@@ -11,13 +11,13 @@ export interface GuildProps {
 export default function Guild({ guild, unread }: GuildProps) {
   return (
     <Tooltip content={guild.name} positioning={{ placement: 'right' }}>
-      <Link to={`/guilds/${guild.id}`} style={{ position: 'relative' }}>
+      <Link to={`/guilds/${guild.id}`} textDecoration="none" position="relative">
         {unread && (
           <Float placement="middle-start" zIndex="1">
             <Circle size="2" backgroundColor="colorPalette.fg"></Circle>
           </Float>
         )}
-        <Avatar.Root size="xl">
+        <Avatar.Root size="md">
           {!!guild.iconUrl ? (
             <Image loading="lazy" src={guild.iconUrl} position="absolute" inset="0" borderRadius="full" />
           ) : (

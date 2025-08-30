@@ -1,10 +1,15 @@
 import { SupportedChannelType, type Channel } from '@main/api/discord/types';
+import { useChannelContext } from './ChannelContext';
 import TextChannel from './TextChannel';
 import VoiceChannel from './VoiceChannel';
 
-export type ChannelProps = { channel: Channel; active?: boolean; unread?: boolean };
+export type ChannelProps = { channel: Channel };
 
-export default function Channel({ channel, active, unread }: ChannelProps) {
+export default function Channel({ channel }: ChannelProps) {
+  const { activeChannel, unreadChannels } = useChannelContext();
+  const active = activeChannel?.id === channel.id;
+  const unread = unreadChannels?.includes(channel.id);
+
   switch (channel.type) {
     case SupportedChannelType.GuildText:
     case SupportedChannelType.GuildAnnouncement:

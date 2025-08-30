@@ -10,6 +10,7 @@ const ipcMainDiscordApiEvents = {
   channelUpdate: null,
   channelCreate: null,
   channelDelete: null,
+  voiceStateUpdate: null,
   threadUpdate: null,
   threadCreate: null,
   threadDelete: null,

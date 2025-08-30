@@ -1,25 +1,15 @@
 import { Stack, StackProps } from '@chakra-ui/react';
-import { Channel as ChannelType } from '@main/api/discord/types';
 import { memo, RefAttributes } from 'react';
 import Channel from './Channel';
+import { useChannelContext } from './ChannelContext';
 
-export type ChannelListProps = {
-  channels: ChannelType[];
-  activeChannel?: ChannelType;
-  unreadChannels?: string[];
-} & StackProps &
-  RefAttributes<HTMLDivElement>;
+const ChannelList = (props: StackProps & RefAttributes<HTMLDivElement>) => {
+  const { channels } = useChannelContext();
 
-const ChannelList = ({ channels, activeChannel, unreadChannels, ...props }: ChannelListProps) => {
   return (
-    <Stack overflow="auto" paddingInline="2.5" paddingBottom="2.5" {...props}>
+    <Stack overflow="auto" paddingInline="2.5" paddingBottom="2.5" gap='2.5' {...props}>
       {channels.map((channel) => (
-        <Channel
-          key={channel.id}
-          channel={channel}
-          active={activeChannel?.id === channel.id}
-          unread={unreadChannels?.includes(channel.id)}
-        />
+        <Channel key={channel.id} channel={channel} />
       ))}
     </Stack>
   );

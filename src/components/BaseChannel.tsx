@@ -25,7 +25,16 @@ export default function BaseChannel({
   }, [channel.type]);
 
   return (
-    <Button variant="ghost" justifyContent="flex-start" width="100%" data-hover={active ? '' : undefined} {...props}>
+    <Button
+      data-hover={active ? '' : undefined}
+      variant="ghost"
+      justifyContent="flex-start"
+      width="100%"
+      height="fit-content"
+      paddingBlock="1"
+      paddingInline="2"
+      {...props}
+    >
       {unread && (
         <Float placement="middle-start">
           <Circle size="2" backgroundColor="colorPalette.fg"></Circle>

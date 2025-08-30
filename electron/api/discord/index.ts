@@ -12,8 +12,9 @@ import {
   SupportedChannelType,
   SupportedMessageType,
   User,
+  VoiceMember,
 } from './types';
-import { structChannel, structGuild, structMessage, structRole, structUser } from './utils';
+import { structChannel, structGuild, structMessage, structRole, structUser, structVoiceMember } from './utils';
 
 export const authorize = async (_: IpcMainInvokeEvent, token: string): Promise<IpcApiResponse> => {
   try {
@@ -267,4 +268,28 @@ export const replyToMessage = async (
   } catch (err: any) {
     return { success: false, error: err.message };
   }
+};
+
+export const getGuildVoiceMembers = (
+  _: IpcMainInvokeEvent,
+  guildId: string
+): IpcApiResponse<Record<string, VoiceMember[]>> => {
+  const guild = client.guilds.cache.find((guild) => guild.id === guildId);
+
+  if (!guild) {
+    return { success: false, error: 'Guild does not exist' };
+  }
+
+  const members: Record<string, VoiceMember[]> = {};
+  const membersInVoice = guild.members.cache.filter((member) => !!member.voice.channel);
+
+  membersInVoice.forEach((member) => {
+    if (!members[member.voice.channelId!]) {
+      members[member.voice.channelId!] = [];
+    }
+
+    members[member.voice.channelId!].push(structVoiceMember(member));
+  });
+
+  return { success: true, payload: members };
 };

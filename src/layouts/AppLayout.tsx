@@ -1,5 +1,6 @@
-import { Box, Text } from '@chakra-ui/react';
+import { Box, Stack, Text } from '@chakra-ui/react';
 import { handleIpcRendererDiscordApiEvents, handleIpcRendererDiscordApiEventWithPayload } from '@renderer/api/discord';
+import ClientActivityPanel from '@renderer/components/ClientActivityPanel';
 import GuildList from '@renderer/components/GuildList';
 import useAppStore from '@renderer/stores/app';
 import useGuildsStore from '@renderer/stores/guilds';
@@ -82,10 +83,16 @@ export default function AppLayout() {
   }, [channelId]);
 
   return (
-    <Box height="100%" display="flex">
+    <Stack direction="row" gap="0" height="100%">
       {!!guilds ? (
         <>
-          <GuildList guilds={guilds} unreadGuilds={unreadGuilds} />
+          <Stack height="100%" gap="0">
+            <Stack height="100%" minHeight="0" direction="row" gap="0">
+              <GuildList guilds={guilds} unreadGuilds={unreadGuilds} />
+              <Box as="aside" id="leftSidebar" height="100%" width="60" flexShrink="0"></Box>
+            </Stack>
+            <ClientActivityPanel margin="2" />
+          </Stack>
           <Box height="100%" width="100%" overflow="auto">
             <Suspense fallback={<RouteSpinner />}>
               <Outlet />
@@ -95,6 +102,6 @@ export default function AppLayout() {
       ) : (
         <RouteSpinner />
       )}
-    </Box>
+    </Stack>
   );
 }

@@ -34,6 +34,7 @@ export default function EmbedRich({ embed }: EmbedProps) {
       paddingBlock="4"
       paddingRight="4"
       paddingLeft="6"
+      backgroundColor="bg.transparentPanel"
     >
       {!!embed.hexColor && (
         <Box position="absolute" left="0" top="0" bottom="0" width="1" backgroundColor={embed.hexColor} />

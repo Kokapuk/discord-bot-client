@@ -1,9 +1,10 @@
-import { Avatar, Image, Stack, StackProps, Text } from '@chakra-ui/react';
+import { Stack, StackProps, Text } from '@chakra-ui/react';
 import { type Message } from '@main/api/discord/types';
 import { useColorMode } from '@renderer/ui/color-mode';
 import dayjs from 'dayjs';
 import { memo, RefAttributes, useMemo } from 'react';
 import Attachments from './Attachments';
+import Avatar from './Avatar';
 import Embeds from './Embeds';
 import FormattedMessageContent from './FormattedMessageContent';
 import ManageMessageActions from './ManageMessageActions';
@@ -69,9 +70,7 @@ const Message = ({ message, chain, ...props }: MessageProps) => {
             {createdAtFormattedTime}
           </Text>
         ) : (
-          <Avatar.Root size="md" backgroundColor="transparent">
-            <Image loading="lazy" src={author.displayAvatarUrl} position="absolute" inset="0" borderRadius="full" />
-          </Avatar.Root>
+          <Avatar src={author.displayAvatarUrl} size="10" />
         )}
         <Stack gap="0" width="100%" minWidth="0">
           {!chain && (

@@ -11,6 +11,7 @@ import {
   getGuildMembers,
   getGuildRoles,
   getGuilds,
+  getGuildVoiceMembers,
   replyToMessage,
   sendMessage,
 } from './discord';
@@ -32,6 +33,7 @@ const ipcMainApiFunctions = {
   editMessage,
   deleteMessage,
   replyToMessage,
+  getGuildVoiceMembers,
 
   // app
   setTheme,

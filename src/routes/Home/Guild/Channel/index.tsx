@@ -119,7 +119,7 @@ export default function Channel() {
         />
       </MessageProvider>
       <TextareaProvider value={textareaContext}>
-        <Textarea flexShrink="0" marginBottom="5" />
+        <Textarea flexShrink="0" marginBottom="5" paddingInline="2.5" width="100%" />
       </TextareaProvider>
     </Box>
   );

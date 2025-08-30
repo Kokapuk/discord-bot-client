@@ -33,20 +33,21 @@ export interface TextChannel extends BaseChannel {
 
 export interface VoiceChannel extends Omit<TextChannel, 'type'> {
   type: SupportedChannelType.GuildVoice | SupportedChannelType.GuildStageVoice;
-  members: User[];
-  userLimit: number;
+  userLimit: number | null;
   connectPermission: boolean;
   speakPermission: boolean;
 }
 
 export type Channel = TextChannel | VoiceChannel;
 
+export type Status = 'online' | 'idle' | 'dnd' | 'invisible' | 'offline';
+
 export interface User {
   id: string;
   displayHexColor?: `#${string}`;
   displayName: string;
   displayAvatarUrl: string;
-  status: 'online' | 'idle' | 'dnd' | 'invisible' | 'offline' | undefined;
+  status?: Status;
 }
 
 export interface Role {
@@ -147,6 +148,13 @@ export interface SendMessageDTO {
 
 export interface EditMessageDTO {
   content: string;
+}
+
+export interface VoiceMember extends Pick<User, 'id' | 'displayName' | 'displayAvatarUrl'> {
+  selfMute: boolean | null;
+  selfDeaf: boolean | null;
+  serverMute: boolean | null;
+  serverDeaf: boolean | null;
 }
 
 export const isChannelVoiceBased = (channel: Channel): channel is VoiceChannel => {

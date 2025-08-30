@@ -18,9 +18,10 @@ const ipcMainApiFunctionsKeys = completedApiFunctionKeys([
   'editMessage',
   'deleteMessage',
   'replyToMessage',
-  
+  'getGuildVoiceMembers',
+
   // app
-  'setTheme'
+  'setTheme',
 ]);
 
 export const ipcRendererApiFunctions = Object.fromEntries(

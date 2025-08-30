@@ -186,7 +186,7 @@ export default function Textarea(props: TextareaProps) {
         {!!replyingMessage && <TextareaReplyContext message={replyingMessage} borderBottomRadius="0" />}
         <Stack
           gap="2.5"
-          backgroundColor="bg.emphasized"
+          backgroundColor="bg.transparentPanel"
           borderRadius="md"
           borderTopRadius={attached ? '0' : undefined}
           width="100%"
@@ -224,6 +224,7 @@ export default function Textarea(props: TextareaProps) {
               minWidth="0"
               maxHeight="96"
               fontSize="md"
+              border="0"
             />
           </Stack>
         </Stack>

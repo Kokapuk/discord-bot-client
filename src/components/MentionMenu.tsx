@@ -1,6 +1,7 @@
-import { Avatar, Menu, Portal } from '@chakra-ui/react';
+import { Menu, Portal } from '@chakra-ui/react';
 import React, { RefObject, useEffect, useRef, useState } from 'react';
 import { useTextareaContext } from './TextareaContext';
+import Avatar from './Avatar';
 
 export type MentionMenuProps = { textarea: RefObject<HTMLTextAreaElement | null> };
 
@@ -83,9 +84,7 @@ export default function MentionMenu({ textarea }: MentionMenuProps) {
           <Menu.Content maxHeight="80" onKeyDown={handleKeydown}>
             {users?.map((user) => (
               <Menu.Item key={user.id} value={`<@${user.id}>`}>
-                <Avatar.Root size="xs">
-                  <Avatar.Image src={user.displayAvatarUrl} />
-                </Avatar.Root>
+                <Avatar src={user.displayAvatarUrl} size="6" />
                 {user.displayName}
               </Menu.Item>
             ))}

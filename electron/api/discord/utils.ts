@@ -29,6 +29,7 @@ import {
   TextChannel,
   User,
   VoiceChannel,
+  VoiceMember,
 } from './types';
 
 export const structGuild = (guild: DiscordGuild): Guild => ({
@@ -58,8 +59,7 @@ export const structChannel = (channel: DiscordChannel): Channel | null => {
     const voiceChannel: VoiceChannel = {
       ...textChannel,
       type: channel.type as number,
-      members: channel.members.map(structUser),
-      userLimit: channel.userLimit,
+      userLimit: channel.userLimit > 0 ? channel.userLimit : null,
       connectPermission: channelPermissions?.has(PermissionFlagsBits.Connect) ?? false,
       speakPermission: channelPermissions?.has(PermissionFlagsBits.Speak) ?? false,
     };
@@ -150,4 +150,14 @@ export const structMessage = (message: DiscordMessage): Message => ({
   embeds: message.embeds.map(structEmbed),
   referenceMessageId: message.reference?.messageId ?? null,
   clientMentioned: message.mentions.has(message.client.user),
+});
+
+export const structVoiceMember = (user: GuildMember): VoiceMember => ({
+  id: user.id,
+  displayName: user.displayName,
+  displayAvatarUrl: user.displayAvatarURL({ size: 64 }),
+  selfMute: user.voice.selfMute,
+  selfDeaf: user.voice.selfDeaf,
+  serverMute: user.voice.serverMute,
+  serverDeaf: user.voice.serverDeaf,
 });

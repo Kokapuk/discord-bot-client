@@ -1,6 +1,15 @@
 import { createSystem, defaultConfig, defineConfig } from '@chakra-ui/react';
 
 const config = defineConfig({
+  theme: {
+    semanticTokens: {
+      colors: {
+        bg: {
+          transparentPanel: { value: { _light: '{colors.bg.inverted/10}', _dark: '{colors.bg/40}' } },
+        },
+      },
+    },
+  },
   globalCss: {
     html: {
       colorPalette: 'blue',

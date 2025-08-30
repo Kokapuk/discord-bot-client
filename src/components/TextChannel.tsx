@@ -9,7 +9,11 @@ export default function TextChannel({ channel, ...props }: TextChannelProps & Re
   const channelNode = <BaseChannel channel={channel} disabled={!channel.viewChannelPermission} {...props} />;
 
   if (channel.viewChannelPermission && !props.disabled) {
-    return <Link to={`${channel.id}`} width='100%'>{channelNode}</Link>;
+    return (
+      <Link to={`${channel.id}`} width="100%" textDecoration="none">
+        {channelNode}
+      </Link>
+    );
   }
 
   return channelNode;

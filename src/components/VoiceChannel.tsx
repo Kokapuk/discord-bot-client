@@ -1,8 +1,10 @@
-import { Box, BoxProps } from '@chakra-ui/react';
+import { Box, BoxProps, Stack, Text } from '@chakra-ui/react';
 import { type VoiceChannel } from '@main/api/discord/types';
 import { RefAttributes } from 'react';
 import BaseChannel, { BaseChannelProps } from './BaseChannel';
 import ChannelAdditionalActions from './ChannelAdditionalActions';
+import { useChannelContext } from './ChannelContext';
+import VoiceMemberList from './VoiceMemberList';
 
 export type VoiceChannelProps = {
   channel: VoiceChannel;
@@ -14,18 +16,39 @@ export default function VoiceChannel({
   wrapperProps,
   ...props
 }: VoiceChannelProps & RefAttributes<HTMLButtonElement>) {
+  const { voiceMembers } = useChannelContext();
+  const membersInVoice = voiceMembers?.[channel.id]?.length ?? 0;
+  const userLimitReached = channel.userLimit ? (membersInVoice ?? 0) >= channel.userLimit : false;
+
   return (
-    <Box className="group" width="100%" position="relative" {...wrapperProps}>
-      <BaseChannel channel={channel} flexShrink="1" disabled={!channel.connectPermission} {...props} />
-      <ChannelAdditionalActions
-        channel={channel}
-        position="absolute"
-        top="50%"
-        right="1"
-        transform="translateY(-50%)"
-        visibility="hidden"
-        _groupHover={{ visibility: 'visible' }}
-      />
-    </Box>
+    <Stack gap="1">
+      <Box className="group" width="100%" position="relative" {...wrapperProps}>
+        <BaseChannel channel={channel} disabled={!channel.connectPermission || userLimitReached} {...props} />
+        <ChannelAdditionalActions
+          channel={channel}
+          position="absolute"
+          top="50%"
+          right="1"
+          transform="translateY(-50%)"
+          visibility="hidden"
+          _groupHover={{ visibility: 'visible' }}
+        />
+        {!!channel.userLimit && !!voiceMembers && (
+          <Text
+            fontSize="xs"
+            color="colorPalette.fg"
+            fontWeight="600"
+            position="absolute"
+            top="50%"
+            right="3"
+            transform="translateY(-50%)"
+            _groupHover={{ visibility: 'hidden' }}
+          >
+            {membersInVoice ?? 0} / {channel.userLimit}
+          </Text>
+        )}
+      </Box>
+      <VoiceMemberList channelId={channel.id} marginLeft="7" />
+    </Stack>
   );
 }

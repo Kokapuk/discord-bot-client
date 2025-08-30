@@ -38,7 +38,7 @@ export default function Auth() {
   };
 
   return (
-    <Card.Root width={500} variant="outline" mx="auto" mt="15vh">
+    <Card.Root width={500} variant="subtle" mx="auto" mt="15vh" backgroundColor="bg.transparentPanel">
       <form onSubmit={handleSubmit} onChange={() => setFormIssues((prev) => (Object.keys.length === 0 ? prev : {}))}>
         <Fieldset.Root size="lg" padding="6">
           <Stack>
