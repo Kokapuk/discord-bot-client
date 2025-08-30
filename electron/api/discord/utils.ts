@@ -26,7 +26,9 @@ import {
   Role,
   SupportedChannelType,
   SupportedMessageType,
+  TextChannel,
   User,
+  VoiceChannel,
 } from './types';
 
 export const structGuild = (guild: DiscordGuild): Guild => ({
@@ -35,35 +37,37 @@ export const structGuild = (guild: DiscordGuild): Guild => ({
   iconUrl: guild.iconURL({ extension: 'webp', size: 64 }),
 });
 
-export const structChannel = (channel: DiscordChannel): Channel => {
-  let name: string | null = null;
-  let sendMessagePermission: boolean = false;
-  let attachFilesPermission: boolean = false;
-  let manageMessagesPermission: boolean = false;
-  let viewChannelPermission: boolean = false;
-
-  if (!channel.isDMBased()) {
-    name = channel.name;
-
-    const channelPermissions = channel.guild.members.me ? channel.permissionsFor(channel.guild.members.me) : null;
-
-    if (channelPermissions) {
-      sendMessagePermission = channelPermissions.has(PermissionFlagsBits.SendMessages);
-      attachFilesPermission = channelPermissions.has(PermissionFlagsBits.AttachFiles);
-      manageMessagesPermission = channelPermissions.has(PermissionFlagsBits.ManageMessages);
-      viewChannelPermission = channelPermissions.has(PermissionFlagsBits.ViewChannel);
-    }
+export const structChannel = (channel: DiscordChannel): Channel | null => {
+  if (channel.isDMBased() || !Object.values(SupportedChannelType).includes(channel.type as number)) {
+    return null;
   }
 
-  return {
+  const channelPermissions = channel.guild.members.me ? channel.permissionsFor(channel.guild.members.me) : null;
+
+  const textChannel: TextChannel = {
     id: channel.id,
-    name,
-    type: channel.type as unknown as SupportedChannelType,
-    sendMessagePermission,
-    attachFilesPermission,
-    manageMessagesPermission,
-    viewChannelPermission,
+    name: channel.name,
+    type: channel.type as number,
+    sendMessagePermission: channelPermissions?.has(PermissionFlagsBits.SendMessages) ?? false,
+    attachFilesPermission: channelPermissions?.has(PermissionFlagsBits.AttachFiles) ?? false,
+    manageMessagesPermission: channelPermissions?.has(PermissionFlagsBits.ManageMessages) ?? false,
+    viewChannelPermission: channelPermissions?.has(PermissionFlagsBits.ViewChannel) ?? false,
   };
+
+  if (channel.isVoiceBased()) {
+    const voiceChannel: VoiceChannel = {
+      ...textChannel,
+      type: channel.type as number,
+      members: channel.members.map(structUser),
+      userLimit: channel.userLimit,
+      connectPermission: channelPermissions?.has(PermissionFlagsBits.Connect) ?? false,
+      speakPermission: channelPermissions?.has(PermissionFlagsBits.Speak) ?? false,
+    };
+
+    return voiceChannel;
+  }
+
+  return textChannel;
 };
 
 export const structUser = (user: GuildMember | DiscordUser): User => ({

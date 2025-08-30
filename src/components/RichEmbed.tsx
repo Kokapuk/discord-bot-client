@@ -1,4 +1,5 @@
-import { Box, Card, Image, Link, Stack, Text } from '@chakra-ui/react';
+import { Box, Card, Image, Stack, Text } from '@chakra-ui/react';
+import Link from '@renderer/ui/Link';
 import { EmbedProps } from './Embed';
 import EmbedAuthor from './EmbedAuthor';
 import EmbedField from './EmbedField';
@@ -49,7 +50,7 @@ export default function EmbedRich({ embed }: EmbedProps) {
 
             {embed.title &&
               (embed.url ? (
-                <Link href={embed.url} target="_blank" fontSize="md" width="fit-content">
+                <Link to={embed.url} target="_blank" fontSize="md" width="fit-content">
                   {embed.title}
                 </Link>
               ) : (

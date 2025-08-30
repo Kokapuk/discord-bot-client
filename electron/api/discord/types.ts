@@ -10,17 +10,36 @@ export enum SupportedChannelType {
   GuildAnnouncement = 5,
   PublicThread = 11,
   PrivateThread = 12,
+  GuildStageVoice = 13,
 }
 
-export interface Channel {
+export interface BaseChannel {
   id: string;
-  name: string | null;
+  name: string;
   type: SupportedChannelType;
+}
+
+export interface TextChannel extends BaseChannel {
+  type:
+    | SupportedChannelType.GuildText
+    | SupportedChannelType.GuildAnnouncement
+    | SupportedChannelType.PublicThread
+    | SupportedChannelType.PrivateThread;
   sendMessagePermission: boolean;
   attachFilesPermission: boolean;
   manageMessagesPermission: boolean;
   viewChannelPermission: boolean;
 }
+
+export interface VoiceChannel extends Omit<TextChannel, 'type'> {
+  type: SupportedChannelType.GuildVoice | SupportedChannelType.GuildStageVoice;
+  members: User[];
+  userLimit: number;
+  connectPermission: boolean;
+  speakPermission: boolean;
+}
+
+export type Channel = TextChannel | VoiceChannel;
 
 export interface User {
   id: string;
@@ -102,7 +121,7 @@ export interface Embed {
 
 export interface Message {
   id: string;
-  type: SupportedMessageType,
+  type: SupportedMessageType;
   authorId: string;
   fallbackAuthor: User;
   channelId: string;
@@ -129,3 +148,7 @@ export interface SendMessageDTO {
 export interface EditMessageDTO {
   content: string;
 }
+
+export const isChannelVoiceBased = (channel: Channel): channel is VoiceChannel => {
+  return channel.type === SupportedChannelType.GuildVoice || channel.type === SupportedChannelType.GuildStageVoice;
+};

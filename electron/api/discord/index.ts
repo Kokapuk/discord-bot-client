@@ -47,10 +47,11 @@ export const getGuildChannels = (_: IpcMainInvokeEvent, guildId: string): IpcApi
     return { success: false, error: 'Guild does not exist' };
   }
 
-  const channels: Channel[] = guild.channels.cache
+  const channels = guild.channels.cache
     .filter((channel) => (Object.values(SupportedChannelType) as number[]).includes(channel.type))
     .sort((channelA, channelB) => channelA.type - channelB.type)
-    .map(structChannel);
+    .map(structChannel)
+    .filter(Boolean) as Channel[];
 
   return { success: true, payload: channels };
 };

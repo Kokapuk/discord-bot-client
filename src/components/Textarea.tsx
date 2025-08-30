@@ -15,7 +15,10 @@ import TextareaReplyContext from './TextareaReplyContext';
 export type TextareaProps = BoxProps & RefAttributes<HTMLDivElement>;
 
 export const messageFormDataSchema = z.object({
-  content: z.string().max(2000, { error: (iss) => `Message must not be longer than ${iss.maximum}` }),
+  content: z
+    .string()
+    .trim()
+    .max(2000, { error: (iss) => `Message must not be longer than ${iss.maximum}` }),
   files: z.array(fileSchema, { error: 'Files are invalid' }).optional(),
 });
 
@@ -64,7 +67,6 @@ export default function Textarea(props: TextareaProps) {
       ...Object.fromEntries(new FormData(form).entries()),
       files: fileUpload.acceptedFiles,
     });
-    messageFormData.content = messageFormData.content.trim();
 
     if (!messageFormData.content && !messageFormData.files?.length) {
       return;
@@ -111,7 +113,6 @@ export default function Textarea(props: TextareaProps) {
     }
 
     const messageFormData = messageFormDataSchema.parse({ ...Object.fromEntries(new FormData(form).entries()) });
-    messageFormData.content = messageFormData.content.trim();
 
     if (!messageFormData.content) {
       return;

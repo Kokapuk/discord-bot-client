@@ -1,4 +1,5 @@
 import { Box, Heading } from '@chakra-ui/react';
+import { isChannelVoiceBased } from '@main/api/discord/types';
 import { handleIpcRendererDiscordApiEvents } from '@renderer/api/discord';
 import ChannelList from '@renderer/components/ChannelList';
 import MemberList from '@renderer/components/MemberList';
@@ -77,7 +78,12 @@ export default function GuildLayout() {
     return <Navigate to="/" />;
   }
 
-  if (channelId && (!activeChannel || !activeChannel.viewChannelPermission)) {
+  if (
+    channelId &&
+    (!activeChannel ||
+      !activeChannel.viewChannelPermission ||
+      (isChannelVoiceBased(activeChannel) && !activeChannel.connectPermission))
+  ) {
     return <Navigate to={`/guilds/${activeGuild.id}`} />;
   }
 

@@ -1,14 +1,16 @@
-import { Button, Card, Field, Fieldset, Link, Stack } from '@chakra-ui/react';
+import { Button, Card, Field, Fieldset, Stack } from '@chakra-ui/react';
 import { ipcRendererApiFunctions } from '@renderer/api';
+import Link from '@renderer/ui/Link';
 import { PasswordInput } from '@renderer/ui/password-input';
+import structureZodIssues, { StructuredZodIssues } from '@renderer/utils/structureZodIssues';
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import z from 'zod';
 
-const authFormDataSchema = z.object({ token: z.string().min(1, { error: 'Token is required' }) });
+const authFormDataSchema = z.object({ token: z.string().trim().min(1, { error: 'Token is required' }) });
 
 export default function Auth() {
-  const [formIssues, setFormIssues] = useState<Record<string, string>>({});
+  const [formIssues, setFormIssues] = useState<StructuredZodIssues>({});
   const [isAuthorizing, setAuthorizing] = useState(false);
   const navigate = useNavigate();
 
@@ -24,16 +26,11 @@ export default function Auth() {
         localStorage.setItem('token', formdata.token);
         navigate('/');
       } else {
-        setFormIssues({ token: response.error });
+        setFormIssues({ token: [response.error] });
       }
     } catch (err) {
       if (err instanceof z.ZodError) {
-        setFormIssues(() => {
-          const issues: typeof formIssues = {};
-          err.issues.forEach((i) => (issues[i.path.join('/')] = i.message));
-
-          return issues;
-        });
+        setFormIssues(structureZodIssues(err));
       }
     } finally {
       setAuthorizing(false);
@@ -48,17 +45,17 @@ export default function Auth() {
             <Fieldset.Legend>Authorization</Fieldset.Legend>
             <Fieldset.HelperText>
               To authorize as bot, you need to get it's token, which located at{' '}
-              <Link href="https://discord.com/developers/applications" target="_blank">
+              <Link to="https://discord.com/developers/applications" target="_blank">
                 Discord Developer Portal
               </Link>
             </Fieldset.HelperText>
           </Stack>
 
           <Fieldset.Content>
-            <Field.Root invalid={Object.keys(formIssues).includes('token')}>
+            <Field.Root invalid={!!formIssues['token']?.length}>
               <Field.Label>Token</Field.Label>
               <PasswordInput defaultValue={localStorage.getItem('token') ?? undefined} name="token" autoFocus />
-              <Field.ErrorText>{formIssues['token']}</Field.ErrorText>
+              <Field.ErrorText>{formIssues['token']?.[0]}</Field.ErrorText>
             </Field.Root>
           </Fieldset.Content>
 

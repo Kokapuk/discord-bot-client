@@ -1,4 +1,5 @@
-import { Card, Icon, Link, Stack, Text } from '@chakra-ui/react';
+import { Card, Icon, Stack, Text } from '@chakra-ui/react';
+import Link from '@renderer/ui/Link';
 import formatBytes from '@renderer/utils/formatBytes';
 import { FaFile } from 'react-icons/fa6';
 import { AttachmentProps } from './Attachment';
@@ -12,7 +13,7 @@ export default function FileAttachment({ attachment }: AttachmentProps) {
         </Icon>
         <Stack gap="0" width="100%" minWidth="0">
           <Link
-            href={attachment.url}
+            to={attachment.url}
             target="_blank"
             width="100%"
             overflow="hidden"

@@ -1,5 +1,6 @@
-import { Image, Link } from '@chakra-ui/react';
+import { Image } from '@chakra-ui/react';
 import { Attachment } from '@main/api/discord/types';
+import Link from '@renderer/ui/Link';
 import useClampedSize from '@renderer/utils/useClampedSize';
 
 const MAX_IMAGE_SIZE = 512;
@@ -14,7 +15,7 @@ export default function ImageAttachment({ attachment }: ImageAttachmentProps) {
   });
 
   return (
-    <Link href={attachment.url} target="_blank" display="block" width={`${clampedWidth}px`} height={`${clampedHeight}px`}>
+    <Link to={attachment.url} target="_blank" display="block" width={`${clampedWidth}px`} height={`${clampedHeight}px`}>
       <Image src={attachment.url} loading="lazy" alt={attachment.name} borderRadius="md" width="100%" height="100%" />
     </Link>
   );

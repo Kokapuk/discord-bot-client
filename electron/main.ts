@@ -4,7 +4,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { bindIpcApiFunctions } from './api';
 import { setTheme } from './api/app';
-import { client } from './api/discord/client';
+import { logout } from './api/discord/client';
 import { bindIpcDiscordApiEvents } from './api/discord/events';
 
 // const require = createRequire(import.meta.url);
@@ -74,8 +74,8 @@ app.on('window-all-closed', () => {
   }
 });
 
-app.on('before-quit', async () => {
-  await client.destroy();
+app.on('before-quit', () => {
+  logout();
 });
 
 app.on('activate', () => {

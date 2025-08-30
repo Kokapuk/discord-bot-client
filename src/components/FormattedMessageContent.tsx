@@ -1,4 +1,5 @@
-import { Image, Link, Text, TextProps } from '@chakra-ui/react';
+import { Image, Text, TextProps } from '@chakra-ui/react';
+import Link from '@renderer/ui/Link';
 import { Fragment, ReactNode, RefAttributes, useMemo } from 'react';
 import reactStringReplace from 'react-string-replace';
 import Mention from './Mention';
@@ -26,7 +27,7 @@ export default function FormattedMessageContent({ rawContent, oneLine, ...props 
       tokenized,
       /(https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*))/,
       (url, index) => (
-        <Link key={`link-${index}`} href={url} target="_blank" wordBreak="break-word">
+        <Link key={`link-${index}`} to={url} target="_blank" wordBreak="break-word">
           {url}
         </Link>
       )
