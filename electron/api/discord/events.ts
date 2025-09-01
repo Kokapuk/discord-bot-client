@@ -10,13 +10,16 @@ const ipcMainDiscordApiEvents = {
   channelUpdate: null,
   channelCreate: null,
   channelDelete: null,
-  voiceStateUpdate: (oldState, newState) => [
-    oldState.channelId === null && newState.channelId !== null
-      ? 'userJoin'
-      : oldState.channelId !== null && newState.channelId === null
-      ? 'userLeave'
-      : 'other',
-  ] as const,
+  voiceStateUpdate: (oldState, newState) =>
+    [
+      oldState.channelId === null && newState.channelId !== null
+        ? 'userJoin'
+        : oldState.channelId !== null && newState.channelId === null
+        ? 'userLeave'
+        : 'other',
+      newState.guild.id,
+      newState.channelId ?? oldState.channelId,
+    ] as const,
   threadUpdate: null,
   threadCreate: null,
   threadDelete: null,

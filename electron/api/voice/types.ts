@@ -5,3 +5,7 @@ export enum VoiceConnectionStatus {
   Disconnected = 'disconnected',
   Destroyed = 'destroyed',
 }
+
+export interface VoiceConnectionState {
+  status: VoiceConnectionStatus;
+}

@@ -17,7 +17,6 @@ import { useShallow } from 'zustand/react/shallow';
 export default function AppLayout() {
   const { channelId } = useParams();
   const pullClient = useAppStore((s) => s.pullClient);
-  const pullVoiceMembers = useVoicesStore((s) => s.pullMembers);
   const navigate = useNavigate();
 
   const { guilds, pullGuilds, channels, pullChannels, pullMembers, pullRoles } = useGuildsStore(
@@ -41,8 +40,12 @@ export default function AppLayout() {
     }))
   );
 
-  const { setConnectionStatus, setActiveChannel } = useVoicesStore(
-    useShallow((s) => ({ setConnectionStatus: s.setConnectionStatus, setActiveChannel: s.setActiveChannel }))
+  const { pullVoiceMembers, setConnectionStatus, setActiveChannel } = useVoicesStore(
+    useShallow((s) => ({
+      pullVoiceMembers: s.pullMembers,
+      setConnectionStatus: s.setConnectionStatus,
+      setActiveChannel: s.setActiveChannel,
+    }))
   );
 
   const unreadGuilds = useMemo(
@@ -92,15 +95,23 @@ export default function AppLayout() {
       pullRoles();
     });
 
-    const unsubscribeVoiceUpdates = handleIpcRendererDiscordApiEventWithPayload('voiceStateUpdate', (actionType) => {
-      pullVoiceMembers();
+    const unsubscribeVoiceUpdates = handleIpcRendererDiscordApiEventWithPayload(
+      'voiceStateUpdate',
+      (actionType, guildId, channelId) => {
+        pullVoiceMembers();
+        // const activeChannel = useVoicesStore.getState().activeChannel;
 
-      if (actionType === 'userJoin') {
-        playAudio('/user-join.mp3');
-      } else if (actionType === 'userLeave') {
-        playAudio('/user-leave.mp3');
+        // if (!activeChannel || activeChannel.guildId !== guildId || activeChannel.channelId !== channelId ||) {
+        //   return;
+        // }
+
+        // if (actionType === 'userJoin') {
+        //   playAudio('/user-join.mp3');
+        // } else if (actionType === 'userLeave') {
+        //   playAudio('/user-leave.mp3');
+        // }
       }
-    });
+    );
 
     const unsubscribeVoiceConnectionStatusUpdate = handleIpcRendererVoiceApiConnectionStatusUpdateEvent(
       (status, activeChannel) => {
