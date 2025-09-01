@@ -9,3 +9,17 @@ export enum VoiceConnectionStatus {
 export interface VoiceConnectionState {
   status: VoiceConnectionStatus;
 }
+
+export interface WindowAudioSource {
+  name: string;
+  windowId: string;
+  appIconDataUrl: string;
+  type: 'window';
+}
+
+export interface OutputDeviceAudioSource {
+  name: string;
+  type: 'outputDevice';
+}
+
+export type AudioSource = WindowAudioSource | OutputDeviceAudioSource;

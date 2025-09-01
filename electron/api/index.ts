@@ -7,16 +7,16 @@ import {
   editMessage,
   fetchChannelMessages,
   getClient,
+  getGuilds,
   getGuildsChannels,
   getGuildsMembers,
   getGuildsRoles,
-  getGuilds,
   getGuildsVoiceChannelsMembers,
   replyToMessage,
   sendMessage,
   setClientStatus,
 } from './discord';
-import { disableReceiver, enableReceiver, joinVoice, leaveVoice } from './voice';
+import { disableReceiver, enableReceiver, getAudioSources, joinVoice, leaveVoice } from './voice';
 
 export type IpcApiResponse<T = void> =
   | (T extends void ? { success: true } : { success: true; payload: T })
@@ -43,6 +43,7 @@ const ipcMainApiFunctions = {
   leaveVoice,
   enableReceiver,
   disableReceiver,
+  getAudioSources,
 
   // app
   setTheme,

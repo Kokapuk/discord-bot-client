@@ -5,10 +5,13 @@ import {
   VoiceConnection,
   VoiceConnectionStatus,
 } from '@discordjs/voice';
-import { IpcMainInvokeEvent } from 'electron';
+import { desktopCapturer, IpcMainInvokeEvent } from 'electron';
 import { createRequire } from 'module';
+import { IpcApiResponse } from '..';
 import { client } from '../discord/client';
 import { bindIpcVoiceApiEvents } from './events';
+import { AudioSource } from './types';
+import { structAudioSource } from './utils';
 
 const require = createRequire(import.meta.url);
 const prism = require('prism-media');
@@ -133,4 +136,18 @@ export const leaveVoice = () => {
   }
 
   connection.destroy();
+};
+
+export const getAudioSources = async (): Promise<IpcApiResponse<AudioSource[]>> => {
+  try {
+    const sources = await desktopCapturer.getSources({
+      types: ['window'],
+      fetchWindowIcons: true,
+      thumbnailSize: { height: 0, width: 0 },
+    });
+
+    return { success: true, payload: sources.map(structAudioSource) };
+  } catch (err) {
+    return { success: false, error: 'Failed to get desktop sources' };
+  }
 };

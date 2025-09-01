@@ -26,6 +26,7 @@ const ipcMainApiFunctionsKeys = completedApiFunctionKeys([
   'leaveVoice',
   'enableReceiver',
   'disableReceiver',
+  'getAudioSources',
 
   // app
   'setTheme',
