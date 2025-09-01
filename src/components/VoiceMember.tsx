@@ -14,7 +14,7 @@ export default function VoiceMember({ member, ...props }: VoiceMemberProps & Ref
         <Text textAlign="left" fontSize="sm" width="100%" overflow="hidden" textOverflow="ellipsis">
           {member.displayName}
         </Text>
-        {(member.selfMute || member.serverMute) && (
+        {(member.selfMute || member.serverMute || !member.canSpeak) && (
           <Icon size="sm" color={member.serverMute ? 'red.fg' : undefined}>
             <FaMicrophoneSlash />
           </Icon>

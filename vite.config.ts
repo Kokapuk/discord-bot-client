@@ -13,7 +13,7 @@ export default defineConfig({
         vite: {
           build: {
             rollupOptions: {
-              external: ['zlib-sync', 'bufferutil', 'utf-8-validate'],
+              external: ['zlib-sync', 'bufferutil', 'utf-8-validate', '@snazzah/davey'],
             },
           },
         },

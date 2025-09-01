@@ -1,8 +1,9 @@
-import { Button, Card, CardRootProps, Text } from '@chakra-ui/react';
+import { Card, CardRootProps, Stack } from '@chakra-ui/react';
 import useAppStore from '@renderer/stores/app';
 import { RefAttributes } from 'react';
-import AvatarWithStatus from './AvatarWithStatus';
 import PickStatusMenu from './PickStatusMenu';
+import VoiceChannelActionButtons from './VoiceChannelActionButtons';
+import VoiceChannelState from './VoiceChannelState';
 
 export default function ClientActivityPanel(props: CardRootProps & RefAttributes<HTMLDivElement>) {
   const client = useAppStore((s) => s.client);
@@ -14,14 +15,11 @@ export default function ClientActivityPanel(props: CardRootProps & RefAttributes
   return (
     <Card.Root variant="subtle" backgroundColor="bg.transparentPanel" {...props}>
       <Card.Body padding="2">
-        <PickStatusMenu>
-          <Button variant="ghost" justifyContent="flex-start" padding="0">
-            <AvatarWithStatus src={client.displayAvatarUrl} status={client.status} />
-            <Text fontSize="md" fontWeight="600">
-              {client.displayName}
-            </Text>
-          </Button>
-        </PickStatusMenu>
+        <VoiceChannelState />
+        <Stack direction="row" alignItems="center">
+          <PickStatusMenu triggerProps={{ width: '100%', flexShrink: '1' }} />
+          <VoiceChannelActionButtons marginLeft="auto" flexShrink="0" />
+        </Stack>
       </Card.Body>
     </Card.Root>
   );

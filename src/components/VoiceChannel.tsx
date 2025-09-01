@@ -1,5 +1,6 @@
 import { Box, BoxProps, Stack, Text } from '@chakra-ui/react';
 import { type VoiceChannel } from '@main/api/discord/types';
+import { ipcRendererApiFunctions } from '@renderer/api';
 import { RefAttributes } from 'react';
 import BaseChannel, { BaseChannelProps } from './BaseChannel';
 import ChannelAdditionalActions from './ChannelAdditionalActions';
@@ -17,13 +18,18 @@ export default function VoiceChannel({
   ...props
 }: VoiceChannelProps & RefAttributes<HTMLButtonElement>) {
   const { voiceMembers } = useChannelContext();
-  const membersInVoice = voiceMembers?.[channel.id]?.length ?? 0;
+  const membersInVoice = voiceMembers?.[channel.guidId]?.[channel.id]?.length ?? 0;
   const userLimitReached = channel.userLimit ? (membersInVoice ?? 0) >= channel.userLimit : false;
 
   return (
     <Stack gap="1">
       <Box className="group" width="100%" position="relative" {...wrapperProps}>
-        <BaseChannel channel={channel} disabled={!channel.connectPermission || userLimitReached} {...props} />
+        <BaseChannel
+          channel={channel}
+          disabled={!channel.connectPermission || !channel.viewChannelPermission || userLimitReached}
+          onClick={() => ipcRendererApiFunctions.joinVoice(channel.guidId, channel.id)}
+          {...props}
+        />
         <ChannelAdditionalActions
           channel={channel}
           position="absolute"
@@ -48,7 +54,7 @@ export default function VoiceChannel({
           </Text>
         )}
       </Box>
-      <VoiceMemberList channelId={channel.id} marginLeft="7" />
+      <VoiceMemberList channel={channel} marginLeft="7" />
     </Stack>
   );
 }

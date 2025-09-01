@@ -49,6 +49,7 @@ export const structChannel = (channel: DiscordChannel): Channel | null => {
     id: channel.id,
     name: channel.name,
     type: channel.type as number,
+    guidId: channel.guildId,
     sendMessagePermission: channelPermissions?.has(PermissionFlagsBits.SendMessages) ?? false,
     attachFilesPermission: channelPermissions?.has(PermissionFlagsBits.AttachFiles) ?? false,
     manageMessagesPermission: channelPermissions?.has(PermissionFlagsBits.ManageMessages) ?? false,
@@ -160,4 +161,5 @@ export const structVoiceMember = (user: GuildMember): VoiceMember => ({
   selfDeaf: user.voice.selfDeaf,
   serverMute: user.voice.serverMute,
   serverDeaf: user.voice.serverDeaf,
+  canSpeak: user.voice.channel?.permissionsFor(user).has(PermissionFlagsBits.Speak) ?? false
 });

@@ -33,7 +33,7 @@ const useMessagesStore = create<MessagesState>()((set, get) => ({
     const lastChannelMessageId = state.messages[channelId]?.[state.messages[channelId].length - 1].id;
 
     set({ isFetchingMessages: true });
-    const response = await ipcRendererApiFunctions.fetchChannelsMessages(channelId, lastChannelMessageId);
+    const response = await ipcRendererApiFunctions.fetchChannelMessages(channelId, lastChannelMessageId);
     set({ isFetchingMessages: false });
 
     if (!response.success) {

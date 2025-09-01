@@ -1,4 +1,4 @@
-import { AttachmentBuilder } from 'discord.js';
+import { ActivityType, AttachmentBuilder, PresenceUpdateStatus } from 'discord.js';
 import { IpcMainInvokeEvent } from 'electron';
 import { IpcApiResponse } from '..';
 import { client } from './client';
@@ -9,6 +9,7 @@ import {
   Message,
   Role,
   SendMessageDTO,
+  Status,
   SupportedChannelType,
   SupportedMessageType,
   User,
@@ -16,10 +17,22 @@ import {
 } from './types';
 import { structChannel, structGuild, structMessage, structRole, structUser, structVoiceMember } from './utils';
 
+const PRIORITY_STATUSES = ['online', 'dnd', 'idle'] as const;
+
 export const authorize = async (_: IpcMainInvokeEvent, token: string): Promise<IpcApiResponse> => {
   try {
     await client.login(token);
     await new Promise((res) => client.once('ready', res));
+
+    client.user?.setPresence({
+      activities: [
+        {
+          name: 'github.com/Kokapuk/discord-bot-client',
+          url: 'https://github.com/Kokapuk/discord-bot-client',
+          type: ActivityType.Custom,
+        },
+      ],
+    });
 
     return { success: true };
   } catch (err: any) {
@@ -35,68 +48,89 @@ export const getClient = (): IpcApiResponse<User> => {
   return { success: true, payload: structUser(client.user) };
 };
 
+export const setClientStatus = (_: IpcMainInvokeEvent, status: Exclude<Status, 'offline'>) => {
+  if (!client.user) {
+    return { success: false, error: 'Client user does not exist' };
+  }
+
+  let newStatus: PresenceUpdateStatus;
+
+  switch (status) {
+    case 'online':
+      newStatus = PresenceUpdateStatus.Online;
+      break;
+    case 'idle':
+      newStatus = PresenceUpdateStatus.Idle;
+      break;
+    case 'dnd':
+      newStatus = PresenceUpdateStatus.DoNotDisturb;
+      break;
+    case 'invisible':
+      newStatus = PresenceUpdateStatus.Invisible;
+      break;
+  }
+
+  client.user.setPresence({ status: newStatus });
+};
+
 export const getGuilds = (): IpcApiResponse<Guild[]> => {
   const guilds: Guild[] = client.guilds.cache.map(structGuild);
 
   return { success: true, payload: guilds };
 };
 
-export const getGuildChannels = (_: IpcMainInvokeEvent, guildId: string): IpcApiResponse<Channel[]> => {
-  const guild = client.guilds.cache.find((guild) => guild.id === guildId);
+export const getGuildsChannels = (_: IpcMainInvokeEvent): IpcApiResponse<Record<string, Channel[]>> => {
+  const guilds = client.guilds.cache;
+  const guildChannels: Record<string, Channel[]> = {};
 
-  if (!guild) {
-    return { success: false, error: 'Guild does not exist' };
-  }
-
-  const channels = guild.channels.cache
-    .filter((channel) => (Object.values(SupportedChannelType) as number[]).includes(channel.type))
-    .sort((channelA, channelB) => channelA.type - channelB.type)
-    .map(structChannel)
-    .filter(Boolean) as Channel[];
-
-  return { success: true, payload: channels };
-};
-
-export const getGuildMembers = (_: IpcMainInvokeEvent, guildId: string): IpcApiResponse<User[]> => {
-  const guild = client.guilds.cache.find((guild) => guild.id === guildId);
-
-  if (!guild) {
-    return { success: false, error: 'Guild does not exist' };
-  }
-
-  const priorityStatuses = ['online', 'dnd', 'idle'];
-  const members: User[] = guild.members.cache.map(structUser).sort((memberA, memberB) => {
-    let result = 0;
-
-    if (priorityStatuses.includes(memberA.status as any)) {
-      result--;
-    }
-
-    if (priorityStatuses.includes(memberB.status as any)) {
-      result++;
-    }
-
-    return result;
+  guilds.forEach((guild) => {
+    guildChannels[guild.id] = guild.channels.cache
+      .filter((channel) => (Object.values(SupportedChannelType) as number[]).includes(channel.type))
+      .sort((channelA, channelB) => channelA.type - channelB.type)
+      .map(structChannel)
+      .filter(Boolean) as Channel[];
   });
 
-  return { success: true, payload: members };
+  return { success: true, payload: guildChannels };
 };
 
-export const getGuildRoles = (_: IpcMainInvokeEvent, guildId: string): IpcApiResponse<Role[]> => {
-  const guild = client.guilds.cache.find((guild) => guild.id === guildId);
+export const getGuildsMembers = (_: IpcMainInvokeEvent): IpcApiResponse<Record<string, User[]>> => {
+  const guilds = client.guilds.cache;
+  const guildMember: Record<string, User[]> = {};
 
-  if (!guild) {
-    return { success: false, error: 'Guild does not exist' };
-  }
+  guilds.forEach((guild) => {
+    guildMember[guild.id] = guild.members.cache.map(structUser).sort((memberA, memberB) => {
+      let result = 0;
 
-  const roles: Role[] = guild.roles.cache.map(structRole);
+      if (PRIORITY_STATUSES.includes(memberA.status as any)) {
+        result--;
+      }
 
-  return { success: true, payload: roles };
+      if (PRIORITY_STATUSES.includes(memberB.status as any)) {
+        result++;
+      }
+
+      return result;
+    });
+  });
+
+  return { success: true, payload: guildMember };
+};
+
+export const getGuildsRoles = (_: IpcMainInvokeEvent): IpcApiResponse<Record<string, Role[]>> => {
+  const guilds = client.guilds.cache;
+  const guildRoles: Record<string, Role[]> = {};
+
+  guilds.forEach((guild) => {
+    guildRoles[guild.id] = guild.roles.cache.map(structRole);
+  });
+
+  return { success: true, payload: guildRoles };
 };
 
 const MESSAGES_PER_PAGE = 50;
 
-export const fetchChannelsMessages = async (
+export const fetchChannelMessages = async (
   _: IpcMainInvokeEvent,
   channelId: string,
   beforeMessageId?: string
@@ -270,26 +304,27 @@ export const replyToMessage = async (
   }
 };
 
-export const getGuildVoiceMembers = (
-  _: IpcMainInvokeEvent,
-  guildId: string
-): IpcApiResponse<Record<string, VoiceMember[]>> => {
-  const guild = client.guilds.cache.find((guild) => guild.id === guildId);
+export const getGuildsVoiceChannelsMembers = (
+  _: IpcMainInvokeEvent
+): IpcApiResponse<Record<string, Record<string, VoiceMember[]>>> => {
+  const guilds = client.guilds.cache;
+  const guildVoiceChannelsMembers: Record<string, Record<string, VoiceMember[]>> = {};
 
-  if (!guild) {
-    return { success: false, error: 'Guild does not exist' };
-  }
+  guilds.forEach((guild) => {
+    const membersInVoice = guild.members.cache.filter((member) => !!member.voice.channel);
 
-  const members: Record<string, VoiceMember[]> = {};
-  const membersInVoice = guild.members.cache.filter((member) => !!member.voice.channel);
+    membersInVoice.forEach((member) => {
+      if (!guildVoiceChannelsMembers[guild.id]) {
+        guildVoiceChannelsMembers[guild.id] = {};
+      }
 
-  membersInVoice.forEach((member) => {
-    if (!members[member.voice.channelId!]) {
-      members[member.voice.channelId!] = [];
-    }
+      if (!guildVoiceChannelsMembers[guild.id][member.voice.channelId!]) {
+        guildVoiceChannelsMembers[guild.id][member.voice.channelId!] = [];
+      }
 
-    members[member.voice.channelId!].push(structVoiceMember(member));
+      guildVoiceChannelsMembers[guild.id][member.voice.channelId!].push(structVoiceMember(member));
+    });
   });
 
-  return { success: true, payload: members };
+  return { success: true, payload: guildVoiceChannelsMembers };
 };

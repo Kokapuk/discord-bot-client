@@ -5,7 +5,7 @@ export type ChannelContext = {
   channels: Channel[];
   activeChannel?: Channel;
   unreadChannels?: string[];
-  voiceMembers?: Record<string, VoiceMember[] | null | undefined>;
+  voiceMembers?: Record<string, Record<string, VoiceMember[] | null | undefined> | null | undefined>;
 };
 
 const ChannelContext = createContext<ChannelContext | null>(null);

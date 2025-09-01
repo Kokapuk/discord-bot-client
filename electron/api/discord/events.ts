@@ -10,7 +10,13 @@ const ipcMainDiscordApiEvents = {
   channelUpdate: null,
   channelCreate: null,
   channelDelete: null,
-  voiceStateUpdate: null,
+  voiceStateUpdate: (oldState, newState) => [
+    oldState.channelId === null && newState.channelId !== null
+      ? 'userJoin'
+      : oldState.channelId !== null && newState.channelId === null
+      ? 'userLeave'
+      : 'other',
+  ] as const,
   threadUpdate: null,
   threadCreate: null,
   threadDelete: null,

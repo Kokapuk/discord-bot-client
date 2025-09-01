@@ -1,16 +1,21 @@
 import { VoiceMember } from '@main/api/discord/types';
+import { VoiceConnectionStatus } from '@main/api/voice/types';
 import { ipcRendererApiFunctions } from '@renderer/api';
 import { create } from 'zustand';
 
 interface VoicesState {
-  members: Record<string, VoiceMember[] | null | undefined>;
-  pullMembers(guildId: string): Promise<void>;
+  members: Record<string, Record<string, VoiceMember[]>>;
+  pullMembers(): Promise<void>;
+  connectionStatus: VoiceConnectionStatus;
+  setConnectionStatus(connectionStatus: VoiceConnectionStatus): void;
+  activeChannel: { guildId: string; channelId: string } | null;
+  setActiveChannel(activeChannel: VoicesState['activeChannel']): void;
 }
 
 const useVoicesStore = create<VoicesState>()((set) => ({
   members: {},
-  pullMembers: async (guildId) => {
-    const response = await ipcRendererApiFunctions.getGuildVoiceMembers(guildId);
+  pullMembers: async () => {
+    const response = await ipcRendererApiFunctions.getGuildsVoiceChannelsMembers();
 
     if (!response.success) {
       set((prev) => ({ ...prev, members: {} }));
@@ -19,6 +24,14 @@ const useVoicesStore = create<VoicesState>()((set) => ({
     }
 
     set((prev) => ({ ...prev, members: response.payload }));
+  },
+  connectionStatus: VoiceConnectionStatus.Destroyed,
+  setConnectionStatus: (connectionStatus) => {
+    set({ connectionStatus });
+  },
+  activeChannel: null,
+  setActiveChannel: (activeChannel) => {
+    set({ activeChannel });
   },
 }));
 

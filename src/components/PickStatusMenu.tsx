@@ -1,6 +1,10 @@
-import { Menu, MenuRootProps, Portal } from '@chakra-ui/react';
+import { Button, Menu, MenuRootProps, MenuTriggerProps, Portal, Text } from '@chakra-ui/react';
 import { Status as StatusType } from '@main/api/discord/types';
-import { ReactNode, RefAttributes } from 'react';
+import { ipcRendererApiFunctions } from '@renderer/api';
+import useAppStore from '@renderer/stores/app';
+import { RefAttributes } from 'react';
+import { useShallow } from 'zustand/shallow';
+import AvatarWithStatus from './AvatarWithStatus';
 import Status from './Status';
 
 const STATUSES = {
@@ -8,25 +12,54 @@ const STATUSES = {
   idle: 'Idle',
   dnd: 'Do Not Disturb',
   invisible: 'Invisible',
-} as const satisfies Partial<Record<StatusType, string>>;
+} as const satisfies Record<Exclude<StatusType, 'offline'>, string>;
 
-export type PickStatusMenuProps = { children: ReactNode } & Omit<MenuRootProps, 'children'>;
+export type PickStatusMenuProps = { triggerProps?: Omit<MenuTriggerProps, 'children'> } & Omit<
+  MenuRootProps,
+  'children'
+>;
 
-export default function PickStatusMenu({ children, ...props }: PickStatusMenuProps & RefAttributes<HTMLDivElement>) {
+export default function PickStatusMenu({
+  triggerProps,
+  ...props
+}: PickStatusMenuProps & RefAttributes<HTMLDivElement>) {
+  const { client, pullClient } = useAppStore(useShallow((s) => ({ client: s.client, pullClient: s.pullClient })));
+
+  if (!client) {
+    return null;
+  }
+
+  const setStatus = (status: Exclude<StatusType, 'offline'>) => {
+    ipcRendererApiFunctions.setClientStatus(status);
+    pullClient();
+  };
+
   return (
     <Menu.Root {...props}>
-      <Menu.Trigger asChild>{children}</Menu.Trigger>
+      <Menu.Trigger asChild {...triggerProps}>
+        <Button variant="ghost" justifyContent="flex-start" padding="0">
+          <AvatarWithStatus src={client.displayAvatarUrl} status={client.status} />
+          <Text fontSize="md" fontWeight="600">
+            {client.displayName}
+          </Text>
+        </Button>
+      </Menu.Trigger>
       <Portal>
         <Menu.Positioner>
           <Menu.Content>
-            <Menu.ItemGroup>
+            <Menu.RadioItemGroup
+              value={client.status}
+              onValueChange={(e) => setStatus(e.value as Exclude<StatusType, 'offline'>)}
+            >
               <Menu.ItemGroupLabel>Status</Menu.ItemGroupLabel>
               {Object.entries(STATUSES).map(([value, label]) => (
-                <Menu.Item key={value} value={value}>
-                  <Status status={value as StatusType} /> {label}
-                </Menu.Item>
+                <Menu.RadioItem key={value} value={value}>
+                  <Menu.ItemIndicator />
+                  <Status status={value as StatusType} />
+                  {label}
+                </Menu.RadioItem>
               ))}
-            </Menu.ItemGroup>
+            </Menu.RadioItemGroup>
           </Menu.Content>
         </Menu.Positioner>
       </Portal>

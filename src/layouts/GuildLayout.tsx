@@ -1,6 +1,5 @@
 import { Box, Heading, Stack } from '@chakra-ui/react';
 import { isChannelVoiceBased } from '@main/api/discord/types';
-import { handleIpcRendererDiscordApiEvents } from '@renderer/api/discord';
 import { ChannelContext, ChannelProvider } from '@renderer/components/ChannelContext';
 import ChannelList from '@renderer/components/ChannelList';
 import MemberList from '@renderer/components/MemberList';
@@ -8,27 +7,22 @@ import useGuildsStore from '@renderer/stores/guilds';
 import useMessagesStore from '@renderer/stores/messages';
 import useVoicesStore from '@renderer/stores/voice';
 import RouteSpinner from '@renderer/ui/RouteSpinner';
-import { Suspense, useEffect, useMemo } from 'react';
+import { Suspense, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { Navigate, Outlet, useParams } from 'react-router';
 import { useShallow } from 'zustand/react/shallow';
 
 export default function GuildLayout() {
   const { guildId, channelId } = useParams();
-  const { guilds, channels, members, pullChannels, pullMembers, pullRoles } = useGuildsStore(
+  const { guilds, channels, members } = useGuildsStore(
     useShallow((s) => ({
       guilds: s.guilds,
       channels: s.channels,
       members: s.members,
-      pullChannels: s.pullChannels,
-      pullMembers: s.pullMembers,
-      pullRoles: s.pullRoles,
     }))
   );
   const unreadChannels = useMessagesStore((s) => s.unreadChannels);
-  const { voiceMembers, pullVoiceMembers } = useVoicesStore(
-    useShallow((s) => ({ voiceMembers: s.members, pullVoiceMembers: s.pullMembers }))
-  );
+  const voiceMembers = useVoicesStore((s) => s.members);
   const activeGuild = useMemo(() => guilds?.find((guild) => guild.id === guildId), [guilds, guildId]);
   const activeGuildChannels = useMemo(() => (activeGuild ? channels[activeGuild.id] : null), [activeGuild, channels]);
   const activeGuildMembers = useMemo(() => (activeGuild ? members[activeGuild.id] : null), [activeGuild, members]);
@@ -36,51 +30,6 @@ export default function GuildLayout() {
     () => activeGuildChannels?.find((channel) => channel.id === channelId),
     [activeGuildChannels, channelId]
   );
-
-  useEffect(() => {
-    if (!guildId) {
-      return;
-    }
-
-    pullChannels(guildId);
-    pullMembers(guildId);
-    pullRoles(guildId);
-    pullVoiceMembers(guildId);
-
-    const unsubscribeChannelUpdates = handleIpcRendererDiscordApiEvents(
-      [
-        'channelUpdate',
-        'channelCreate',
-        'channelDelete',
-        'threadUpdate',
-        'threadCreate',
-        'threadDelete',
-        'roleUpdate',
-        'guildMemberUpdate',
-      ],
-      () => pullChannels(guildId)
-    );
-
-    const unsubscribeMemberUpdates = handleIpcRendererDiscordApiEvents(
-      ['guildMemberUpdate', 'guildMemberAdd', 'guildMemberRemove', 'presenceUpdate'],
-      () => pullMembers(guildId)
-    );
-
-    const unsubscribeRoleUpdates = handleIpcRendererDiscordApiEvents(['roleUpdate', 'roleCreate', 'roleDelete'], () =>
-      pullRoles(guildId)
-    );
-
-    const unsubscribeVoiceUpdates = handleIpcRendererDiscordApiEvents(['voiceStateUpdate'], () =>
-      pullVoiceMembers(guildId)
-    );
-
-    return () => {
-      unsubscribeChannelUpdates();
-      unsubscribeMemberUpdates();
-      unsubscribeRoleUpdates();
-      unsubscribeVoiceUpdates();
-    };
-  }, [guildId]);
 
   const channelContext = useMemo<ChannelContext>(
     () => ({

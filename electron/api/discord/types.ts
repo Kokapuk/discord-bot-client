@@ -17,6 +17,7 @@ export interface BaseChannel {
   id: string;
   name: string;
   type: SupportedChannelType;
+  guidId: string;
 }
 
 export interface TextChannel extends BaseChannel {
@@ -155,6 +156,7 @@ export interface VoiceMember extends Pick<User, 'id' | 'displayName' | 'displayA
   selfDeaf: boolean | null;
   serverMute: boolean | null;
   serverDeaf: boolean | null;
+  canSpeak: boolean;
 }
 
 export const isChannelVoiceBased = (channel: Channel): channel is VoiceChannel => {

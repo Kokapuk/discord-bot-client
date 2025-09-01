@@ -5,12 +5,12 @@ import { create } from 'zustand';
 interface GuildsState {
   guilds: Guild[] | null;
   pullGuilds(): Promise<void>;
-  channels: Record<string, Channel[] | null | undefined>;
-  pullChannels(guildId: string): Promise<void>;
-  members: Record<string, User[] | null | undefined>;
-  pullMembers(guildId: string): Promise<void>;
-  roles: Record<string, Role[] | null | undefined>;
-  pullRoles(guildId: string): Promise<void>;
+  channels: Record<string, Channel[]>;
+  pullChannels(): Promise<void>;
+  members: Record<string, User[]>;
+  pullMembers(): Promise<void>;
+  roles: Record<string, Role[]>;
+  pullRoles(): Promise<void>;
 }
 
 const useGuildsStore = create<GuildsState>()((set) => ({
@@ -27,40 +27,40 @@ const useGuildsStore = create<GuildsState>()((set) => ({
     set({ guilds: response.payload });
   },
   channels: {},
-  pullChannels: async (guildId) => {
-    const response = await ipcRendererApiFunctions.getGuildChannels(guildId);
+  pullChannels: async () => {
+    const response = await ipcRendererApiFunctions.getGuildsChannels();
 
     if (!response.success) {
-      set((prev) => ({ ...prev, channels: { ...prev.channels, [guildId]: [] } }));
+      set((prev) => ({ ...prev, channels: {} }));
       console.error(`Failed to pull channels: ${response.error}`);
       return;
     }
 
-    set((prev) => ({ ...prev, channels: { ...prev.channels, [guildId]: response.payload } }));
+    set((prev) => ({ ...prev, channels: response.payload }));
   },
   members: {},
-  pullMembers: async (guildId) => {
-    const response = await ipcRendererApiFunctions.getGuildMembers(guildId);
+  pullMembers: async () => {
+    const response = await ipcRendererApiFunctions.getGuildsMembers();
 
     if (!response.success) {
-      set((prev) => ({ ...prev, members: { ...prev.members, [guildId]: [] } }));
+      set((prev) => ({ ...prev, members: {} }));
       console.error(`Failed to pull members: ${response.error}`);
       return;
     }
 
-    set((prev) => ({ ...prev, members: { ...prev.members, [guildId]: response.payload } }));
+    set((prev) => ({ ...prev, members: response.payload }));
   },
   roles: {},
-  pullRoles: async (guildId) => {
-    const response = await ipcRendererApiFunctions.getGuildRoles(guildId);
+  pullRoles: async () => {
+    const response = await ipcRendererApiFunctions.getGuildsRoles();
 
     if (!response.success) {
-      set((prev) => ({ ...prev, roles: { ...prev.roles, [guildId]: [] } }));
+      set((prev) => ({ ...prev, roles: {} }));
       console.error(`Failed to pull roles: ${response.error}`);
       return;
     }
 
-    set((prev) => ({ ...prev, roles: { ...prev.roles, [guildId]: response.payload } }));
+    set((prev) => ({ ...prev, roles: response.payload }));
   },
 }));
 

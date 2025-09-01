@@ -9,16 +9,23 @@ const ipcMainApiFunctionsKeys = completedApiFunctionKeys([
   // discord
   'authorize',
   'getClient',
+  'setClientStatus',
   'getGuilds',
-  'getGuildChannels',
-  'getGuildMembers',
-  'getGuildRoles',
-  'fetchChannelsMessages',
+  'getGuildsChannels',
+  'getGuildsMembers',
+  'getGuildsRoles',
+  'fetchChannelMessages',
   'sendMessage',
   'editMessage',
   'deleteMessage',
   'replyToMessage',
-  'getGuildVoiceMembers',
+  'getGuildsVoiceChannelsMembers',
+
+  // voice,
+  'joinVoice',
+  'leaveVoice',
+  'enableReceiver',
+  'disableReceiver',
 
   // app
   'setTheme',

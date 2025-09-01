@@ -1,12 +1,15 @@
 import { Box, Stack, Text } from '@chakra-ui/react';
 import { handleIpcRendererDiscordApiEvents, handleIpcRendererDiscordApiEventWithPayload } from '@renderer/api/discord';
+import { handleIpcRendererVoiceApiConnectionStatusUpdateEvent } from '@renderer/api/voice';
 import ClientActivityPanel from '@renderer/components/ClientActivityPanel';
 import GuildList from '@renderer/components/GuildList';
 import useAppStore from '@renderer/stores/app';
 import useGuildsStore from '@renderer/stores/guilds';
 import useMessagesStore from '@renderer/stores/messages';
+import useVoicesStore from '@renderer/stores/voice';
 import RouteSpinner from '@renderer/ui/RouteSpinner';
 import { toaster } from '@renderer/ui/toaster';
+import playAudio from '@renderer/utils/playAudio';
 import { Suspense, useEffect, useMemo } from 'react';
 import { Outlet, useNavigate, useParams } from 'react-router';
 import { useShallow } from 'zustand/react/shallow';
@@ -14,9 +17,20 @@ import { useShallow } from 'zustand/react/shallow';
 export default function AppLayout() {
   const { channelId } = useParams();
   const pullClient = useAppStore((s) => s.pullClient);
-  const { guilds, pullGuilds, channels } = useGuildsStore(
-    useShallow((s) => ({ guilds: s.guilds, pullGuilds: s.pullGuilds, channels: s.channels }))
+  const pullVoiceMembers = useVoicesStore((s) => s.pullMembers);
+  const navigate = useNavigate();
+
+  const { guilds, pullGuilds, channels, pullChannels, pullMembers, pullRoles } = useGuildsStore(
+    useShallow((s) => ({
+      guilds: s.guilds,
+      pullGuilds: s.pullGuilds,
+      channels: s.channels,
+      pullChannels: s.pullChannels,
+      pullMembers: s.pullMembers,
+      pullRoles: s.pullRoles,
+    }))
   );
+
   const { unreadChannels, updateMessage, addMessage, removeMessage, addUnreadChannel } = useMessagesStore(
     useShallow((s) => ({
       unreadChannels: s.unreadChannels,
@@ -26,6 +40,11 @@ export default function AppLayout() {
       addUnreadChannel: s.addUnreadChannel,
     }))
   );
+
+  const { setConnectionStatus, setActiveChannel } = useVoicesStore(
+    useShallow((s) => ({ setConnectionStatus: s.setConnectionStatus, setActiveChannel: s.setActiveChannel }))
+  );
+
   const unreadGuilds = useMemo(
     () =>
       guilds
@@ -33,7 +52,6 @@ export default function AppLayout() {
         .map((guild) => guild.id),
     [guilds, channels, unreadChannels]
   );
-  const navigate = useNavigate();
 
   useEffect(() => {
     pullClient();
@@ -41,14 +59,63 @@ export default function AppLayout() {
 
   useEffect(() => {
     pullGuilds();
+    pullChannels();
+    pullMembers();
+    pullRoles();
+    pullVoiceMembers();
 
     const unsubscribeGuildUpdates = handleIpcRendererDiscordApiEvents(
       ['guildUpdate', 'guildCreate', 'guildDelete'],
       pullGuilds
     );
 
+    const unsubscribeChannelUpdates = handleIpcRendererDiscordApiEvents(
+      [
+        'channelUpdate',
+        'channelCreate',
+        'channelDelete',
+        'threadUpdate',
+        'threadCreate',
+        'threadDelete',
+        'roleUpdate',
+        'guildMemberUpdate',
+      ],
+      () => pullChannels()
+    );
+
+    const unsubscribeMemberUpdates = handleIpcRendererDiscordApiEvents(
+      ['guildMemberUpdate', 'guildMemberAdd', 'guildMemberRemove', 'presenceUpdate'],
+      () => pullMembers()
+    );
+
+    const unsubscribeRoleUpdates = handleIpcRendererDiscordApiEvents(['roleUpdate', 'roleCreate', 'roleDelete'], () => {
+      pullRoles();
+    });
+
+    const unsubscribeVoiceUpdates = handleIpcRendererDiscordApiEventWithPayload('voiceStateUpdate', (actionType) => {
+      pullVoiceMembers();
+
+      if (actionType === 'userJoin') {
+        playAudio('/user-join.mp3');
+      } else if (actionType === 'userLeave') {
+        playAudio('/user-leave.mp3');
+      }
+    });
+
+    const unsubscribeVoiceConnectionStatusUpdate = handleIpcRendererVoiceApiConnectionStatusUpdateEvent(
+      (status, activeChannel) => {
+        setConnectionStatus(status);
+        setActiveChannel(activeChannel);
+      }
+    );
+
     return () => {
       unsubscribeGuildUpdates();
+      unsubscribeChannelUpdates();
+      unsubscribeMemberUpdates();
+      unsubscribeRoleUpdates();
+      unsubscribeVoiceUpdates();
+      unsubscribeVoiceConnectionStatusUpdate();
     };
   }, []);
 
@@ -59,18 +126,23 @@ export default function AppLayout() {
 
       if (channelId !== message.channelId) {
         addUnreadChannel(message.channelId);
-        toaster.create({
-          title: message.fallbackAuthor.displayName,
-          description: (
-            <Text width="100%" overflow="hidden" textOverflow="ellipsis" whiteSpace="nowrap">
-              {message.content}
-            </Text>
-          ),
-          action: message.guildId
-            ? { label: 'View', onClick: () => navigate(`/guilds/${message.guildId}/${message.channelId}`) }
-            : undefined,
-          closable: true,
-        });
+
+        if (useAppStore.getState().client?.status !== 'dnd') {
+          playAudio('/notification.mp3');
+
+          toaster.create({
+            title: message.fallbackAuthor.displayName,
+            description: (
+              <Text width="100%" overflow="hidden" textOverflow="ellipsis" whiteSpace="nowrap">
+                {message.content}
+              </Text>
+            ),
+            action: message.guildId
+              ? { label: 'View', onClick: () => navigate(`/guilds/${message.guildId}/${message.channelId}`) }
+              : undefined,
+            closable: true,
+          });
+        }
       }
     });
     const unsubscribeMessageDelete = handleIpcRendererDiscordApiEventWithPayload('messageDelete', removeMessage);

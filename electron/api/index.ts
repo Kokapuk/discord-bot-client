@@ -5,16 +5,18 @@ import {
   authorize,
   deleteMessage,
   editMessage,
-  fetchChannelsMessages,
+  fetchChannelMessages,
   getClient,
-  getGuildChannels,
-  getGuildMembers,
-  getGuildRoles,
+  getGuildsChannels,
+  getGuildsMembers,
+  getGuildsRoles,
   getGuilds,
-  getGuildVoiceMembers,
+  getGuildsVoiceChannelsMembers,
   replyToMessage,
   sendMessage,
+  setClientStatus,
 } from './discord';
+import { disableReceiver, enableReceiver, joinVoice, leaveVoice } from './voice';
 
 export type IpcApiResponse<T = void> =
   | (T extends void ? { success: true } : { success: true; payload: T })
@@ -24,16 +26,23 @@ const ipcMainApiFunctions = {
   // discord
   authorize,
   getClient,
+  setClientStatus,
   getGuilds,
-  getGuildChannels,
-  getGuildMembers,
-  getGuildRoles,
-  fetchChannelsMessages,
+  getGuildsChannels,
+  getGuildsMembers,
+  getGuildsRoles,
+  fetchChannelMessages,
   sendMessage,
   editMessage,
   deleteMessage,
   replyToMessage,
-  getGuildVoiceMembers,
+  getGuildsVoiceChannelsMembers,
+
+  // voice
+  joinVoice,
+  leaveVoice,
+  enableReceiver,
+  disableReceiver,
 
   // app
   setTheme,
