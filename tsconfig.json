@@ -22,10 +22,10 @@
 
     "baseUrl": "./",
     "paths": {
-      "@main/*": ["./electron/*"],
-      "@renderer/*": ["./src/*"]
+      "@main/*": ["./main/*"],
+      "@renderer/*": ["renderer/*"]
     }
   },
-  "include": ["src", "electron"],
+  "include": ["renderer", "main"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
