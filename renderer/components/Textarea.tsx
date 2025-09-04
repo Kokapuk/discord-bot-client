@@ -8,7 +8,7 @@ import z from 'zod';
 import FileUploadList from './FileUploadList';
 import MentionMenu from './MentionMenu';
 import TextareaActionContext from './TextareaActionContext';
-import { useTextareaContext } from './TextareaContext';
+import { useTextareaContext } from '../providers/TextareaContext';
 import TextareaReplyContext from './TextareaReplyContext';
 
 export type TextareaProps = BoxProps & RefAttributes<HTMLDivElement>;

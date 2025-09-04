@@ -1,6 +1,6 @@
 import { Menu, Portal } from '@chakra-ui/react';
 import React, { RefObject, useEffect, useRef, useState } from 'react';
-import { useTextareaContext } from './TextareaContext';
+import { useTextareaContext } from '../providers/TextareaContext';
 import Avatar from './Avatar';
 
 export type MentionMenuProps = { textarea: RefObject<HTMLTextAreaElement | null> };

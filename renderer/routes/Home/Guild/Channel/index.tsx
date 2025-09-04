@@ -1,8 +1,8 @@
 import { Box, Heading } from '@chakra-ui/react';
-import { MessageContext, MessageProvider } from '@renderer/components/MessageContext';
+import { MessageContext, MessageProvider } from '@renderer/providers/MessageContext';
 import MessageList from '@renderer/components/MessageList';
 import Textarea from '@renderer/components/Textarea';
-import { TextareaContext, TextareaProvider } from '@renderer/components/TextareaContext';
+import { TextareaContext, TextareaProvider } from '@renderer/providers/TextareaContext';
 import useAppStore from '@renderer/stores/app';
 import useGuildsStore from '@renderer/stores/guilds';
 import useMessagesStore from '@renderer/stores/messages';

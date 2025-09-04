@@ -10,6 +10,7 @@ export type VoiceIpcSlice = CreateIpcSlice<{
     joinVoice: (guildId: string, channelId: string) => Promise<void>;
     leaveVoice: () => Promise<void>;
     getAudioSources: () => Promise<IpcApiResponse<AudioSource[]>>;
+    // voiceChunk: (buffer: ArrayBuffer) => Promise<void>;
   };
   mainToRenderer: {
     voiceStateUpdate: (oldState: VoiceState, newState: VoiceState) => void;

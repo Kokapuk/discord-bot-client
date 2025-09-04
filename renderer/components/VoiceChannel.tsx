@@ -3,7 +3,7 @@ import { type VoiceChannel } from '@main/ipc/guilds/types';
 import { RefAttributes } from 'react';
 import BaseChannel, { BaseChannelProps } from './BaseChannel';
 import ChannelAdditionalActions from './ChannelAdditionalActions';
-import { useChannelContext } from './ChannelContext';
+import { useChannelContext } from '../providers/ChannelContext';
 import VoiceMemberList from './VoiceMemberList';
 
 export type VoiceChannelProps = {

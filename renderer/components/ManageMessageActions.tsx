@@ -3,7 +3,7 @@ import { Message } from '@main/ipc/messages/types';
 import { RefAttributes, useMemo, useState } from 'react';
 import { FaPen, FaReply, FaTrash } from 'react-icons/fa6';
 import ManageMessageButton from './ManageMessageButton';
-import { useMessageContext } from './MessageContext';
+import { useMessageContext } from '../providers/MessageContext';
 
 export type ManageMessageActionsProps = { message: Message } & GroupProps & RefAttributes<HTMLDivElement>;
 

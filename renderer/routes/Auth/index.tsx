@@ -20,7 +20,6 @@ export default function Auth() {
       setAuthorizing(true);
       const formdata = authFormDataSchema.parse(Object.fromEntries(new FormData(event.currentTarget).entries()));
       const response = await window.ipcRenderer.invoke('login', formdata.token);
-      console.log('TEST', response);
 
       if (response.success) {
         localStorage.setItem('token', formdata.token);

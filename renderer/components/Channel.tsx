@@ -1,5 +1,5 @@
 import { SupportedChannelType, type Channel } from '@main/ipc/guilds/types';
-import { useChannelContext } from './ChannelContext';
+import { useChannelContext } from '../providers/ChannelContext';
 import TextChannel from './TextChannel';
 import VoiceChannel from './VoiceChannel';
 

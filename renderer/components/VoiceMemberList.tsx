@@ -1,7 +1,7 @@
 import { Stack, StackProps } from '@chakra-ui/react';
 import { Channel } from '@main/ipc/guilds/types';
 import { RefAttributes } from 'react';
-import { useChannelContext } from './ChannelContext';
+import { useChannelContext } from '../providers/ChannelContext';
 import VoiceMember from './VoiceMember';
 
 export type VoiceMemberListProps = { channel: Channel } & StackProps;

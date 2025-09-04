@@ -1,6 +1,6 @@
 import { Box, Heading, Stack } from '@chakra-ui/react';
 import { isChannelVoiceBased } from '@main/ipc/voice/rendererSafeUtils';
-import { ChannelContext, ChannelProvider } from '@renderer/components/ChannelContext';
+import { ChannelContext, ChannelProvider } from '@renderer/providers/ChannelContext';
 import ChannelList from '@renderer/components/ChannelList';
 import MemberList from '@renderer/components/MemberList';
 import useGuildsStore from '@renderer/stores/guilds';

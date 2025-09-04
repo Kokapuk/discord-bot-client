@@ -17,6 +17,21 @@ let connection: VoiceConnection | null = null;
 let receiverEnabled = false;
 const activeSpeakers: any[] = [];
 
+// const audioPlayer = createAudioPlayer({
+//   behaviors: {
+//     noSubscriber: NoSubscriberBehavior.Pause,
+//   },
+// });
+// const inputStream = new PassThrough();
+// const demuxer = new prism.opus.WebmDemuxer();
+// demuxer.pipe(inputStream);
+// const resource = createAudioResource(inputStream, { inputType: StreamType.Opus });
+// audioPlayer.play(resource);
+
+// audioPlayer.on(AudioPlayerStatus.Playing, () => {
+//   console.log('The audio player has started playing!');
+// });
+
 const disableReceiver = () => {
   if (!receiverEnabled) {
     return;
@@ -38,7 +53,9 @@ const updateEvents = () => {
   }
 
   const savedConnection = connection;
+
   savedConnection.removeAllListeners();
+  // savedConnection.subscribe(audioPlayer);
 
   savedConnection.on(VoiceConnectionStatus.Disconnected, async () => {
     try {
@@ -154,8 +171,8 @@ export const handleIpcMainEvents = () => {
       channelId: channel.id,
       guildId: guild.id,
       adapterCreator: guild.voiceAdapterCreator,
-      selfDeaf: true,
-      selfMute: true,
+      selfDeaf: false,
+      selfMute: false,
     });
 
     updateEvents();
@@ -183,6 +200,10 @@ export const handleIpcMainEvents = () => {
       return { success: false, error: 'Failed to get desktop sources' };
     }
   });
+
+  // ipcMain.handle('voiceChunk', (_, buffer) => {
+  //   inputStream.write(Buffer.from(buffer));
+  // });
 };
 
 export const handleIpcMainAutoInvokeEvents = (webContents: WebContents) => {

@@ -9,7 +9,7 @@ import Avatar from './Avatar';
 import Embeds from './Embeds';
 import FormattedMessageContent from './FormattedMessageContent';
 import ManageMessageActions from './ManageMessageActions';
-import { useMessageContext } from './MessageContext';
+import { useMessageContext } from '../providers/MessageContext';
 import ReferenceMessage from './ReferenceMessage';
 
 export type MessageProps = {

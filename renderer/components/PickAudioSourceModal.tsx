@@ -31,7 +31,7 @@ export default function PickAudioSourceModal(props: Omit<DialogRootProps, 'child
         <Dialog.Positioner>
           <Dialog.Content height="90%">
             <Dialog.Header>
-              <Dialog.Title>Pick source you want to use as audio output</Dialog.Title>
+              <Dialog.Title>Pick source you want to use as an audio output</Dialog.Title>
             </Dialog.Header>
             <Dialog.Body>
               {!sources ? (

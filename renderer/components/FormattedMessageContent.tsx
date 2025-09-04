@@ -3,7 +3,7 @@ import Link from '@renderer/ui/Link';
 import { Fragment, ReactNode, RefAttributes, useMemo } from 'react';
 import reactStringReplace from 'react-string-replace';
 import Mention from './Mention';
-import { useMessageContext } from './MessageContext';
+import { useMessageContext } from '../providers/MessageContext';
 
 export type FormattedMessageContentProps = {
   rawContent: string;

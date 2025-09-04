@@ -2,7 +2,7 @@ import { Box, Stack, StackProps, Text } from '@chakra-ui/react';
 import { GuildMember } from '@main/ipc/guilds/types';
 import { RefAttributes, useMemo } from 'react';
 import FormattedMessageContent from './FormattedMessageContent';
-import { useMessageContext } from './MessageContext';
+import { useMessageContext } from '../providers/MessageContext';
 
 export type ReferenceMessageProps = { referenceMessageId: string } & StackProps & RefAttributes<HTMLDivElement>;
 

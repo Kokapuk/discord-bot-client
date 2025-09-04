@@ -34,18 +34,6 @@ const createWindow = () => {
   } else {
     window.loadFile(path.join(RENDERER_DIST, 'index.html'), { hash: 'auth' });
   }
-
-  window.webContents.setWindowOpenHandler(({ url, referrer }) => {
-    if (new URL(url).origin !== new URL(referrer.url).origin) {
-      shell.openExternal(url);
-      return { action: 'deny' };
-    }
-
-    return { action: 'allow' };
-  });
-
-  handleIpcMainEvents();
-  handleIpcMainAutoInvokeEvents(window.webContents);
 };
 
 const subscribeToThemeUpdate = () => {
@@ -61,6 +49,17 @@ const subscribeToThemeUpdate = () => {
   handleThemeUpdate();
 
   nativeTheme.themeSource = 'dark';
+};
+
+const handleThirdPartLinks = () => {
+  window!.webContents.setWindowOpenHandler(({ url, referrer }) => {
+    if (new URL(url).origin !== new URL(referrer.url).origin) {
+      shell.openExternal(url);
+      return { action: 'deny' };
+    }
+
+    return { action: 'allow' };
+  });
 };
 
 app.on('window-all-closed', () => {
@@ -83,4 +82,7 @@ app.on('activate', () => {
 app.whenReady().then(() => {
   createWindow();
   subscribeToThemeUpdate();
+  handleThirdPartLinks();
+  handleIpcMainEvents();
+  handleIpcMainAutoInvokeEvents(window!.webContents);
 });

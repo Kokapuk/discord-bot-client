@@ -7,8 +7,6 @@ export const createIpcRenderer = <T extends IpcSlice>() => {
 
   return {
     invoke: <C extends keyof RendererToMain>(channel: C, ...args: Parameters<RendererToMain[C]>) => {
-      console.log(channel);
-
       return ipcRenderer.invoke(channel as string, ...args) as ReturnType<RendererToMain[C]>;
     },
 

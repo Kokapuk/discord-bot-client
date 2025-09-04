@@ -3,7 +3,7 @@ import { GuildMember } from '@main/ipc/guilds/types';
 import { Message } from '@main/ipc/messages/types';
 import { useMemo } from 'react';
 import TextareaActionContext, { TextareaActionContextProps } from './TextareaActionContext';
-import { useTextareaContext } from './TextareaContext';
+import { useTextareaContext } from '../providers/TextareaContext';
 
 export type TextareaReplyContextProps = { message: Message } & Omit<TextareaActionContextProps, 'label' | 'onCancel'>;
 
