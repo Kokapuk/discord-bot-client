@@ -9,7 +9,9 @@ interface VoicesState {
   activeChannel: { guildId: string; channelId: string } | null;
   setActiveChannel(activeChannel: VoicesState['activeChannel']): void;
   receiving: boolean;
-  setReceiving(deaf: boolean): void;
+  setReceiving(receiving: boolean): void;
+  sending: boolean;
+  setSending(sending: boolean): void;
 }
 
 const useVoicesStore = create<VoicesState>()((set) => ({
@@ -36,6 +38,10 @@ const useVoicesStore = create<VoicesState>()((set) => ({
   receiving: false,
   setReceiving: (receiving) => {
     set({ receiving });
+  },
+  sending: false,
+  setSending: (sending) => {
+    set({ sending });
   },
 }));
 

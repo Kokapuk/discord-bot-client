@@ -65,7 +65,6 @@ export default function ToggleReceiveVoiceChannelButton() {
       toggled={receiving}
       tooltip={receiving ? 'Deafen' : 'Undeafen'}
       onClick={receiving ? disableReceiver : enableReceiver}
-      aria-checked={receiving}
       colorPalette={clientVoiceMember.serverDeaf ? 'red' : undefined}
     >
       {receiving ? <FaVolumeLow /> : <FaVolumeXmark />}

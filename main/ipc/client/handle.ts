@@ -9,7 +9,7 @@ export const handleIpcMainEvents = () => {
   ipcMain.handle('login', async (_, token) => {
     try {
       await client.login(token);
-      await new Promise((res) => client.once('ready', res));
+      await new Promise((res) => client.once('clientReady', res));
 
       client.user?.setPresence({
         activities: [

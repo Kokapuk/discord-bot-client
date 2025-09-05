@@ -22,20 +22,8 @@ export interface VoiceConnectionState {
 
 export interface VoiceState {
   guildId: string;
-  channelId: string | null; 
+  channelId: string | null;
   member: VoiceMember | null;
 }
 
-export interface WindowAudioSource {
-  name: string;
-  windowId: string;
-  appIconDataUrl: string;
-  type: 'window';
-}
-
-export interface OutputDeviceAudioSource {
-  name: string;
-  type: 'outputDevice';
-}
-
-export type AudioSource = WindowAudioSource | OutputDeviceAudioSource;
+export type OutputAudioSource = 'systemwide' | 'isolatedExternal';

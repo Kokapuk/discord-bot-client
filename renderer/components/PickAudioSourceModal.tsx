@@ -1,28 +1,50 @@
-import { Button, CloseButton, Dialog, DialogRootProps, Grid, Image, Portal, Spinner, Text } from '@chakra-ui/react';
-import { AudioSource } from '@main/ipc/voice/types';
-import { RefAttributes, useEffect, useState } from 'react';
+import { Button, CloseButton, Dialog, DialogRootProps, Grid, Portal, Text } from '@chakra-ui/react';
+import { OutputAudioSource } from '@main/ipc/voice/types';
+import useVoicesStore from '@renderer/stores/voice';
+import { RefAttributes } from 'react';
+import { useShallow } from 'zustand/shallow';
+
+const OUTPUT_AUDIO_SOURCES: Record<OutputAudioSource, string> = {
+  isolatedExternal: 'Isolated external',
+  systemwide: 'Systemwide',
+};
 
 export default function PickAudioSourceModal(props: Omit<DialogRootProps, 'children'> & RefAttributes<HTMLDivElement>) {
-  const [sources, setSources] = useState<AudioSource[] | null>(null);
+  const setSending = useVoicesStore(useShallow((s) => s.setSending));
 
-  useEffect(() => {
-    if (!props.open) {
-      return;
-    }
+  const startAudioOutput = async (outputAudioSource: OutputAudioSource) => {
+    await window.ipcRenderer.invoke('startHandlingOutputAudioSource', outputAudioSource);
 
-    (async () => {
-      setSources(null);
+    const stream = await navigator.mediaDevices.getDisplayMedia({
+      audio: {
+        autoGainControl: false,
+        noiseSuppression: false,
+        echoCancellation: false,
+      },
+      video: false,
+    });
 
-      const response = await window.ipcRenderer.invoke('getAudioSources');
+    setSending(true);
+    props.onOpenChange?.({ open: false });
 
-      if (!response.success) {
-        console.error('Failed to get sources:', response.error);
-        return;
+    const mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm; codecs=opus' });
+
+    mediaRecorder.ondataavailable = (e) => {
+      if (e.data.size > 0) {
+        e.data.arrayBuffer().then((buf) => {
+          window.ipcRenderer.invoke('voiceChunk', buf);
+        });
       }
+    };
 
-      setSources(response.payload);
-    })();
-  }, [props.open]);
+    mediaRecorder.start(200);
+
+    window.ipcRenderer.once('audioOutputHandlingStop', () => {
+      mediaRecorder.stop();
+      stream.getTracks().forEach((track) => track.stop());
+      setSending(false);
+    });
+  };
 
   return (
     <Dialog.Root placement="center" size="xl" unmountOnExit {...props}>
@@ -34,30 +56,20 @@ export default function PickAudioSourceModal(props: Omit<DialogRootProps, 'child
               <Dialog.Title>Pick source you want to use as an audio output</Dialog.Title>
             </Dialog.Header>
             <Dialog.Body>
-              {!sources ? (
-                <Spinner
-                  color="colorPalette.fg"
-                  position="absolute"
-                  left="50%"
-                  top="50%"
-                  transform="translate(-50%, -50%)"
-                />
-              ) : (
-                <Grid templateColumns="repeat(2 ,1fr)" gap="4">
-                  {sources.map((source) => (
-                    <Button
-                      key={source.type === 'window' ? source.windowId : 'TODO'}
-                      variant="subtle"
-                      justifyContent="flex-start"
-                    >
-                      {source.type === 'window' && <Image height="5" width="5" src={source.appIconDataUrl} />}
-                      <Text textAlign="start" width="100%" overflow="hidden" textOverflow="ellipsis">
-                        {source.name}
-                      </Text>
-                    </Button>
-                  ))}
-                </Grid>
-              )}
+              <Grid templateColumns="repeat(2 ,1fr)" gap="4">
+                {Object.entries(OUTPUT_AUDIO_SOURCES).map(([outputAudioSource, label]) => (
+                  <Button
+                    key={outputAudioSource}
+                    variant="subtle"
+                    justifyContent="flex-start"
+                    onClick={() => startAudioOutput(outputAudioSource as OutputAudioSource)}
+                  >
+                    <Text textAlign="start" width="100%" overflow="hidden" textOverflow="ellipsis">
+                      {label}
+                    </Text>
+                  </Button>
+                ))}
+              </Grid>
             </Dialog.Body>
             <Dialog.CloseTrigger asChild>
               <CloseButton size="sm" />

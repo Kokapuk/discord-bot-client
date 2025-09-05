@@ -1,36 +1,29 @@
-import { EndBehaviorType, entersState, joinVoiceChannel, VoiceConnection } from '@discordjs/voice';
-import { desktopCapturer, WebContents } from 'electron';
+import { createAudioResource, EndBehaviorType, entersState, joinVoiceChannel, VoiceConnection } from '@discordjs/voice';
+import { BrowserWindow, WebContents } from 'electron';
 import { createRequire } from 'module';
+import { PassThrough } from 'stream';
 import { VoiceIpcSlice } from '.';
 import { createIpcMain } from '../../utils/createIpcMain';
 import { client } from '../client/utils';
 import { VoiceConnectionStatus, VoiceMember } from './types';
-import { structAudioSource, structVoiceMember, structVoiceState } from './utils';
+import {
+  audioOutputStream,
+  audioPlayer,
+  startHandlingOutputAudioIsolatedExternalSource,
+  stopHandlingAudioOutputSource,
+  structVoiceMember,
+  structVoiceState,
+} from './utils';
 
 const require = createRequire(import.meta.url);
 const prism = require('prism-media');
 const Speaker = require('speaker');
 
-const ipcMain = createIpcMain<VoiceIpcSlice>();
+export const ipcMain = createIpcMain<VoiceIpcSlice>();
 
 let connection: VoiceConnection | null = null;
 let receiverEnabled = false;
 const activeSpeakers: any[] = [];
-
-// const audioPlayer = createAudioPlayer({
-//   behaviors: {
-//     noSubscriber: NoSubscriberBehavior.Pause,
-//   },
-// });
-// const inputStream = new PassThrough();
-// const demuxer = new prism.opus.WebmDemuxer();
-// demuxer.pipe(inputStream);
-// const resource = createAudioResource(inputStream, { inputType: StreamType.Opus });
-// audioPlayer.play(resource);
-
-// audioPlayer.on(AudioPlayerStatus.Playing, () => {
-//   console.log('The audio player has started playing!');
-// });
 
 const disableReceiver = () => {
   if (!receiverEnabled) {
@@ -47,7 +40,7 @@ const disableReceiver = () => {
   activeSpeakers.length = 0;
 };
 
-const updateEvents = () => {
+const updateEvents = (webContents: WebContents) => {
   if (!connection) {
     return;
   }
@@ -55,7 +48,7 @@ const updateEvents = () => {
   const savedConnection = connection;
 
   savedConnection.removeAllListeners();
-  // savedConnection.subscribe(audioPlayer);
+  savedConnection.subscribe(audioPlayer);
 
   savedConnection.on(VoiceConnectionStatus.Disconnected, async () => {
     try {
@@ -70,6 +63,7 @@ const updateEvents = () => {
 
   savedConnection.on(VoiceConnectionStatus.Destroyed, () => {
     disableReceiver();
+    stopHandlingAudioOutputSource(webContents);
     connection = null;
   });
 };
@@ -175,7 +169,7 @@ export const handleIpcMainEvents = () => {
       selfMute: false,
     });
 
-    updateEvents();
+    updateEvents(event.sender);
     handleConnectionStateChangeEvent(connection, event.sender, { guildId: guild.id, channelId: channel.id });
   });
 
@@ -187,23 +181,25 @@ export const handleIpcMainEvents = () => {
     connection.destroy();
   });
 
-  ipcMain.handle('getAudioSources', async () => {
-    try {
-      const sources = await desktopCapturer.getSources({
-        types: ['window'],
-        fetchWindowIcons: true,
-        thumbnailSize: { height: 0, width: 0 },
-      });
-
-      return { success: true, payload: sources.map(structAudioSource) };
-    } catch (err) {
-      return { success: false, error: 'Failed to get desktop sources' };
+  ipcMain.handle('startHandlingOutputAudioSource', (event, source) => {
+    if (source === 'isolatedExternal') {
+      startHandlingOutputAudioIsolatedExternalSource(BrowserWindow.fromWebContents(event.sender)!);
     }
+
+    audioOutputStream.current = new PassThrough();
+    const resource = createAudioResource(audioOutputStream.current);
+    audioPlayer.play(resource);
   });
 
-  // ipcMain.handle('voiceChunk', (_, buffer) => {
-  //   inputStream.write(Buffer.from(buffer));
-  // });
+  ipcMain.handle('stopHandlingOutputAudioSource', (event) => {
+    stopHandlingAudioOutputSource(event.sender);
+    audioPlayer.stop();
+    audioOutputStream.current = null;
+  });
+
+  ipcMain.handle('voiceChunk', (_, buffer) => {
+    audioOutputStream.current?.write(Buffer.from(buffer));
+  });
 };
 
 export const handleIpcMainAutoInvokeEvents = (webContents: WebContents) => {
