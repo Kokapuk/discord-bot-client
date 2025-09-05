@@ -1,4 +1,11 @@
-import { createAudioResource, EndBehaviorType, entersState, joinVoiceChannel, VoiceConnection } from '@discordjs/voice';
+import {
+  createAudioResource,
+  EndBehaviorType,
+  entersState,
+  joinVoiceChannel,
+  StreamType,
+  VoiceConnection,
+} from '@discordjs/voice';
 import { BrowserWindow, WebContents } from 'electron';
 import { createRequire } from 'module';
 import { PassThrough } from 'stream';
@@ -10,6 +17,7 @@ import {
   audioOutputStream,
   audioPlayer,
   startHandlingOutputAudioIsolatedExternalSource,
+  startHandlingOutputAudioSystemwideSource,
   stopHandlingAudioOutputSource,
   structVoiceMember,
   structVoiceState,
@@ -165,8 +173,8 @@ export const handleIpcMainEvents = () => {
       channelId: channel.id,
       guildId: guild.id,
       adapterCreator: guild.voiceAdapterCreator,
-      selfDeaf: false,
-      selfMute: false,
+      selfDeaf: true,
+      selfMute: true,
     });
 
     updateEvents(event.sender);
@@ -182,12 +190,16 @@ export const handleIpcMainEvents = () => {
   });
 
   ipcMain.handle('startHandlingOutputAudioSource', (event, source) => {
-    if (source === 'isolatedExternal') {
+    if (source === 'systemwide') {
+      startHandlingOutputAudioSystemwideSource();
+    } else if (source === 'isolatedExternal') {
       startHandlingOutputAudioIsolatedExternalSource(BrowserWindow.fromWebContents(event.sender)!);
+    } else if (source === 'isolatedExternalWithLocalEcho') {
+      startHandlingOutputAudioIsolatedExternalSource(BrowserWindow.fromWebContents(event.sender)!, true);
     }
 
-    audioOutputStream.current = new PassThrough();
-    const resource = createAudioResource(audioOutputStream.current);
+    audioOutputStream.current = new PassThrough({ highWaterMark: 1024 });
+    const resource = createAudioResource(audioOutputStream.current, { inputType: StreamType.Raw });
     audioPlayer.play(resource);
   });
 

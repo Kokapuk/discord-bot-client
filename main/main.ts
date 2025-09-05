@@ -26,6 +26,7 @@ const createWindow = () => {
     backgroundMaterial: 'mica',
     webPreferences: {
       preload: path.join(__dirname, 'preload.mjs'),
+      backgroundThrottling: false,
     },
   });
 

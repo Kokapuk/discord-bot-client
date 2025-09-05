@@ -6,7 +6,14 @@ const createAudioCaptureWindow = (parent: BrowserWindow) => {
     icon: path.join(process.env.VITE_PUBLIC, 'electron-vite.svg'),
     width: 800,
     height: 600,
-    parent,
+    autoHideMenuBar: true,
+    webPreferences: {
+      backgroundThrottling: true,
+    },
+  });
+
+  parent.once('close', () => {
+    window.close();
   });
 
   window.loadURL('https://youtube.com');

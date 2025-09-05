@@ -32,36 +32,47 @@ export const structVoiceState = (voiceState: DiscordVoiceState): VoiceState => (
   member: voiceState.member ? structVoiceMember(voiceState.member) : null,
 });
 
-export const stopHandlingAudioOutputIsolatedExternalSource = async () => {
+export const startHandlingOutputAudioSystemwideSource = async () => {
+  session.defaultSession.setDisplayMediaRequestHandler((_, callback) => {
+    callback({ audio: 'loopback' });
+  });
+};
+
+export const startHandlingOutputAudioIsolatedExternalSource = async (window: BrowserWindow, enableLocalEcho?: true) => {
+  return await new Promise<void>((resolve) =>
+    session.defaultSession.setDisplayMediaRequestHandler((_, callback) => {
+      audioCaptureWindow = createAudioCaptureWindow(window);
+      callback({ audio: audioCaptureWindow.webContents.mainFrame, enableLocalEcho: enableLocalEcho });
+
+      audioCaptureWindow.once('closed', () => {
+        if (!window.isDestroyed()) {
+          stopHandlingAudioOutputSource(window.webContents);
+        }
+      });
+
+      resolve();
+    })
+  );
+};
+
+export const stopHandlingAudioOutputIsolatedExternalSource = () => {
   if (audioCaptureWindow && !audioCaptureWindow.isDestroyed()) {
     audioCaptureWindow.removeAllListeners('close');
     audioCaptureWindow.close();
   }
 
   audioCaptureWindow = null;
-  session.defaultSession.setDevicePermissionHandler(null);
 };
 
 export const stopHandlingAudioOutputSource = async (webContents: WebContents) => {
-  audioPlayer.stop();
-  audioOutputStream.current = null;
+  stopHandlingAudioOutputIsolatedExternalSource();
 
-  await stopHandlingAudioOutputIsolatedExternalSource();
+  session.defaultSession.setDevicePermissionHandler(null);
 
   try {
     ipcMain.send(webContents, 'audioOutputHandlingStop');
+    audioPlayer.stop();
+    audioOutputStream.current?.end();
+    audioOutputStream.current = null;
   } catch {}
-};
-
-export const startHandlingOutputAudioIsolatedExternalSource = async (window: BrowserWindow) => {
-  return await new Promise<void>((resolve) =>
-    session.defaultSession.setDisplayMediaRequestHandler((_, callback) => {
-      audioCaptureWindow = createAudioCaptureWindow(window);
-      callback({ audio: audioCaptureWindow.webContents.mainFrame, enableLocalEcho: false });
-
-      audioCaptureWindow.once('closed', () => stopHandlingAudioOutputSource(window.webContents));
-
-      resolve();
-    })
-  );
 };

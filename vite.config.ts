@@ -13,7 +13,14 @@ export default defineConfig({
         vite: {
           build: {
             rollupOptions: {
-              external: ['zlib-sync', 'bufferutil', 'utf-8-validate', '@snazzah/davey', 'ffmpeg-static'],
+              external: [
+                'zlib-sync',
+                'bufferutil',
+                'utf-8-validate',
+                '@snazzah/davey',
+                'ffmpeg-static',
+                '@discordjs/voice',
+              ],
             },
           },
         },
@@ -23,7 +30,6 @@ export default defineConfig({
       },
       renderer: process.env.NODE_ENV === 'test' ? undefined : {},
     }),
-
     tsconfigPaths(),
   ],
 });
