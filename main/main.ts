@@ -1,4 +1,4 @@
-import { app, BrowserWindow, nativeTheme, shell } from 'electron';
+import { app, BrowserWindow, nativeTheme, session, shell } from 'electron';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { handleIpcMainAutoInvokeEvents, handleIpcMainEvents } from './ipc';
@@ -86,4 +86,5 @@ app.whenReady().then(() => {
   handleThirdPartLinks();
   handleIpcMainEvents();
   handleIpcMainAutoInvokeEvents(window!.webContents);
+  session.defaultSession.extensions.loadExtension(path.join(process.env.VITE_PUBLIC, '/extensions/uBlock'));
 });

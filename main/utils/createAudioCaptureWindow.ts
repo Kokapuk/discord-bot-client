@@ -12,8 +12,14 @@ const createAudioCaptureWindow = (parent: BrowserWindow) => {
     },
   });
 
-  parent.once('close', () => {
+  const handleParentClose = () => {
     window.close();
+  };
+
+  parent.on('close', handleParentClose);
+
+  window.once('close', () => {
+    parent.off('close', handleParentClose);
   });
 
   window.loadURL('https://youtube.com');
