@@ -201,6 +201,8 @@ export const handleIpcMainEvents = () => {
     audioOutputStream.current = new PassThrough({ highWaterMark: 1024 });
     const resource = createAudioResource(audioOutputStream.current, { inputType: StreamType.Raw });
     audioPlayer.play(resource);
+
+    // audioOutputStream.current.pipe(new Speaker({ frameSize: 960, channels: 2, rate: 48000 }));
   });
 
   ipcMain.handle('stopHandlingOutputAudioSource', (event) => {

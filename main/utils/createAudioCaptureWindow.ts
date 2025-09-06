@@ -22,6 +22,8 @@ const createAudioCaptureWindow = (parent: BrowserWindow) => {
     titleBarStyle: 'hidden',
     titleBarOverlay: {},
     backgroundMaterial: 'mica',
+    alwaysOnTop: true,
+    minimizable: false,
     webPreferences: {
       preload: path.join(__dirname, 'preload.mjs'),
     },
@@ -61,6 +63,16 @@ const createAudioCaptureWindow = (parent: BrowserWindow) => {
 
     removeHandlers();
     unsubscribe();
+  });
+
+  window.on('blur', () => {
+    window.setOpacity(0);
+    window.setIgnoreMouseEvents(true);
+  });
+
+  window.on('focus', () => {
+    window.setOpacity(1);
+    window.setIgnoreMouseEvents(false);
   });
 
   return { window, webFrameMain: view.webContents.mainFrame };

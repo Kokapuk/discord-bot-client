@@ -1,8 +1,8 @@
-import { Button, CloseButton, Dialog, DialogRootProps, Portal, Stack, Text } from '@chakra-ui/react';
+import { Button, CloseButton, Dialog, DialogRootProps, Portal, Spinner, Stack, Text } from '@chakra-ui/react';
 import { OutputAudioSource } from '@main/ipc/voice/types';
 import useVoicesStore from '@renderer/stores/voice';
-import { ReactNode, RefAttributes, useState } from 'react';
-import { FaCircleNodes, FaSquareArrowUpRight } from 'react-icons/fa6';
+import { ReactNode, RefAttributes, useEffect, useState } from 'react';
+import { FaCircleNodes, FaMicrophoneLines, FaSquareArrowUpRight } from 'react-icons/fa6';
 import { useShallow } from 'zustand/shallow';
 import AudioOutputToggleSettingsMenu, { AudioOutputToggleSettings } from './AudioOutputToggleSettingsMenu';
 
@@ -19,15 +19,20 @@ export default function PickAudioSourceModal(props: Omit<DialogRootProps, 'child
     noiseSuppression: false,
     echoCancellation: false,
   }));
+  const [audioInputDevices, setAudioInputDevices] = useState<MediaDeviceInfo[] | null>(null);
 
-  const startAudioOutput = async (outputAudioSource: OutputAudioSource) => {
-    await window.ipcRenderer.invoke('startHandlingOutputAudioSource', outputAudioSource);
+  useEffect(() => {
+    if (props.open) {
+      return;
+    }
 
-    const stream = await navigator.mediaDevices.getDisplayMedia({
-      audio: audioOutputSettings,
-      video: false,
-    });
+    (async () => {
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      setAudioInputDevices(devices.filter((device) => device.kind === 'audioinput'));
+    })();
+  }, [props.open]);
 
+  const startAudioOutput = async (stream: MediaStream) => {
     setSending(true);
     props.onOpenChange?.({ open: false });
 
@@ -52,6 +57,26 @@ export default function PickAudioSourceModal(props: Omit<DialogRootProps, 'child
     });
   };
 
+  const startAudioOutputWithSource = async (outputAudioSource: OutputAudioSource) => {
+    await window.ipcRenderer.invoke('startHandlingOutputAudioSource', outputAudioSource);
+
+    const stream = await navigator.mediaDevices.getDisplayMedia({
+      audio: { ...audioOutputSettings },
+      video: false,
+    });
+
+    startAudioOutput(stream);
+  };
+
+  const startAudioOutputWithDevice = async (device: MediaDeviceInfo) => {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      audio: { ...audioOutputSettings, deviceId: device.deviceId, groupId: device.groupId },
+      video: false,
+    });
+
+    startAudioOutput(stream);
+  };
+
   return (
     <Dialog.Root placement="center" unmountOnExit {...props}>
       <Portal>
@@ -62,14 +87,14 @@ export default function PickAudioSourceModal(props: Omit<DialogRootProps, 'child
               <Dialog.Title>Pick a source you want to use as an audio output</Dialog.Title>
             </Dialog.Header>
             <Dialog.Body>
-              <Text marginBottom="3">System audio</Text>
+              <Text marginBottom="3">System</Text>
               <Stack gap="3" marginBottom="5">
                 {Object.entries(OUTPUT_AUDIO_SOURCES).map(([outputAudioSource, { icon, label }]) => (
                   <Button
                     key={outputAudioSource}
                     variant="subtle"
                     justifyContent="flex-start"
-                    onClick={() => startAudioOutput(outputAudioSource as OutputAudioSource)}
+                    onClick={() => startAudioOutputWithSource(outputAudioSource as OutputAudioSource)}
                   >
                     {icon}
                     <Text textAlign="start" width="100%" overflow="hidden" textOverflow="ellipsis">
@@ -79,7 +104,26 @@ export default function PickAudioSourceModal(props: Omit<DialogRootProps, 'child
                 ))}
               </Stack>
 
-              {/* <Text marginBottom="3">Output device</Text> */}
+              <Text marginBottom="3">Device</Text>
+              <Stack gap="3" marginBottom="5">
+                {audioInputDevices ? (
+                  audioInputDevices.map((device) => (
+                    <Button
+                      key={device.deviceId}
+                      variant="subtle"
+                      justifyContent="flex-start"
+                      onClick={() => startAudioOutputWithDevice(device)}
+                    >
+                      <FaMicrophoneLines />
+                      <Text textAlign="start" width="100%" overflow="hidden" textOverflow="ellipsis">
+                        {device.label}
+                      </Text>
+                    </Button>
+                  ))
+                ) : (
+                  <Spinner position="absolute" top="50%" left="50%" transform="translate(-50%, -50%)" />
+                )}
+              </Stack>
             </Dialog.Body>
 
             <Dialog.Footer>
