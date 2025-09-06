@@ -12,6 +12,7 @@ const Home = lazy(() => import('./routes/Home'));
 const GuildLayout = lazy(() => import('./layouts/GuildLayout'));
 const Guild = lazy(() => import('./routes/Home/Guild'));
 const Channel = lazy(() => import('./routes/Home/Guild/Channel'));
+const MiniBrowser = lazy(() => import('./routes/MiniBrowser'));
 
 const router = createHashRouter([
   {
@@ -46,6 +47,10 @@ const router = createHashRouter([
         ],
       },
     ],
+  },
+  {
+    path: '/miniBrowser',
+    element: <MiniBrowser />,
   },
 ]);
 

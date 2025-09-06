@@ -3,16 +3,18 @@ import { AppIpcSlice } from './ipc/app';
 import { ClientIpcSlice } from './ipc/client';
 import { GuildsIpcSlice } from './ipc/guilds';
 import { MessagesIpcSlice } from './ipc/messages';
+import { MiniBrowserIpcSlice } from './ipc/miniBrowser';
 import { VoiceIpcSlice } from './ipc/voice';
 import { createIpcRenderer } from './utils/createIpcRenderer';
 import { MergeSlices } from './utils/ipc';
 
-const ipcRenderer =
-  createIpcRenderer<MergeSlices<AppIpcSlice | ClientIpcSlice | GuildsIpcSlice | MessagesIpcSlice | VoiceIpcSlice>>();
+type MergedSlices = MergeSlices<
+  AppIpcSlice | ClientIpcSlice | GuildsIpcSlice | MessagesIpcSlice | VoiceIpcSlice | MiniBrowserIpcSlice
+>;
+
+const ipcRenderer = createIpcRenderer<MergedSlices>();
 
 export type IpcRenderer = typeof ipcRenderer;
-export type MainToRendererChannel = keyof MergeSlices<
-  AppIpcSlice | ClientIpcSlice | GuildsIpcSlice | MessagesIpcSlice | VoiceIpcSlice
->['mainToRenderer'];
+export type MainToRendererChannel = keyof MergeSlices<MergedSlices>['mainToRenderer'];
 
 contextBridge.exposeInMainWorld('ipcRenderer', ipcRenderer);

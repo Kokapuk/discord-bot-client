@@ -41,8 +41,10 @@ export const startHandlingOutputAudioSystemwideSource = async () => {
 export const startHandlingOutputAudioIsolatedExternalSource = async (window: BrowserWindow, enableLocalEcho?: true) => {
   return await new Promise<void>((resolve) =>
     session.defaultSession.setDisplayMediaRequestHandler((_, callback) => {
-      audioCaptureWindow = createAudioCaptureWindow(window);
-      callback({ audio: audioCaptureWindow.webContents.mainFrame, enableLocalEcho: enableLocalEcho });
+      const audioCaptureWindowData = createAudioCaptureWindow(window);
+      audioCaptureWindow = audioCaptureWindowData.window;
+
+      callback({ audio: audioCaptureWindowData.webFrameMain, enableLocalEcho: enableLocalEcho });
 
       audioCaptureWindow.once('closed', () => {
         if (!window.isDestroyed()) {

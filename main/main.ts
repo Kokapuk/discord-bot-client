@@ -3,6 +3,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { handleIpcMainAutoInvokeEvents, handleIpcMainEvents } from './ipc';
 import { logout } from './ipc/client/utils';
+import handleThemeUpdate from './utils/handleThemeUpdate';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -26,7 +27,6 @@ const createWindow = () => {
     backgroundMaterial: 'mica',
     webPreferences: {
       preload: path.join(__dirname, 'preload.mjs'),
-      backgroundThrottling: false,
     },
   });
 
@@ -35,21 +35,6 @@ const createWindow = () => {
   } else {
     window.loadFile(path.join(RENDERER_DIST, 'index.html'), { hash: 'auth' });
   }
-};
-
-const subscribeToThemeUpdate = () => {
-  const handleThemeUpdate = () => {
-    window?.setTitleBarOverlay({
-      color: nativeTheme.shouldUseDarkColors ? 'rgba(0,0,0,0)' : 'rgba(255,255,255,0)',
-      symbolColor: nativeTheme.shouldUseDarkColors ? 'white' : 'black',
-      height: 30,
-    });
-  };
-
-  nativeTheme.on('updated', handleThemeUpdate);
-  handleThemeUpdate();
-
-  nativeTheme.themeSource = 'dark';
 };
 
 const handleThirdPartLinks = () => {
@@ -82,9 +67,13 @@ app.on('activate', () => {
 
 app.whenReady().then(() => {
   createWindow();
-  subscribeToThemeUpdate();
+
+  nativeTheme.themeSource = 'dark';
+  handleThemeUpdate(window!, 32);
+
   handleThirdPartLinks();
   handleIpcMainEvents();
   handleIpcMainAutoInvokeEvents(window!.webContents);
+
   session.defaultSession.extensions.loadExtension(path.join(process.env.VITE_PUBLIC, '/extensions/uBlock'));
 });
