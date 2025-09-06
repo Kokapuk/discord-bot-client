@@ -64,6 +64,14 @@ export interface Embed {
   provider: string | null;
 }
 
+export interface MessageSnapshot {
+  id: string | null;
+  type: SupportedMessageType;
+  content: string;
+  attachments: Attachment[];
+  embeds: Embed[];
+}
+
 export interface Message {
   id: string;
   type: SupportedMessageType;
@@ -78,6 +86,7 @@ export interface Message {
   embeds: Embed[];
   referenceMessageId: string | null;
   clientMentioned: boolean;
+  messageSnapshots: MessageSnapshot[];
 }
 
 export interface SendMessageFileDTO {

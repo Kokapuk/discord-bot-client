@@ -4,12 +4,12 @@ import { type Message } from '@main/ipc/messages/types';
 import { useColorMode } from '@renderer/ui/color-mode';
 import dayjs from 'dayjs';
 import { memo, RefAttributes, useMemo } from 'react';
+import { useMessageContext } from '../providers/MessageContext';
 import Attachments from './Attachments';
 import Avatar from './Avatar';
 import Embeds from './Embeds';
 import FormattedMessageContent from './FormattedMessageContent';
 import ManageMessageActions from './ManageMessageActions';
-import { useMessageContext } from '../providers/MessageContext';
 import ReferenceMessage from './ReferenceMessage';
 
 export type MessageProps = {
@@ -89,7 +89,13 @@ const Message = ({ message, chain, ...props }: MessageProps) => {
               )}
             </Stack>
           )}
+
           <FormattedMessageContent rawContent={message.content} />
+          {message.messageSnapshots.length > 0 && (
+            <Text fontSize="sm" color="fg.muted" fontStyle="italic">
+              Forwarded
+            </Text>
+          )}
 
           <Attachments attachments={message.attachments} />
           <Embeds embeds={message.embeds} />

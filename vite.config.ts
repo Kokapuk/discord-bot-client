@@ -18,7 +18,6 @@ export default defineConfig({
                 'bufferutil',
                 'utf-8-validate',
                 '@snazzah/davey',
-                'ffmpeg-static',
                 '@discordjs/voice',
               ],
             },

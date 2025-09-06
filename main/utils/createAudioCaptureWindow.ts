@@ -8,7 +8,7 @@ const createAudioCaptureWindow = (parent: BrowserWindow) => {
     height: 600,
     autoHideMenuBar: true,
     webPreferences: {
-      backgroundThrottling: true,
+      backgroundThrottling: false,
     },
   });
 

@@ -6,9 +6,20 @@ import {
   Message as DiscordMessage,
   EmbedAuthorData,
   EmbedFooterData,
+  MessageSnapshot as DiscordMessageSnapshot,
 } from 'discord.js';
 import { structUser } from '../client/utils';
-import { Attachment, Embed, EmbedAssetData, EmbedAuthor, EmbedField, EmbedFooter, Message } from './types';
+import {
+  Attachment,
+  Embed,
+  EmbedAssetData,
+  EmbedAuthor,
+  EmbedField,
+  EmbedFooter,
+  Message,
+  MessageSnapshot,
+  SupportedMessageType,
+} from './types';
 
 export const structAttachment = (attachment: DiscordAttachment): Attachment => ({
   id: attachment.id,
@@ -59,6 +70,14 @@ export const structEmbed = (embed: DiscordEmbed): Embed => ({
   provider: embed.provider?.name ?? null,
 });
 
+export const structMessageSnapshot = (message: DiscordMessageSnapshot): MessageSnapshot => ({
+  id: message.id,
+  type: message.type as number,
+  content: message.content,
+  attachments: message.attachments.map(structAttachment),
+  embeds: message.embeds.map(structEmbed),
+});
+
 export const structMessage = (message: DiscordMessage): Message => ({
   id: message.id,
   type: message.type as number,
@@ -73,4 +92,7 @@ export const structMessage = (message: DiscordMessage): Message => ({
   embeds: message.embeds.map(structEmbed),
   referenceMessageId: message.reference?.messageId ?? null,
   clientMentioned: message.mentions.has(message.client.user),
+  messageSnapshots: message.messageSnapshots
+    .filter((message) => (Object.values(SupportedMessageType) as number[]).includes(message.type))
+    .map(structMessageSnapshot),
 });
