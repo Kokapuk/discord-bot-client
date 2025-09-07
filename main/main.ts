@@ -1,3 +1,4 @@
+import { ElectronBlocker } from '@ghostery/adblocker-electron';
 import { app, BrowserWindow, nativeTheme, session, shell } from 'electron';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -77,5 +78,7 @@ app.whenReady().then(() => {
   handleIpcMainAutoInvokeEvents(window!.webContents);
   preventBackgroundThrottling(window!);
 
-  session.defaultSession.extensions.loadExtension(path.join(process.env.VITE_PUBLIC, '/extensions/uBlock'));
+  ElectronBlocker.fromPrebuiltAdsAndTracking(fetch).then((blocker) => {
+    blocker.enableBlockingInSession(session.defaultSession);
+  });
 });
