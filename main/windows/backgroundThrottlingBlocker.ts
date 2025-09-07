@@ -1,6 +1,6 @@
 import { BrowserWindow } from 'electron';
 
-const preventBackgroundThrottling = (parent: BrowserWindow) => {
+const createBackgroundThrottlingBlocker = (parent: BrowserWindow) => {
   const window = new BrowserWindow({
     width: 1,
     height: 1,
@@ -14,4 +14,4 @@ const preventBackgroundThrottling = (parent: BrowserWindow) => {
   parent.on('close', () => window.close());
 };
 
-export default preventBackgroundThrottling;
+export default createBackgroundThrottlingBlocker;

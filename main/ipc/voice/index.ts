@@ -12,6 +12,8 @@ export type VoiceIpcSlice = CreateIpcSlice<{
     startHandlingOutputAudioSource: (source?: OutputAudioSource) => Promise<void>;
     stopHandlingOutputAudioSource: () => Promise<void>;
     voiceChunk: (buffer: ArrayBuffer) => Promise<void>;
+    getUserVolume: (userId: string) => Promise<number>;
+    setUserVolume: (userId: string, volume: number) => Promise<number>;
   };
   mainToRenderer: {
     voiceStateUpdate: (oldState: VoiceState, newState: VoiceState) => void;

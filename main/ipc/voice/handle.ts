@@ -32,6 +32,7 @@ export const ipcMain = createIpcMain<VoiceIpcSlice>();
 let connection: VoiceConnection | null = null;
 let receiverEnabled = false;
 const activeSpeakers: any[] = [];
+const userVolumes: Record<string, number> = {};
 
 const disableReceiver = () => {
   if (!receiverEnabled) {
@@ -129,6 +130,7 @@ export const handleIpcMainEvents = () => {
       });
 
       const decoder = new prism.opus.Decoder({ frameSize: 960, channels: 2, rate: 48000 });
+      const volume = new prism.VolumeTransformer({ type: 's16le', volume: userVolumes[userId] ?? 1 });
 
       const speaker = new Speaker({
         channels: 2,
@@ -136,8 +138,7 @@ export const handleIpcMainEvents = () => {
         sampleRate: 48000,
       });
       activeSpeakers.push(speaker);
-
-      opusStream.pipe(decoder).pipe(speaker);
+      opusStream.pipe(decoder).pipe(volume).pipe(speaker);
 
       opusStream.on('end', () => {
         speaker.close();
@@ -201,8 +202,6 @@ export const handleIpcMainEvents = () => {
     audioOutputStream.current = new PassThrough({ highWaterMark: 1024 });
     const resource = createAudioResource(audioOutputStream.current, { inputType: StreamType.Raw });
     audioPlayer.play(resource);
-
-    // audioOutputStream.current.pipe(new Speaker({ frameSize: 960, channels: 2, rate: 48000 }));
   });
 
   ipcMain.handle('stopHandlingOutputAudioSource', (event) => {
@@ -213,6 +212,14 @@ export const handleIpcMainEvents = () => {
 
   ipcMain.handle('voiceChunk', (_, buffer) => {
     audioOutputStream.current?.write(Buffer.from(buffer));
+  });
+
+  ipcMain.handle('getUserVolume', (_, userId) => {
+    return userVolumes[userId] ?? 1;
+  });
+
+  ipcMain.handle('setUserVolume', (_, userId, volume) => {
+    userVolumes[userId] = volume;
   });
 };
 

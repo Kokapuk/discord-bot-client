@@ -36,7 +36,7 @@ export default function PickStatusMenu({
   };
 
   return (
-    <Menu.Root {...props}>
+    <Menu.Root unmountOnExit {...props}>
       <Menu.Trigger asChild {...triggerProps}>
         <Button variant="ghost" justifyContent="flex-start" padding="0">
           <AvatarWithStatus src={client.displayAvatarUrl} status={client.status} />

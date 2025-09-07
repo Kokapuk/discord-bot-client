@@ -75,6 +75,7 @@ export default function MentionMenu({ textarea }: MentionMenuProps) {
   return (
     <Menu.Root
       positioning={{ getAnchorRect }}
+      unmountOnExit
       open={open}
       onOpenChange={(e) => handleOpenChange(e.open)}
       onSelect={(e) => handleSelect(e.value)}

@@ -2,7 +2,7 @@ import { createAudioPlayer, NoSubscriberBehavior } from '@discordjs/voice';
 import { VoiceState as DiscordVoiceState, GuildMember, PermissionFlagsBits } from 'discord.js';
 import { BrowserWindow, session, WebContents } from 'electron';
 import { PassThrough } from 'stream';
-import createAudioCaptureWindow from '../../utils/createAudioCaptureWindow';
+import createAudioCaptureWindow from '../../windows/audioCapture';
 import { ipcMain } from './handle';
 import { VoiceMember, VoiceState } from './types';
 

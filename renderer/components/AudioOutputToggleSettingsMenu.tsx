@@ -21,7 +21,7 @@ export default function AudioOutputToggleSettingsMenu({
   ...props
 }: AudioOutputToggleSettingsMenuProps & RefAttributes<HTMLButtonElement>) {
   return (
-    <Menu.Root closeOnSelect={false}>
+    <Menu.Root closeOnSelect={false} unmountOnExit>
       <Menu.Trigger asChild>
         <IconButton variant="surface" {...props}>
           <FaGear />
