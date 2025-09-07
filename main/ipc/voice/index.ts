@@ -9,7 +9,7 @@ export type VoiceIpcSlice = CreateIpcSlice<{
     disableReceiver: () => Promise<void>;
     joinVoice: (guildId: string, channelId: string) => Promise<void>;
     leaveVoice: () => Promise<void>;
-    startHandlingOutputAudioSource: (source: OutputAudioSource) => Promise<void>;
+    startHandlingOutputAudioSource: (source?: OutputAudioSource) => Promise<void>;
     stopHandlingOutputAudioSource: () => Promise<void>;
     voiceChunk: (buffer: ArrayBuffer) => Promise<void>;
   };

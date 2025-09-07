@@ -59,7 +59,6 @@ export const startHandlingOutputAudioIsolatedExternalSource = async (window: Bro
 
 export const stopHandlingAudioOutputIsolatedExternalSource = () => {
   if (audioCaptureWindow && !audioCaptureWindow.isDestroyed()) {
-    audioCaptureWindow.removeAllListeners('close');
     audioCaptureWindow.close();
   }
 

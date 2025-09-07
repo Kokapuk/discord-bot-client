@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { handleIpcMainAutoInvokeEvents, handleIpcMainEvents } from './ipc';
 import { logout } from './ipc/client/utils';
 import handleThemeUpdate from './utils/handleThemeUpdate';
+import preventBackgroundThrottling from './utils/preventBackgroundThrottling';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -74,6 +75,7 @@ app.whenReady().then(() => {
   handleThirdPartLinks();
   handleIpcMainEvents();
   handleIpcMainAutoInvokeEvents(window!.webContents);
+  preventBackgroundThrottling(window!);
 
   session.defaultSession.extensions.loadExtension(path.join(process.env.VITE_PUBLIC, '/extensions/uBlock'));
 });

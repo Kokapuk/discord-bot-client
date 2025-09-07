@@ -69,6 +69,8 @@ export default function PickAudioSourceModal(props: Omit<DialogRootProps, 'child
   };
 
   const startAudioOutputWithDevice = async (device: MediaDeviceInfo) => {
+    await window.ipcRenderer.invoke('startHandlingOutputAudioSource');
+
     const stream = await navigator.mediaDevices.getUserMedia({
       audio: { ...audioOutputSettings, deviceId: device.deviceId, groupId: device.groupId },
       video: false,
