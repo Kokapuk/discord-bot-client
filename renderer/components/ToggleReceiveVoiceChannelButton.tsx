@@ -4,7 +4,7 @@ import useVoicesStore from '@renderer/stores/voice';
 import { useEffect, useMemo } from 'react';
 import { FaVolumeLow, FaVolumeXmark } from 'react-icons/fa6';
 import { useShallow } from 'zustand/shallow';
-import VoiceChannelActionButton from './VoiceChannelActionButton';
+import ClientActivityPanelActionButton from './ClientActivityPanelActionButton';
 
 export default function ToggleReceiveVoiceChannelButton() {
   const { connectionStatus, activeChannelData, members, receiving, setReceiving } = useVoicesStore(
@@ -61,13 +61,13 @@ export default function ToggleReceiveVoiceChannelButton() {
   }
 
   return (
-    <VoiceChannelActionButton
+    <ClientActivityPanelActionButton
       toggled={receiving}
       tooltip={receiving ? 'Deafen' : 'Undeafen'}
       onClick={receiving ? disableReceiver : enableReceiver}
       colorPalette={clientVoiceMember.serverDeaf ? 'red' : undefined}
     >
       {receiving ? <FaVolumeLow /> : <FaVolumeXmark />}
-    </VoiceChannelActionButton>
+    </ClientActivityPanelActionButton>
   );
 }

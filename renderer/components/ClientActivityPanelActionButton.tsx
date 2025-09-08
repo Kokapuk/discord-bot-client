@@ -4,7 +4,7 @@ import { RefAttributes } from 'react';
 
 export type VoiceChannelActionButtonProps = { toggled?: boolean; tooltip?: string };
 
-export default function VoiceChannelActionButton({
+export default function ClientActivityPanelActionButton({
   toggled,
   tooltip,
   ...props

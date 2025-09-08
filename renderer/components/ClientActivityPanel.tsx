@@ -2,7 +2,7 @@ import { Card, CardRootProps, Stack } from '@chakra-ui/react';
 import useAppStore from '@renderer/stores/app';
 import { RefAttributes } from 'react';
 import PickStatusMenu from './PickStatusMenu';
-import VoiceChannelActionButtons from './VoiceChannelActionButtons';
+import ClientActivityPanelActionButtons from './ClientActivityPanelActionButtons';
 import VoiceChannelState from './VoiceChannelState';
 
 export default function ClientActivityPanel(props: CardRootProps & RefAttributes<HTMLDivElement>) {
@@ -18,7 +18,7 @@ export default function ClientActivityPanel(props: CardRootProps & RefAttributes
         <VoiceChannelState />
         <Stack direction="row" alignItems="center">
           <PickStatusMenu triggerProps={{ width: '100%', flexShrink: '1' }} />
-          <VoiceChannelActionButtons marginLeft="auto" flexShrink="0" _empty={{ display: 'none' }} />
+          <ClientActivityPanelActionButtons marginLeft="auto" flexShrink="0" _empty={{ display: 'none' }} />
         </Stack>
       </Card.Body>
     </Card.Root>
