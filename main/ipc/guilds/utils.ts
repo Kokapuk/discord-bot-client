@@ -48,6 +48,7 @@ export const structChannel = (channel: DiscordChannel): Channel | null => {
 
 export const structGuildMember = (member: DiscordGuildMember): GuildMember => ({
   id: member.id,
+  username: member.user.username,
   displayName: member.displayName,
   displayAvatarUrl: member.displayAvatarURL({ size: 64 }),
   status: member.presence?.status,
