@@ -1,4 +1,5 @@
 import { Box, Stack, Text } from '@chakra-ui/react';
+import { VoiceConnectionStatus } from '@main/ipc/voice/types';
 import ClientActivityPanel from '@renderer/components/ClientActivityPanel';
 import GuildList from '@renderer/components/GuildList';
 import useAppStore from '@renderer/stores/app';
@@ -39,11 +40,23 @@ export default function AppLayout() {
     }))
   );
 
-  const { pullVoiceMembers, setConnectionStatus, setActiveChannel } = useVoicesStore(
+  const {
+    pullVoiceMembers,
+    setConnectionStatus,
+    receiving,
+    setActiveChannel,
+    addSpeakingMember,
+    removeSpeakingMember,
+    resetSpeakingMembers,
+  } = useVoicesStore(
     useShallow((s) => ({
       pullVoiceMembers: s.pullMembers,
       setConnectionStatus: s.setConnectionStatus,
+      receiving: s.receiving,
       setActiveChannel: s.setActiveChannel,
+      addSpeakingMember: s.addSpeakingMember,
+      removeSpeakingMember: s.removeSpeakingMember,
+      resetSpeakingMembers: s.resetSpeakingMembers,
     }))
   );
 
@@ -95,16 +108,58 @@ export default function AppLayout() {
       pullRoles
     );
 
-    const unsubscribeVoiceStateUpdate = window.ipcRenderer.on('voiceStateUpdate', async () => {
+    const unsubscribeVoiceStateUpdate = window.ipcRenderer.on('voiceStateUpdate', async (_, oldState, newState) => {
       pullVoiceMembers();
+
+      const clientUser = useAppStore.getState().clientUser;
+      const connectionStatus = useVoicesStore.getState().connectionStatus;
+      const activeChannel = useVoicesStore.getState().activeChannel;
+
+      if (
+        connectionStatus !== VoiceConnectionStatus.Ready ||
+        !activeChannel ||
+        oldState.member?.id === clientUser?.id ||
+        newState.member?.id === clientUser?.id
+      ) {
+        return;
+      }
+
+      const shouldPlayConnectEffect =
+        oldState.channelId !== newState.channelId && newState.channelId === activeChannel.channelId;
+      const shouldPlayDisconnectEffect =
+        oldState.channelId !== newState.channelId && oldState.channelId === activeChannel.channelId;
+
+      if (shouldPlayConnectEffect) {
+        playAudio('/user-join.mp3');
+      } else if (shouldPlayDisconnectEffect) {
+        playAudio('/user-leave.mp3');
+      }
     });
 
     const unsubscribeVoiceConnectionStatusUpdate = window.ipcRenderer.on(
       'voiceConnectionStatusUpdate',
       async (_, status, activeChannel) => {
+        if (status === VoiceConnectionStatus.Ready) {
+          playAudio('/user-join.mp3');
+        } else if (status === VoiceConnectionStatus.Disconnected || status === VoiceConnectionStatus.Destroyed) {
+          playAudio('/user-leave.mp3');
+        }
+
         setConnectionStatus(status);
-        setActiveChannel(activeChannel);
+
+        if (status === VoiceConnectionStatus.Destroyed) {
+          setActiveChannel(null);
+        } else {
+          setActiveChannel(activeChannel);
+        }
       }
+    );
+
+    const unsubscribeMemberSpeakingStart = window.ipcRenderer.on('userSpeakingStart', (_, memberId) =>
+      addSpeakingMember(memberId)
+    );
+    const unsubscribeMemberSpeakingEnd = window.ipcRenderer.on('userSpeakingEnd', (_, memberId) =>
+      removeSpeakingMember(memberId)
     );
 
     return () => {
@@ -114,6 +169,8 @@ export default function AppLayout() {
       unsubscribeRoleUpdates();
       unsubscribeVoiceStateUpdate();
       unsubscribeVoiceConnectionStatusUpdate();
+      unsubscribeMemberSpeakingStart();
+      unsubscribeMemberSpeakingEnd();
     };
   }, []);
 
@@ -157,6 +214,12 @@ export default function AppLayout() {
       unsubscribeMessageDelete();
     };
   }, [channelId]);
+
+  useEffect(() => {
+    if (!receiving) {
+      resetSpeakingMembers();
+    }
+  }, [receiving]);
 
   return (
     <Stack direction="row" gap="0" height="100%">

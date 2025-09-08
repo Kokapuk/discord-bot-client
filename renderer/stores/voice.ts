@@ -12,6 +12,10 @@ interface VoicesState {
   setReceiving(receiving: boolean): void;
   sending: boolean;
   setSending(sending: boolean): void;
+  speakingMemberIds: string[];
+  addSpeakingMember(memberId: string): void;
+  removeSpeakingMember(memberId: string): void;
+  resetSpeakingMembers(): void;
 }
 
 const useVoicesStore = create<VoicesState>()((set) => ({
@@ -42,6 +46,25 @@ const useVoicesStore = create<VoicesState>()((set) => ({
   sending: false,
   setSending: (sending) => {
     set({ sending });
+  },
+  speakingMemberIds: [],
+  addSpeakingMember(memberId) {
+    set((prev) => {
+      if (prev.speakingMemberIds.includes(memberId)) {
+        return prev;
+      }
+
+      return { ...prev, speakingMemberIds: [...prev.speakingMemberIds, memberId] };
+    });
+  },
+  removeSpeakingMember(memberId) {
+    set((prev) => ({
+      ...prev,
+      speakingMemberIds: prev.speakingMemberIds.filter((speakingMemberId) => speakingMemberId !== memberId),
+    }));
+  },
+  resetSpeakingMembers() {
+    set({ speakingMemberIds: [] });
   },
 }));
 

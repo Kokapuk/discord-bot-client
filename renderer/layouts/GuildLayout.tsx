@@ -1,8 +1,8 @@
 import { Box, Heading, Stack } from '@chakra-ui/react';
 import { isChannelVoiceBased } from '@main/ipc/voice/rendererSafeUtils';
-import { ChannelContext, ChannelProvider } from '@renderer/providers/ChannelContext';
 import ChannelList from '@renderer/components/ChannelList';
 import MemberList from '@renderer/components/MemberList';
+import { ChannelContext, ChannelProvider } from '@renderer/providers/ChannelContext';
 import useGuildsStore from '@renderer/stores/guilds';
 import useMessagesStore from '@renderer/stores/messages';
 import useVoicesStore from '@renderer/stores/voice';
@@ -14,6 +14,7 @@ import { useShallow } from 'zustand/react/shallow';
 
 export default function GuildLayout() {
   const { guildId, channelId } = useParams();
+
   const { guilds, channels, members } = useGuildsStore(
     useShallow((s) => ({
       guilds: s.guilds,
@@ -21,8 +22,13 @@ export default function GuildLayout() {
       members: s.members,
     }))
   );
+
   const unreadChannels = useMessagesStore((s) => s.unreadChannels);
-  const voiceMembers = useVoicesStore((s) => s.members);
+
+  const { voiceMembers, speakingMemberIds } = useVoicesStore(
+    useShallow((s) => ({ voiceMembers: s.members, speakingMemberIds: s.speakingMemberIds }))
+  );
+
   const activeGuild = useMemo(() => guilds?.find((guild) => guild.id === guildId), [guilds, guildId]);
   const activeGuildChannels = useMemo(() => (activeGuild ? channels[activeGuild.id] : null), [activeGuild, channels]);
   const activeGuildMembers = useMemo(() => (activeGuild ? members[activeGuild.id] : null), [activeGuild, members]);
@@ -37,8 +43,9 @@ export default function GuildLayout() {
       activeChannel,
       unreadChannels,
       voiceMembers,
+      speakingMemberIds
     }),
-    [activeGuildChannels, activeChannel, unreadChannels, voiceMembers]
+    [activeGuildChannels, activeChannel, unreadChannels, voiceMembers, speakingMemberIds]
   );
 
   if (!activeGuild || !activeGuildChannels || !activeGuildMembers) {

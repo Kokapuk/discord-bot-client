@@ -7,7 +7,7 @@ import VoiceMember from './VoiceMember';
 export type VoiceMemberListProps = { channel: Channel } & StackProps;
 
 export default function VoiceMemberList({ channel, ...props }: VoiceMemberListProps & RefAttributes<HTMLDivElement>) {
-  const { voiceMembers } = useChannelContext();
+  const { voiceMembers, speakingMemberIds } = useChannelContext();
   const channelMembers = voiceMembers?.[channel.guidId]?.[channel.id];
 
   if (!channelMembers) {
@@ -17,7 +17,7 @@ export default function VoiceMemberList({ channel, ...props }: VoiceMemberListPr
   return (
     <Stack {...props}>
       {channelMembers.map((member) => (
-        <VoiceMember key={member.id} member={member} />
+        <VoiceMember key={member.id} member={member} speaking={speakingMemberIds?.includes(member.id)} />
       ))}
     </Stack>
   );

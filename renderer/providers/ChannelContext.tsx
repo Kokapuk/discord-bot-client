@@ -7,6 +7,7 @@ export type ChannelContext = {
   activeChannel?: Channel;
   unreadChannels?: string[];
   voiceMembers?: Record<string, Record<string, VoiceMember[] | null | undefined> | null | undefined>;
+  speakingMemberIds?: string[];
 };
 
 const ChannelContext = createContext<ChannelContext | null>(null);

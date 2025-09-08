@@ -111,7 +111,7 @@ export const handleIpcMainEvents = () => {
     return { success: true, payload: guildVoiceChannelsMembers };
   });
 
-  ipcMain.handle('enableReceiver', () => {
+  ipcMain.handle('enableReceiver', (event) => {
     if (!connection || receiverEnabled) {
       return;
     }
@@ -125,8 +125,10 @@ export const handleIpcMainEvents = () => {
         return;
       }
 
-      const opusStream = receiver.subscribe(userId, {
-        end: { behavior: EndBehaviorType.AfterSilence, duration: 300 },
+      ipcMain.send(event.sender, 'userSpeakingStart', userId);
+
+      const stream = receiver.subscribe(userId, {
+        end: { behavior: EndBehaviorType.Manual },
       });
 
       const decoder = new prism.opus.Decoder({ frameSize: 960, channels: 2, rate: 48000 });
@@ -138,16 +140,34 @@ export const handleIpcMainEvents = () => {
         sampleRate: 48000,
       });
       activeSpeakers.push(speaker);
-      opusStream.pipe(decoder).pipe(volume).pipe(speaker);
+      stream.pipe(decoder).pipe(volume).pipe(speaker);
 
-      opusStream.on('end', () => {
+      stream.on('end', () => {
         speaker.close();
         const speakerIndex = activeSpeakers.indexOf(speaker);
 
         if (speakerIndex !== -1) {
           activeSpeakers.splice(speakerIndex, 1);
         }
+
+        volume.destroy();
+        decoder.destroy();
       });
+    });
+
+    receiver.speaking.on('end', (userId) => {
+      if (!receiverEnabled) {
+        return;
+      }
+
+      ipcMain.send(event.sender, 'userSpeakingEnd', userId);
+
+      const stream = receiver.subscriptions.get(userId);
+
+      if (stream) {
+        stream.emit('end');
+        stream.destroy();
+      }
     });
   });
 

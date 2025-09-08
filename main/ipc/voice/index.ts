@@ -24,5 +24,7 @@ export type VoiceIpcSlice = CreateIpcSlice<{
     ) => void;
 
     audioOutputHandlingStop: () => void;
+    userSpeakingStart: (userId: string) => void;
+    userSpeakingEnd: (userId: string) => void;
   };
 }>;
