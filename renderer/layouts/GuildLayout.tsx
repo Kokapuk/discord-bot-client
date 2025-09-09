@@ -1,11 +1,12 @@
 import { Box, Heading, Stack } from '@chakra-ui/react';
 import { isChannelVoiceBased } from '@main/ipc/voice/rendererSafeUtils';
-import ChannelList from '@renderer/components/ChannelList';
-import MemberList from '@renderer/components/MemberList';
-import { ChannelContext, ChannelProvider } from '@renderer/providers/ChannelContext';
-import useGuildsStore from '@renderer/stores/guilds';
-import useMessagesStore from '@renderer/stores/messages';
-import useVoicesStore from '@renderer/stores/voice';
+import ChannelList from '@renderer/features/Channels/components/ChannelList';
+import { ChannelContext, ChannelProvider } from '@renderer/features/Channels/context';
+import MemberList from '@renderer/features/Guilds/components/MemberList';
+import useGuildsStore from '@renderer/features/Guilds/store';
+import useMessagesStore from '@renderer/features/Messages/store';
+import { VoiceContext, VoiceProvider } from '@renderer/features/Voices/context';
+import useVoicesStore from '@renderer/features/Voices/store';
 import RouteSpinner from '@renderer/ui/RouteSpinner';
 import { Suspense, useMemo } from 'react';
 import { createPortal } from 'react-dom';
@@ -42,10 +43,16 @@ export default function GuildLayout() {
       channels: activeGuildChannels ?? [],
       activeChannel,
       unreadChannels,
-      voiceMembers,
-      speakingMemberIds
     }),
-    [activeGuildChannels, activeChannel, unreadChannels, voiceMembers, speakingMemberIds]
+    [activeGuildChannels, activeChannel, unreadChannels]
+  );
+
+  const voiceContext = useMemo<VoiceContext>(
+    () => ({
+      voiceMembers,
+      speakingMemberIds,
+    }),
+    [voiceMembers, speakingMemberIds]
   );
 
   if (!activeGuild || !activeGuildChannels || !activeGuildMembers) {
@@ -82,7 +89,9 @@ export default function GuildLayout() {
             {activeGuild.name}
           </Heading>
           <ChannelProvider value={channelContext}>
-            <ChannelList height="100%" width="100%" minHeight="0" />
+            <VoiceProvider value={voiceContext}>
+              <ChannelList height="100%" width="100%" minHeight="0" />
+            </VoiceProvider>
           </ChannelProvider>
         </Stack>,
         document.getElementById('leftSidebar')!

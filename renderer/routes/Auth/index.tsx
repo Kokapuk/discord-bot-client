@@ -1,6 +1,6 @@
 import { Button, Card, Field, Fieldset, Stack } from '@chakra-ui/react';
 import Link from '@renderer/ui/Link';
-import { PasswordInput } from '@renderer/ui/password-input';
+import { PasswordInput } from '@renderer/ui/PasswordInput';
 import structureZodIssues, { StructuredZodIssues } from '@renderer/utils/structureZodIssues';
 import { useState } from 'react';
 import { useNavigate } from 'react-router';

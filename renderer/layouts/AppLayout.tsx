@@ -1,13 +1,13 @@
 import { Box, Stack, Text } from '@chakra-ui/react';
 import { VoiceConnectionStatus } from '@main/ipc/voice/types';
-import ClientActivityPanel from '@renderer/components/ClientActivityPanel';
-import GuildList from '@renderer/components/GuildList';
-import useAppStore from '@renderer/stores/app';
-import useGuildsStore from '@renderer/stores/guilds';
-import useMessagesStore from '@renderer/stores/messages';
-import useVoicesStore from '@renderer/stores/voice';
+import ClientActivityPanel from '@renderer/features/Client/components/ClientActivityPanel';
+import useClientStore from '@renderer/features/Client/store';
+import GuildList from '@renderer/features/Guilds/components/GuildList';
+import useGuildsStore from '@renderer/features/Guilds/store';
+import useMessagesStore from '@renderer/features/Messages/store';
+import useVoicesStore from '@renderer/features/Voices/store';
 import RouteSpinner from '@renderer/ui/RouteSpinner';
-import { toaster } from '@renderer/ui/toaster';
+import { toaster } from '@renderer/ui/Toaster';
 import handleIpcRendererAutoInvokeEvents from '@renderer/utils/handleIpcRendererAutoInvokeEvents';
 import playAudio from '@renderer/utils/playAudio';
 import { Suspense, useEffect, useMemo } from 'react';
@@ -16,7 +16,7 @@ import { useShallow } from 'zustand/react/shallow';
 
 export default function AppLayout() {
   const { channelId } = useParams();
-  const pullClient = useAppStore((s) => s.pullClientUser);
+  const pullClient = useClientStore((s) => s.pullClientUser);
   const navigate = useNavigate();
 
   const { guilds, pullGuilds, channels, pullChannels, pullMembers, pullRoles } = useGuildsStore(
@@ -111,7 +111,7 @@ export default function AppLayout() {
     const unsubscribeVoiceStateUpdate = window.ipcRenderer.on('voiceStateUpdate', async (_, oldState, newState) => {
       pullVoiceMembers();
 
-      const clientUser = useAppStore.getState().clientUser;
+      const clientUser = useClientStore.getState().clientUser;
       const connectionStatus = useVoicesStore.getState().connectionStatus;
       const activeChannel = useVoicesStore.getState().activeChannel;
 
@@ -185,7 +185,7 @@ export default function AppLayout() {
       if (channelId !== message.channelId) {
         addUnreadChannel(message.channelId);
 
-        if (useAppStore.getState().clientUser?.status !== 'dnd') {
+        if (useClientStore.getState().clientUser?.status !== 'dnd') {
           playAudio('/notification.mp3');
 
           toaster.create({

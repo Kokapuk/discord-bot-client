@@ -3,8 +3,8 @@ import ReactDOM from 'react-dom/client';
 import { createHashRouter } from 'react-router';
 import { RouterProvider } from 'react-router/dom';
 import GlobalLayout from './layouts/GlobalLayout';
-import { Provider } from './ui/provider';
-import { Toaster } from './ui/toaster';
+import { ChakraProvider } from './ui/ChakraProvider';
+import { Toaster } from './ui/Toaster';
 
 const Auth = lazy(() => import('./routes/Auth'));
 const AppLayout = lazy(() => import('./layouts/AppLayout'));
@@ -55,8 +55,8 @@ const router = createHashRouter([
 ]);
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
-  <Provider>
+  <ChakraProvider>
     <Toaster />
     <RouterProvider router={router} />
-  </Provider>
+  </ChakraProvider>
 );

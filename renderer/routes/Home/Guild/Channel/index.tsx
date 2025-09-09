@@ -1,40 +1,39 @@
 import { Box, Heading } from '@chakra-ui/react';
-import { MessageContext, MessageProvider } from '@renderer/providers/MessageContext';
-import MessageList from '@renderer/components/MessageList';
-import Textarea from '@renderer/components/Textarea';
-import { TextareaContext, TextareaProvider } from '@renderer/providers/TextareaContext';
-import useAppStore from '@renderer/stores/app';
-import useGuildsStore from '@renderer/stores/guilds';
-import useMessagesStore from '@renderer/stores/messages';
+import useClientStore from '@renderer/features/Client/store';
+import useGuildsStore from '@renderer/features/Guilds/store';
+import MessageList from '@renderer/features/Messages/components/MessageList';
+import { MessageContext, MessageProvider } from '@renderer/features/Messages/context';
+import useMessagesStore from '@renderer/features/Messages/store';
+import Textarea from '@renderer/features/TextArea/components/Textarea';
+import { TextareaContext, TextareaProvider } from '@renderer/features/TextArea/context';
+import useTextAreaStore from '@renderer/features/TextArea/store';
 import { useEffect, useMemo } from 'react';
 import { useParams } from 'react-router';
 import { useShallow } from 'zustand/react/shallow';
 
 export default function Channel() {
   const { guildId, channelId } = useParams();
-  const client = useAppStore((s) => s.clientUser);
+  const client = useClientStore((s) => s.clientUser);
+
   const { channels, members, roles } = useGuildsStore(
     useShallow((s) => ({ channels: s.channels, members: s.members, roles: s.roles }))
   );
-  const {
-    messages,
-    topReachedChannels,
-    fetchMessages,
-    editingMessage,
-    setEditingMessage,
-    replyingMessage,
-    setReplyingMessage,
-    removeUnreadChannel,
-  } = useMessagesStore(
+
+  const { messages, topReachedChannels, fetchMessages, removeUnreadChannel } = useMessagesStore(
     useShallow((s) => ({
       messages: s.messages,
       topReachedChannels: s.topReachedChannels,
       fetchMessages: s.fetchMessages,
+      removeUnreadChannel: s.removeUnreadChannel,
+    }))
+  );
+
+  const { editingMessage, setEditingMessage, replyingMessage, setReplyingMessage } = useTextAreaStore(
+    useShallow((s) => ({
       editingMessage: s.editingMessage,
       setEditingMessage: s.setEditingMessage,
       replyingMessage: s.replyingMessage,
       setReplyingMessage: s.setReplyingMessage,
-      removeUnreadChannel: s.removeUnreadChannel,
     }))
   );
 
@@ -119,7 +118,7 @@ export default function Channel() {
         />
       </MessageProvider>
       <TextareaProvider value={textareaContext}>
-        <Textarea flexShrink="0" marginBottom="5" paddingInline="2.5" width="100%" />
+        <Textarea flexShrink="0" marginBottom="2" paddingInline="2.5" width="100%" />
       </TextareaProvider>
     </Box>
   );
