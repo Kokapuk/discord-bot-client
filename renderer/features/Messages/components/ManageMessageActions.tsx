@@ -5,7 +5,8 @@ import { FaPen, FaReply, FaTrash } from 'react-icons/fa6';
 import { useMessageContext } from '../context';
 import ManageMessageActionButton from './ManageMessageActionButton';
 
-export type ManageMessageActionsProps = { message: Message } & GroupProps & RefAttributes<HTMLDivElement>;
+export type ManageMessageActionsBaseProps = { message: Message };
+export type ManageMessageActionsProps = ManageMessageActionsBaseProps & GroupProps & RefAttributes<HTMLDivElement>;
 
 export default function ManageMessageActionList({ message, ...props }: ManageMessageActionsProps) {
   const { users, clientUser: client, channel, onEdit, onReply } = useMessageContext();

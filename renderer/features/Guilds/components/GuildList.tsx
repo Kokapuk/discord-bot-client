@@ -4,8 +4,8 @@ import debounce from 'lodash/debounce';
 import { memo, RefAttributes, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import Guild from './Guild';
 
-export type GuildListProps = { guilds: GuildType[]; unreadGuilds?: string[] } & StackProps &
-  RefAttributes<HTMLDivElement>;
+export type GuildListBaseProps = { guilds: GuildType[]; unreadGuilds?: string[] };
+export type GuildListProps = GuildListBaseProps & StackProps & RefAttributes<HTMLDivElement>;
 
 const GuildList = ({ guilds, unreadGuilds, ref, ...props }: GuildListProps) => {
   const guildList = useRef<HTMLDivElement>(null);

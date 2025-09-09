@@ -2,8 +2,8 @@ import { Image, Stack, StackProps, Text } from '@chakra-ui/react';
 import { type EmbedFooter } from '@main/ipc/messages/types';
 import { RefAttributes } from 'react';
 
-export type EmbedFooterProps = { footer?: EmbedFooter | null; timestamp?: string | null } & StackProps &
-  RefAttributes<HTMLDivElement>;
+export type EmbedFooterBaseProps = { footer?: EmbedFooter | null; timestamp?: string | null };
+export type EmbedFooterProps = EmbedFooterBaseProps & StackProps & RefAttributes<HTMLDivElement>;
 
 export default function EmbedFooter({ footer, timestamp, ...props }: EmbedFooterProps) {
   return (

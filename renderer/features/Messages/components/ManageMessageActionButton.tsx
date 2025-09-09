@@ -2,7 +2,10 @@ import { IconButton, IconButtonProps } from '@chakra-ui/react';
 import { Tooltip } from '@renderer/ui/Tooltip';
 import { RefAttributes } from 'react';
 
-export type ManageMessageActionButtonProps = { tooltip: string } & IconButtonProps & RefAttributes<HTMLButtonElement>;
+export type ManageMessageActionButtonBaseProps = { tooltip: string };
+export type ManageMessageActionButtonProps = ManageMessageActionButtonBaseProps &
+  IconButtonProps &
+  RefAttributes<HTMLButtonElement>;
 
 export default function ManageMessageActionButton({ tooltip, ...props }: ManageMessageActionButtonProps) {
   return (

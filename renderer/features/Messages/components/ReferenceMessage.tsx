@@ -4,7 +4,8 @@ import { RefAttributes, useMemo } from 'react';
 import { useMessageContext } from '../context';
 import FormattedMessageContent from './FormattedMessageContent';
 
-export type ReferenceMessageProps = { referenceMessageId: string } & StackProps & RefAttributes<HTMLDivElement>;
+export type ReferenceMessageBaseProps = { referenceMessageId: string };
+export type ReferenceMessageProps = ReferenceMessageBaseProps & StackProps & RefAttributes<HTMLDivElement>;
 
 export default function ReferenceMessage({ referenceMessageId, ...props }: ReferenceMessageProps) {
   const { messages, users } = useMessageContext();

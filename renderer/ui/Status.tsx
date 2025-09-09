@@ -1,13 +1,14 @@
-import { BoxProps, Status as ChakraStatus, StatusRootProps as ChakraStatusRootProps } from '@chakra-ui/react';
+import { BoxProps, Status as ChakraStatus } from '@chakra-ui/react';
 import { Status as StatusType } from '@main/ipc/client/types';
 import { RefAttributes, useMemo } from 'react';
 
-export type StatusProps = { status: StatusType | undefined; size?: BoxProps['width'] } & Omit<
-  ChakraStatusRootProps,
-  'children' | 'size'
->;
+export type StatusBaseProps = { status: StatusType | undefined; size?: BoxProps['width'] };
+export type StatusProps = StatusBaseProps & {
+  indicatorProps?: ChakraStatus.IndicatorProps & RefAttributes<HTMLDivElement>;
+} & ChakraStatus.RootProps &
+  RefAttributes<HTMLDivElement>;
 
-export default function Status({ status, size = '2.5', ...props }: StatusProps & RefAttributes<HTMLDivElement>) {
+export default function Status({ status, size = '2.5', indicatorProps, ...props }: StatusProps) {
   const statusColorPalette = useMemo(() => {
     switch (status) {
       case 'online':
@@ -25,7 +26,7 @@ export default function Status({ status, size = '2.5', ...props }: StatusProps &
 
   return (
     <ChakraStatus.Root width={size} height={size} {...props}>
-      <ChakraStatus.Indicator backgroundColor={statusColorPalette} width="100%" height="100%" />
+      <ChakraStatus.Indicator backgroundColor={statusColorPalette} width="100%" height="100%" {...indicatorProps} />
     </ChakraStatus.Root>
   );
 }

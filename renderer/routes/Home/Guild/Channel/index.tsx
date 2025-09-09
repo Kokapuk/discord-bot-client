@@ -110,6 +110,7 @@ export default function Channel() {
       </Box>
       <MessageProvider value={messageContext}>
         <MessageList
+          key={channelId}
           height="100%"
           minHeight="0"
           marginBottom="4"

@@ -1,14 +1,14 @@
-import { Box, IconButton, Separator, Stack, Text } from '@chakra-ui/react';
+import { IconButton, Stack, StackProps, Text } from '@chakra-ui/react';
 import { VoiceConnectionStatus } from '@main/ipc/voice/types';
 import useGuildsStore from '@renderer/features/Guilds/store';
 import Link from '@renderer/ui/Link';
 import { Tooltip } from '@renderer/ui/Tooltip';
-import { useMemo } from 'react';
+import { RefAttributes, useMemo } from 'react';
 import { FaPhoneSlash } from 'react-icons/fa6';
 import { useShallow } from 'zustand/shallow';
 import useVoicesStore from '../store';
 
-export default function VoiceChannelState() {
+export default function VoiceStatus(props: StackProps & RefAttributes<HTMLDivElement>) {
   const { connectionStatus, activeChannelData } = useVoicesStore(
     useShallow((s) => ({ connectionStatus: s.connectionStatus, activeChannelData: s.activeChannel }))
   );
@@ -55,38 +55,38 @@ export default function VoiceChannelState() {
     [channels, activeChannelData?.guildId, activeChannelData?.channelId]
   );
 
-  if (connectionStatus === VoiceConnectionStatus.Destroyed || !activeChannel) {
-    return null;
+  if (connectionStatus === VoiceConnectionStatus.Destroyed) {
+    throw Error('Connection is destroyed');
+  }
+
+  if (!activeChannel) {
+    throw Error('Failed to find active channel');
   }
 
   return (
-    <Box>
-      <Stack direction="row" alignItems="center">
-        <Stack gap="0">
-          <Text color={statusColor} fontSize="sm" fontWeight="500">
-            {statusLabel}
-          </Text>
+    <Stack direction="row" alignItems="center" {...props}>
+      <Stack gap="0">
+        <Text color={statusColor} fontSize="sm" fontWeight="500">
+          {statusLabel}
+        </Text>
 
-          {!!activeGuild && !!activeChannel && (
-            <Link to={`/guilds/${activeGuild.id}/${activeChannel.id}`} fontSize="sm">
-              {activeChannel.name} / {activeGuild.name}
-            </Link>
-          )}
-        </Stack>
-
-        <Tooltip content="Disconnect">
-          <IconButton
-            size="xs"
-            colorPalette="red"
-            variant="surface"
-            marginLeft="auto"
-            onClick={() => window.ipcRenderer.invoke('leaveVoice')}
-          >
-            <FaPhoneSlash />
-          </IconButton>
-        </Tooltip>
+        {!!activeGuild && !!activeChannel && (
+          <Link to={`/guilds/${activeGuild.id}/${activeChannel.id}`} fontSize="sm">
+            {activeChannel.name} / {activeGuild.name}
+          </Link>
+        )}
       </Stack>
-      <Separator marginBlock="2" />
-    </Box>
+
+      <Tooltip content='Disconnect'>
+        <IconButton
+          onClick={() => window.ipcRenderer.invoke('leaveVoice')}
+          colorPalette="red"
+          variant="surface"
+          marginLeft="auto"
+        >
+          <FaPhoneSlash />
+        </IconButton>
+      </Tooltip>
+    </Stack>
   );
 }

@@ -1,13 +1,15 @@
 import { Box, Wrap, WrapProps } from '@chakra-ui/react';
 import { Status as StatusType } from '@main/ipc/client/types';
 import { RefAttributes } from 'react';
-import Avatar, { AvatarProps } from './Avatar';
-import Status from './Status';
+import Avatar, { AvatarBaseProps, AvatarProps } from './Avatar';
+import Status, { StatusProps } from './Status';
 
-export type AvatarWithStatusProps = { src: string; size?: AvatarProps['size']; status: StatusType | undefined } & Omit<
-  WrapProps,
-  'children'
->;
+export type AvatarWithStatusBaseProps = AvatarBaseProps & { status: StatusType | undefined };
+export type AvatarWithStatusProps = AvatarWithStatusBaseProps & {
+  avatarProps?: AvatarProps & RefAttributes<HTMLImageElement>;
+  statusProps?: StatusProps & RefAttributes<HTMLDivElement>;
+} & WrapProps &
+  RefAttributes<HTMLDivElement>;
 
 const STATUS_INDICATOR_SIZE = 30;
 const STATUS_INDICATOR_MASK_SIZE = 50;
@@ -16,8 +18,10 @@ export default function AvatarWithStatus({
   src,
   size = '8',
   status,
+  avatarProps,
+  statusProps,
   ...props
-}: AvatarWithStatusProps & RefAttributes<HTMLDivElement>) {
+}: AvatarWithStatusProps) {
   return (
     <Wrap width={size} height={size} position="relative" {...props}>
       <Box
@@ -29,9 +33,16 @@ export default function AvatarWithStatus({
         position="absolute"
         inset="0"
       >
-        <Avatar src={src} position="absolute" inset="0" borderRadius="full" />
+        <Avatar src={src} position="absolute" inset="0" borderRadius="full" {...avatarProps} />
       </Box>
-      <Status status={status} size={`${STATUS_INDICATOR_SIZE}%`} position="absolute" right="0" bottom="0" />
+      <Status
+        status={status}
+        size={`${STATUS_INDICATOR_SIZE}%`}
+        position="absolute"
+        right="0"
+        bottom="0"
+        {...statusProps}
+      />
     </Wrap>
   );
 }

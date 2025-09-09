@@ -2,8 +2,8 @@ import { FileUpload as ChakraFileUpload, Float, Stack, StackProps, Text, UseFile
 import { RefAttributes } from 'react';
 import { FaX } from 'react-icons/fa6';
 
-export type FileUploadListProps = { fileUpload: UseFileUploadReturn } & Omit<StackProps, 'value'> &
-  RefAttributes<HTMLDivElement>;
+export type FileUploadListBaseProps = { fileUpload: UseFileUploadReturn };
+export type FileUploadListProps = FileUploadListBaseProps & StackProps & RefAttributes<HTMLDivElement>;
 
 export default function FileUploadList({ fileUpload, ...props }: FileUploadListProps) {
   return (

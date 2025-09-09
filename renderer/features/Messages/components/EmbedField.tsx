@@ -2,7 +2,8 @@ import { Stack, StackProps, Text } from '@chakra-ui/react';
 import { type EmbedField } from '@main/ipc/messages/types';
 import { RefAttributes } from 'react';
 
-export type EmbedFieldProps = { field: EmbedField } & StackProps & RefAttributes<HTMLDivElement>;
+export type EmbedFieldBaseProps = { field: EmbedField };
+export type EmbedFieldProps = EmbedFieldBaseProps & StackProps & RefAttributes<HTMLDivElement>;
 
 export default function EmbedField({ field, ...props }: EmbedFieldProps) {
   return (

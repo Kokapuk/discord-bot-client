@@ -1,11 +1,14 @@
 import { Card, FormatByte, Icon, Stack, Text } from '@chakra-ui/react';
 import Link from '@renderer/ui/Link';
+import { RefAttributes } from 'react';
 import { FaFile } from 'react-icons/fa6';
 import { AttachmentProps } from './Attachment';
 
-export default function FileAttachment({ attachment }: AttachmentProps) {
+export type FileAttachmentProps = AttachmentProps & Card.RootProps & RefAttributes<HTMLDivElement>;
+
+export default function FileAttachment({ attachment, ...props }: FileAttachmentProps) {
   return (
-    <Card.Root variant="subtle" width="fit-content" maxWidth="32rem">
+    <Card.Root variant="subtle" width="fit-content" maxWidth="32rem" {...props}>
       <Card.Body gap="2" padding="4" flexDirection="row" alignItems="center">
         <Icon size="2xl" color="colorPalette.fg">
           <FaFile />

@@ -2,9 +2,10 @@ import { Menu, Portal, Slider, Stack } from '@chakra-ui/react';
 import { VoiceMember } from '@main/ipc/voice/types';
 import { ReactNode, useEffect, useState } from 'react';
 
-export type VoiceMemberMenuProps = { member: VoiceMember; children: ReactNode };
+export type VoiceMemberMenuBaseProps = { member: VoiceMember; children: ReactNode };
+export type VoiceMemberMenuProps = VoiceMemberMenuBaseProps & Menu.RootProps;
 
-export default function VoiceMemberMenu({ member, children }: VoiceMemberMenuProps) {
+export default function VoiceMemberMenu({ member, children, ...props }: VoiceMemberMenuProps) {
   const [isMenuOpen, setMenuOpen] = useState(false);
   const [volume, setVolume] = useState(1);
 
@@ -19,7 +20,7 @@ export default function VoiceMemberMenu({ member, children }: VoiceMemberMenuPro
   }, [isMenuOpen]);
 
   return (
-    <Menu.Root unmountOnExit onOpenChange={(e) => setMenuOpen(e.open)}>
+    <Menu.Root unmountOnExit onOpenChange={(e) => setMenuOpen(e.open)} {...props}>
       <Menu.Trigger asChild>{children}</Menu.Trigger>
       <Portal>
         <Menu.Positioner>

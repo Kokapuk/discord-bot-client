@@ -1,9 +1,7 @@
 import { Mark, MarkProps } from '@chakra-ui/react';
 import { RefAttributes } from 'react';
 
-export type MentionProps = MarkProps & RefAttributes<HTMLElement>;
-
-export default function Mention(props: MentionProps) {
+export default function Mention(props: MarkProps & RefAttributes<HTMLElement>) {
   return (
     <Mark
       backgroundColor="colorPalette.muted"

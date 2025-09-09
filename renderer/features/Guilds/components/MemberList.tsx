@@ -3,7 +3,8 @@ import { GuildMember } from '@main/ipc/guilds/types';
 import { memo, RefAttributes } from 'react';
 import Member from './Member';
 
-export type MemberListProps = { members: GuildMember[] } & StackProps & RefAttributes<HTMLDivElement>;
+export type MemberListBaseProps = { members: GuildMember[] };
+export type MemberListProps = MemberListBaseProps & StackProps & RefAttributes<HTMLDivElement>;
 
 const MemberList = ({ members, ...props }: MemberListProps) => {
   return (

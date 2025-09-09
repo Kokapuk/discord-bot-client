@@ -3,9 +3,10 @@ import { GuildMember } from '@main/ipc/guilds/types';
 import AvatarWithStatus from '@renderer/ui/AvatarWithStatus';
 import { memo, RefAttributes } from 'react';
 
-export type MemberProps = { member: GuildMember } & StackProps;
+export type MemberBaseProps = { member: GuildMember };
+export type MemberProps = MemberBaseProps & StackProps & RefAttributes<HTMLDivElement>;
 
-const Member = ({ member, ...props }: MemberProps & RefAttributes<HTMLDivElement>) => {
+const Member = ({ member, ...props }: MemberProps) => {
   return (
     <Stack
       direction="row"

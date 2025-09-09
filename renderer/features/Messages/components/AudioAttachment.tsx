@@ -1,7 +1,9 @@
 import useClientStore from '@renderer/features/Client/store';
-import { AttachmentProps } from './Attachment';
+import { Attachment } from 'discord.js';
 
-export default function AudioAttachment({ attachment }: AttachmentProps) {
+export type AudioAttachmentProps = { attachment: Pick<Attachment, 'url'> };
+
+export default function AudioAttachment({ attachment }: AudioAttachmentProps) {
   const setMediaVolume = useClientStore((s) => s.setMediaVolume);
 
   return (

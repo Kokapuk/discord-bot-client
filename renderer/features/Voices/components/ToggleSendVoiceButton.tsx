@@ -1,13 +1,15 @@
 import { VoiceConnectionStatus } from '@main/ipc/voice/types';
+import ClientActivityActionButton, {
+  ClientActivityActionButtonProps,
+} from '@renderer/features/Client/components/ClientActivityActionButton';
 import useClientStore from '@renderer/features/Client/store';
 import { useMemo, useState } from 'react';
 import { FaMicrophone, FaMicrophoneSlash } from 'react-icons/fa6';
 import { useShallow } from 'zustand/shallow';
-import ClientActivityPanelActionButton from '../../Client/components/ClientActivityPanelActionButton';
 import useVoicesStore from '../store';
 import PickAudioSourceModal from './PickAudioSourceModal';
 
-export default function ToggleSendVoiceChannelButton() {
+export default function ToggleSendVoiceButton(props: ClientActivityActionButtonProps) {
   const { connectionStatus, activeChannelData, members, sending } = useVoicesStore(
     useShallow((s) => ({
       connectionStatus: s.connectionStatus,
@@ -33,14 +35,15 @@ export default function ToggleSendVoiceChannelButton() {
 
   return (
     <>
-      <ClientActivityPanelActionButton
+      <ClientActivityActionButton
         toggled={sending}
         tooltip={sending ? 'Mute' : 'Unmute'}
         onClick={sending ? () => window.ipcRenderer.invoke('stopHandlingOutputAudioSource') : () => setModalOpen(true)}
         colorPalette={clientVoiceMember.serverMute ? 'red' : undefined}
+        {...props}
       >
         {sending ? <FaMicrophone /> : <FaMicrophoneSlash />}
-      </ClientActivityPanelActionButton>
+      </ClientActivityActionButton>
       <PickAudioSourceModal open={isModalOpen} onOpenChange={(e) => setModalOpen(e.open)} />
     </>
   );

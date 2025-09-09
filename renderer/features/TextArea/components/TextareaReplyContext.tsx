@@ -2,10 +2,12 @@ import { Text } from '@chakra-ui/react';
 import { GuildMember } from '@main/ipc/guilds/types';
 import { Message } from '@main/ipc/messages/types';
 import { useMemo } from 'react';
-import TextareaActionContext, { TextareaActionContextProps } from './TextareaActionContext';
 import { useTextareaContext } from '../context';
+import TextareaActionContext, { TextareaActionContextProps } from './TextareaActionContext';
 
-export type TextareaReplyContextProps = { message: Message } & Omit<TextareaActionContextProps, 'label' | 'onCancel'>;
+export type TextareaReplyContextBaseProps = { message: Message };
+export type TextareaReplyContextProps = TextareaReplyContextBaseProps &
+  Omit<TextareaActionContextProps, 'label' | 'onCancel'>;
 
 export default function TextareaReplyContext({ message, ...props }: TextareaReplyContextProps) {
   const { users, onReplyClose } = useTextareaContext();

@@ -1,11 +1,14 @@
 import { Box, Card, Image, Stack, Text } from '@chakra-ui/react';
 import Link from '@renderer/ui/Link';
+import { RefAttributes } from 'react';
 import { EmbedProps } from './Embed';
 import EmbedAuthor from './EmbedAuthor';
 import EmbedField from './EmbedField';
 import EmbedFooter from './EmbedFooter';
 
-export default function EmbedRich({ embed }: EmbedProps) {
+export type RichEmbedProps = EmbedProps & Card.RootProps & RefAttributes<HTMLDivElement>;
+
+export default function EmbedRich({ embed }: RichEmbedProps) {
   // const testEmbed: Embed = {
   //   hexColor: '#0099FF',
   //   title: 'Some title',
@@ -51,11 +54,11 @@ export default function EmbedRich({ embed }: EmbedProps) {
 
             {embed.title &&
               (embed.url ? (
-                <Link to={embed.url} target="_blank" fontSize="md" width="fit-content">
+                <Link to={embed.url} target="_blank" fontSize="md" fontWeight="600" width="fit-content">
                   {embed.title}
                 </Link>
               ) : (
-                <Text fontSize="md" width="fit-content">
+                <Text fontSize="md" fontWeight="600" width="fit-content">
                   {embed.title}
                 </Text>
               ))}

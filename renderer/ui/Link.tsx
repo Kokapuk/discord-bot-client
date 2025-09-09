@@ -2,8 +2,9 @@ import { Link as ChakraLink, LinkProps as ChakraLinkProps } from '@chakra-ui/rea
 import { RefAttributes } from 'react';
 import { Link as RouterLink } from 'react-router';
 
-export type LinkProps = { to: string } & Omit<ChakraLinkProps, 'as' | 'href'>;
+export type LinkBaseProps = { to: string };
+export type LinkProps = LinkBaseProps & ChakraLinkProps & RefAttributes<HTMLAnchorElement>;
 
-export default function Link(props: LinkProps & RefAttributes<HTMLAnchorElement>) {
+export default function Link(props: LinkProps) {
   return <ChakraLink as={RouterLink} {...props} />;
 }

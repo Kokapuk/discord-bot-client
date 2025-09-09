@@ -3,7 +3,8 @@ import { Embed as EmbedType } from '@main/ipc/messages/types';
 import { RefAttributes } from 'react';
 import Embed from './Embed';
 
-export type EmbedListProps = { embeds: EmbedType[] } & StackProps & RefAttributes<HTMLDivElement>;
+export type EmbedListBaseProps = { embeds: EmbedType[] };
+export type EmbedListProps = EmbedListBaseProps & StackProps & RefAttributes<HTMLDivElement>;
 
 export default function EmbedList({ embeds, ...props }: EmbedListProps) {
   return (

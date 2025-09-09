@@ -2,8 +2,8 @@ import { Group, GroupProps, IconButton, Text } from '@chakra-ui/react';
 import { ReactNode, RefAttributes } from 'react';
 import { FaX } from 'react-icons/fa6';
 
-export type TextareaActionContextProps = { label: ReactNode; onCancel?(): void } & GroupProps &
-  RefAttributes<HTMLDivElement>;
+export type TextareaActionContextBaseProps = { label: ReactNode; onCancel?(): void };
+export type TextareaActionContextProps = TextareaActionContextBaseProps & GroupProps & RefAttributes<HTMLDivElement>;
 
 export default function TextareaActionContext({ label, onCancel, ...props }: TextareaActionContextProps) {
   return (

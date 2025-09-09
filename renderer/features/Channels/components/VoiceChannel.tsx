@@ -1,4 +1,4 @@
-import { Box, BoxProps, Stack, Text } from '@chakra-ui/react';
+import { Box, Stack, StackProps, Text } from '@chakra-ui/react';
 import { type VoiceChannel } from '@main/ipc/guilds/types';
 import BaseChannel, { BaseChannelProps } from '@renderer/features/Channels/components/BaseChannel';
 import ChannelAdditionalActions from '@renderer/features/Channels/components/ChannelAdditionalActions';
@@ -6,23 +6,19 @@ import VoiceMemberList from '@renderer/features/Voices/components/VoiceMemberLis
 import { useVoiceContext } from '@renderer/features/Voices/context';
 import { RefAttributes } from 'react';
 
-export type VoiceChannelProps = {
-  channel: VoiceChannel;
-  wrapperProps?: BoxProps & RefAttributes<HTMLDivElement>;
-} & Omit<BaseChannelProps, 'channel'>;
+export type VoiceChannelBaseProps = { channel: VoiceChannel };
+export type VoiceChannelProps = VoiceChannelBaseProps & {
+  wrapperProps?: StackProps & RefAttributes<HTMLDivElement>;
+} & BaseChannelProps;
 
-export default function VoiceChannel({
-  channel,
-  wrapperProps,
-  ...props
-}: VoiceChannelProps & RefAttributes<HTMLButtonElement>) {
+export default function VoiceChannel({ channel, wrapperProps, ...props }: VoiceChannelProps) {
   const { voiceMembers } = useVoiceContext();
   const membersInVoice = voiceMembers?.[channel.guidId]?.[channel.id]?.length ?? 0;
   const userLimitReached = channel.userLimit ? (membersInVoice ?? 0) >= channel.userLimit : false;
 
   return (
-    <Stack gap="1">
-      <Box className="group" width="100%" position="relative" {...wrapperProps}>
+    <Stack gap="1" {...wrapperProps}>
+      <Box className="group" width="100%" position="relative">
         <BaseChannel
           channel={channel}
           disabled={!channel.connectPermission || !channel.viewChannelPermission || userLimitReached}

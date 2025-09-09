@@ -1,4 +1,12 @@
-import { BoxProps, Textarea as ChakraTextarea, FileUpload, IconButton, Stack, useFileUpload } from '@chakra-ui/react';
+import {
+  BoxProps,
+  Textarea as ChakraTextarea,
+  TextareaProps as ChakraTextareaProps,
+  FileUpload,
+  IconButton,
+  Stack,
+  useFileUpload,
+} from '@chakra-ui/react';
 import { EditMessageDTO, SendMessageDTO, SendMessageFileDTO } from '@main/ipc/messages/types';
 import fileSchema from '@renderer/utils/fileSchema';
 import dayjs from 'dayjs';
@@ -11,7 +19,8 @@ import MentionMenu from './MentionMenu';
 import TextareaActionContext from './TextareaActionContext';
 import TextareaReplyContext from './TextareaReplyContext';
 
-export type TextareaProps = BoxProps & RefAttributes<HTMLDivElement>;
+export type TextareaProps = { textareaProps?: ChakraTextareaProps & RefAttributes<HTMLTextAreaElement> } & BoxProps &
+  RefAttributes<HTMLDivElement>;
 
 export const messageFormDataSchema = z.object({
   content: z
@@ -21,7 +30,7 @@ export const messageFormDataSchema = z.object({
   files: z.array(fileSchema, { error: 'Files are invalid' }).optional(),
 });
 
-export default function Textarea(props: TextareaProps) {
+export default function Textarea({ textareaProps, ...props }: TextareaProps) {
   const { channel, editingMessage, onEditClose, replyingMessage, onReplyClose } = useTextareaContext();
   const form = useRef<HTMLFormElement>(null);
   const textarea = useRef<HTMLTextAreaElement>(null);
@@ -224,6 +233,7 @@ export default function Textarea(props: TextareaProps) {
               maxHeight="96"
               fontSize="md"
               border="0"
+              {...textareaProps}
             />
           </Stack>
         </Stack>

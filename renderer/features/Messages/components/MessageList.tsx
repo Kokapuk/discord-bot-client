@@ -4,8 +4,8 @@ import dayjs from 'dayjs';
 import { memo, ReactNode, RefAttributes, useEffect, useMemo, useRef } from 'react';
 import Message from './Message';
 
-export type MessageListProps = { messages: MessageType[]; onPaginate?(): void } & StackProps &
-  RefAttributes<HTMLDivElement>;
+export type MessageListBaseProps = { messages: MessageType[]; onPaginate?(): void };
+export type MessageListProps = MessageListBaseProps & StackProps & RefAttributes<HTMLDivElement>;
 
 export const CHAIN_MESSAGES_TIME_GAP = 1000 * 60 * 5; // 5 minutes
 

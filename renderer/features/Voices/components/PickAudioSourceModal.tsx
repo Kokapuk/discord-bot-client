@@ -1,10 +1,10 @@
-import { Button, CloseButton, Dialog, DialogRootProps, Portal, Spinner, Stack, Text } from '@chakra-ui/react';
+import { Button, CloseButton, Dialog, IconButton, Portal, Spinner, Stack, Text } from '@chakra-ui/react';
 import { OutputAudioSource } from '@main/ipc/voice/types';
 import { ReactNode, RefAttributes, useEffect, useState } from 'react';
-import { FaCircleNodes, FaMicrophoneLines, FaSquareArrowUpRight } from 'react-icons/fa6';
+import { FaCircleNodes, FaGear, FaMicrophoneLines, FaSquareArrowUpRight } from 'react-icons/fa6';
 import { useShallow } from 'zustand/shallow';
 import useVoicesStore from '../store';
-import AudioOutputToggleSettingsMenu, { AudioOutputToggleSettings } from './AudioOutputToggleSettingsMenu';
+import AudioToggleSettingsMenu, { AudioToggleSettings } from './AudioToggleSettingsMenu';
 
 const OUTPUT_AUDIO_SOURCES: Record<OutputAudioSource, { icon?: ReactNode; label: string }> = {
   systemwide: { icon: <FaCircleNodes />, label: 'Systemwide' },
@@ -12,9 +12,11 @@ const OUTPUT_AUDIO_SOURCES: Record<OutputAudioSource, { icon?: ReactNode; label:
   isolatedExternalWithLocalEcho: { icon: <FaSquareArrowUpRight />, label: 'Isolated external with local echo' },
 };
 
-export default function PickAudioSourceModal(props: Omit<DialogRootProps, 'children'> & RefAttributes<HTMLDivElement>) {
+export default function PickAudioSourceModal(
+  props: Omit<Dialog.RootProps, 'children'> & RefAttributes<HTMLDivElement>
+) {
   const setSending = useVoicesStore(useShallow((s) => s.setSending));
-  const [audioOutputSettings, setAudioOutputSettings] = useState<AudioOutputToggleSettings>(() => ({
+  const [audioOutputSettings, setAudioOutputSettings] = useState<AudioToggleSettings>(() => ({
     autoGainControl: false,
     noiseSuppression: false,
     echoCancellation: false,
@@ -129,12 +131,16 @@ export default function PickAudioSourceModal(props: Omit<DialogRootProps, 'child
             </Dialog.Body>
 
             <Dialog.Footer>
-              <AudioOutputToggleSettingsMenu
+              <AudioToggleSettingsMenu
                 settings={audioOutputSettings}
                 onCheckedChange={(setting, toggled) =>
                   setAudioOutputSettings((prev) => ({ ...prev, [setting]: toggled }))
                 }
-              />
+              >
+                <IconButton variant="surface">
+                  <FaGear />
+                </IconButton>
+              </AudioToggleSettingsMenu>
             </Dialog.Footer>
 
             <Dialog.CloseTrigger asChild>

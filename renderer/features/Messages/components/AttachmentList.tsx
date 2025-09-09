@@ -3,7 +3,8 @@ import { Attachment as AttachmentType } from '@main/ipc/messages/types';
 import { RefAttributes } from 'react';
 import Attachment from './Attachment';
 
-export type AttachmentListProps = { attachments: AttachmentType[] } & StackProps & RefAttributes<HTMLDivElement>;
+export type AttachmentListBaseProps = { attachments: AttachmentType[] };
+export type AttachmentListProps = AttachmentListBaseProps & StackProps & RefAttributes<HTMLDivElement>;
 
 export default function AttachmentList({ attachments, ...props }: AttachmentListProps) {
   return (

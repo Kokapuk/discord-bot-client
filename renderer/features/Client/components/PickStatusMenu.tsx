@@ -1,8 +1,7 @@
-import { Button, Menu, MenuRootProps, MenuTriggerProps, Portal, Text } from '@chakra-ui/react';
+import { Menu, Portal } from '@chakra-ui/react';
 import { Status as StatusType } from '@main/ipc/client/types';
-import AvatarWithStatus from '@renderer/ui/AvatarWithStatus';
 import Status from '@renderer/ui/Status';
-import { RefAttributes } from 'react';
+import { ReactNode, RefAttributes } from 'react';
 import { useShallow } from 'zustand/shallow';
 import useClientStore from '../store';
 
@@ -13,43 +12,31 @@ const STATUSES = {
   invisible: 'Invisible',
 } as const satisfies Record<Exclude<StatusType, 'offline'>, string>;
 
-export type PickStatusMenuProps = { triggerProps?: Omit<MenuTriggerProps, 'children'> } & Omit<
-  MenuRootProps,
-  'children'
->;
+export type PickStatusMenuBaseProps = { children: ReactNode };
+export type PickStatusMenuProps = PickStatusMenuBaseProps & Menu.RootProps & RefAttributes<HTMLDivElement>;
 
-export default function PickStatusMenu({
-  triggerProps,
-  ...props
-}: PickStatusMenuProps & RefAttributes<HTMLDivElement>) {
-  const { client, pullClient } = useClientStore(
-    useShallow((s) => ({ client: s.clientUser, pullClient: s.pullClientUser }))
+export default function PickStatusMenu({ children, ...props }: PickStatusMenuProps) {
+  const { clientUser, pullClientUser } = useClientStore(
+    useShallow((s) => ({ clientUser: s.clientUser, pullClientUser: s.pullClientUser }))
   );
 
-  if (!client) {
+  if (!clientUser) {
     return null;
   }
 
   const setStatus = (status: Exclude<StatusType, 'offline'>) => {
     window.ipcRenderer.invoke('setClientStatus', status);
-    pullClient();
+    pullClientUser();
   };
 
   return (
     <Menu.Root unmountOnExit {...props}>
-      <Menu.Trigger asChild {...triggerProps}>
-        <Button variant="ghost" justifyContent="flex-start" padding="0">
-          <AvatarWithStatus src={client.displayAvatarUrl} status={client.status} />
-          <Text fontSize="md" fontWeight="600">
-            {client.displayName}
-          </Text>
-        </Button>
-      </Menu.Trigger>
+      <Menu.Trigger asChild>{children}</Menu.Trigger>
       <Portal>
         <Menu.Positioner>
           <Menu.Content>
             <Menu.RadioItemGroup
-              value={client.status}
+              value={clientUser.status}
               onValueChange={(e) => setStatus(e.value as Exclude<StatusType, 'offline'>)}
             >
               <Menu.ItemGroupLabel>Status</Menu.ItemGroupLabel>

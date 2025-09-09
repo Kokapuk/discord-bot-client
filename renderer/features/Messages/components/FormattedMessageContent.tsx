@@ -5,10 +5,9 @@ import reactStringReplace from 'react-string-replace';
 import { useMessageContext } from '../context';
 import Mention from './Mention';
 
-export type FormattedMessageContentProps = {
-  rawContent: string;
-  oneLine?: boolean;
-} & TextProps &
+export type FormattedMessageContentBaseProps = { rawContent: string; oneLine?: boolean };
+export type FormattedMessageContentProps = FormattedMessageContentBaseProps &
+  TextProps &
   RefAttributes<HTMLParagraphElement>;
 
 export default function FormattedMessageContent({ rawContent, oneLine, ...props }: FormattedMessageContentProps) {

@@ -1,11 +1,12 @@
 import { Input, Menu, Portal } from '@chakra-ui/react';
 import Avatar from '@renderer/ui/Avatar';
-import { RefObject, useEffect, useMemo, useRef, useState } from 'react';
+import { RefAttributes, RefObject, useEffect, useMemo, useRef, useState } from 'react';
 import { useTextareaContext } from '../context';
 
-export type MentionMenuProps = { textarea: RefObject<HTMLTextAreaElement | null> };
+export type MentionMenuBaseProps = { textarea: RefObject<HTMLTextAreaElement | null> };
+export type MentionMenuProps = MentionMenuBaseProps & Omit<Menu.RootProps, 'children'> & RefAttributes<HTMLDivElement>;
 
-export default function MentionMenu({ textarea }: MentionMenuProps) {
+export default function MentionMenu({ textarea, ...props }: MentionMenuProps) {
   const [open, setOpen] = useState(false);
   const getAnchorRect = () => textarea.current!.getBoundingClientRect();
   const { users, roles } = useTextareaContext();
@@ -79,6 +80,7 @@ export default function MentionMenu({ textarea }: MentionMenuProps) {
       onOpenChange={(e) => handleOpenChange(e.open)}
       onExitComplete={() => setQuery('')}
       onSelect={(e) => handleSelect(e.value)}
+      {...props}
     >
       <Portal>
         <Menu.Positioner>

@@ -1,11 +1,13 @@
 import { SupportedChannelType, type Channel } from '@main/ipc/guilds/types';
-import VoiceChannel from '@renderer/features/Voices/components/VoiceChannel';
+import VoiceChannel from '@renderer/features/Channels/components/VoiceChannel';
 import { useChannelContext } from '../context';
+import { BaseChannelProps } from './BaseChannel';
 import TextChannel from './TextChannel';
 
-export type ChannelProps = { channel: Channel };
+export type ChannelBaseProps = { channel: Channel };
+export type ChannelProps = ChannelBaseProps & Omit<BaseChannelProps, 'channel'>;
 
-export default function Channel({ channel }: ChannelProps) {
+export default function Channel({ channel, ...props }: ChannelProps) {
   const { activeChannel, unreadChannels } = useChannelContext();
   const active = activeChannel?.id === channel.id;
   const unread = unreadChannels?.includes(channel.id);
@@ -15,9 +17,9 @@ export default function Channel({ channel }: ChannelProps) {
     case SupportedChannelType.GuildAnnouncement:
     case SupportedChannelType.PublicThread:
     case SupportedChannelType.PrivateThread:
-      return <TextChannel channel={channel} active={active} unread={unread} />;
+      return <TextChannel channel={channel} active={active} unread={unread} {...props} />;
     case SupportedChannelType.GuildVoice:
     case SupportedChannelType.GuildStageVoice:
-      return <VoiceChannel channel={channel} active={active} unread={unread} />;
+      return <VoiceChannel channel={channel} active={active} unread={unread} {...props} />;
   }
 }

@@ -16,7 +16,7 @@ import { useShallow } from 'zustand/react/shallow';
 
 export default function AppLayout() {
   const { channelId } = useParams();
-  const pullClient = useClientStore((s) => s.pullClientUser);
+  const pullClientUser = useClientStore((s) => s.pullClientUser);
   const navigate = useNavigate();
 
   const { guilds, pullGuilds, channels, pullChannels, pullMembers, pullRoles } = useGuildsStore(
@@ -69,7 +69,7 @@ export default function AppLayout() {
   );
 
   useEffect(() => {
-    pullClient();
+    pullClientUser();
   }, []);
 
   useEffect(() => {

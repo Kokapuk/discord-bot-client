@@ -12,11 +12,8 @@ import FormattedMessageContent from './FormattedMessageContent';
 import ManageMessageActionList from './ManageMessageActions';
 import ReferenceMessage from './ReferenceMessage';
 
-export type MessageProps = {
-  message: Message;
-  chain?: boolean;
-} & StackProps &
-  RefAttributes<HTMLDivElement>;
+export type MessageBaseProps = { message: Message; chain?: boolean };
+export type MessageProps = MessageBaseProps & StackProps & RefAttributes<HTMLDivElement>;
 
 const Message = ({ message, chain, ...props }: MessageProps) => {
   const { users } = useMessageContext();

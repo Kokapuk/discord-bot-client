@@ -1,12 +1,14 @@
 import { VoiceConnectionStatus } from '@main/ipc/voice/types';
-import ClientActivityPanelActionButton from '@renderer/features/Client/components/ClientActivityPanelActionButton';
+import ClientActivityActionButton, {
+  ClientActivityActionButtonProps,
+} from '@renderer/features/Client/components/ClientActivityActionButton';
 import useClientStore from '@renderer/features/Client/store';
 import { useEffect, useMemo } from 'react';
 import { FaVolumeLow, FaVolumeXmark } from 'react-icons/fa6';
 import { useShallow } from 'zustand/shallow';
 import useVoicesStore from '../store';
 
-export default function ToggleReceiveVoiceChannelButton() {
+export default function ToggleReceiveVoiceButton(props: ClientActivityActionButtonProps) {
   const { connectionStatus, activeChannelData, members, receiving, setReceiving } = useVoicesStore(
     useShallow((s) => ({
       connectionStatus: s.connectionStatus,
@@ -61,13 +63,14 @@ export default function ToggleReceiveVoiceChannelButton() {
   }
 
   return (
-    <ClientActivityPanelActionButton
+    <ClientActivityActionButton
       toggled={receiving}
       tooltip={receiving ? 'Deafen' : 'Undeafen'}
       onClick={receiving ? disableReceiver : enableReceiver}
       colorPalette={clientVoiceMember.serverDeaf ? 'red' : undefined}
+      {...props}
     >
       {receiving ? <FaVolumeLow /> : <FaVolumeXmark />}
-    </ClientActivityPanelActionButton>
+    </ClientActivityActionButton>
   );
 }
