@@ -1,5 +1,4 @@
 import { WebContents } from 'electron';
-import { handleIpcMainEvents as handleIpcMainAppEvents } from './app/handle';
 import { handleIpcMainEvents as handleIpcMainClientEvents } from './client/handle';
 import {
   handleIpcMainAutoInvokeEvents as handleIpcMainAutoInvokeAppEvents,
@@ -10,6 +9,10 @@ import {
   handleIpcMainEvents as handleIpcMainMessagesEvents,
 } from './messages/handle';
 import {
+  handleIpcMainAutoInvokeEvents as handleIpcMainAutoInvokeSettingsEvents,
+  handleIpcMainEvents as handleIpcMainSettingsEvents,
+} from './settings/handle';
+import {
   handleIpcMainAutoInvokeEvents as handleIpcMainAutoInvokeVoiceEvents,
   handleIpcMainEvents as handleIpcMainVoiceEvents,
 } from './voice/handle';
@@ -19,15 +22,16 @@ export type IpcApiResponse<T = void> =
   | { success: false; error: string };
 
 export const handleIpcMainEvents = () => {
-  handleIpcMainAppEvents();
   handleIpcMainClientEvents();
   handleIpcMainGuildsEvents();
   handleIpcMainMessagesEvents();
   handleIpcMainVoiceEvents();
+  handleIpcMainSettingsEvents();
 };
 
 export const handleIpcMainAutoInvokeEvents = (webContents: WebContents) => {
   handleIpcMainAutoInvokeAppEvents(webContents);
   handleIpcMainAutoInvokeMessagesEvents(webContents);
   handleIpcMainAutoInvokeVoiceEvents(webContents);
+  handleIpcMainAutoInvokeSettingsEvents(webContents);
 };

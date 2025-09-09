@@ -1,15 +1,15 @@
 import { contextBridge } from 'electron';
-import { AppIpcSlice } from './ipc/app';
 import { ClientIpcSlice } from './ipc/client';
 import { GuildsIpcSlice } from './ipc/guilds';
 import { MessagesIpcSlice } from './ipc/messages';
 import { MiniBrowserIpcSlice } from './ipc/miniBrowser';
+import { SettingsIpcSlice } from './ipc/settings';
 import { VoiceIpcSlice } from './ipc/voice';
 import { createIpcRenderer } from './utils/createIpcRenderer';
 import { MergeSlices } from './utils/ipc';
 
 type MergedSlices = MergeSlices<
-  AppIpcSlice | ClientIpcSlice | GuildsIpcSlice | MessagesIpcSlice | VoiceIpcSlice | MiniBrowserIpcSlice
+  ClientIpcSlice | GuildsIpcSlice | MessagesIpcSlice | VoiceIpcSlice | MiniBrowserIpcSlice | SettingsIpcSlice
 >;
 
 const ipcRenderer = createIpcRenderer<MergedSlices>();

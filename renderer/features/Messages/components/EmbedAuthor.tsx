@@ -11,11 +11,11 @@ export default function EmbedAuthor({ author, ...props }: EmbedAuthorProps) {
     <Stack direction="row" alignItems="center" {...props}>
       {!!author.iconURL && <Image loading="lazy" src={author.iconURL} height="6" width="6" borderRadius="full" />}
       {author.url ? (
-        <Link to={author.url} target="_blank" color="white" fontSize="xs" fontWeight="600">
+        <Link to={author.url} target="_blank" color="fg" fontSize="xs" fontWeight="600">
           {author.name}
         </Link>
       ) : (
-        <Text color="white" fontSize="xs" fontWeight="600">
+        <Text color="fg" fontSize="xs" fontWeight="600">
           {author.name}
         </Text>
       )}

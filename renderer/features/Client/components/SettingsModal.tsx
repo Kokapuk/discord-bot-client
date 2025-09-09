@@ -1,13 +1,21 @@
-import { CloseButton, Dialog, Portal, RadioGroup, Stack } from '@chakra-ui/react';
-import { ReactNode } from 'react';
-import Setting from './Setting';
+import { CloseButton, Dialog, Portal, Stack } from '@chakra-ui/react';
+import { Tooltip } from '@renderer/ui/Tooltip';
+import { ReactNode, RefAttributes } from 'react';
+import ThemeSetting from './ThemeSetting';
 
-export type SettingsModalProps = { children: ReactNode };
+export type SettingsModalBaseProps = { children: ReactNode; triggerTooltip?: string };
+export type SettingsModalProps = SettingsModalBaseProps & Dialog.RootProps & RefAttributes<HTMLDivElement>;
 
-export default function SettingsModal({ children }: SettingsModalProps) {
+export default function SettingsModal({ children, triggerTooltip, ...props }: SettingsModalProps) {
+  let trigger = <Dialog.Trigger asChild>{children}</Dialog.Trigger>;
+
+  if (triggerTooltip) {
+    trigger = <Tooltip content={triggerTooltip}>{trigger}</Tooltip>;
+  }
+
   return (
-    <Dialog.Root unmountOnExit placement="center">
-      <Dialog.Trigger asChild>{children}</Dialog.Trigger>
+    <Dialog.Root unmountOnExit placement="center" {...props}>
+      {trigger}
       <Portal>
         <Dialog.Backdrop />
         <Dialog.Positioner>
@@ -17,22 +25,7 @@ export default function SettingsModal({ children }: SettingsModalProps) {
             </Dialog.Header>
             <Dialog.Body>
               <Stack gap="5">
-                <Setting title="Theme">
-                  <RadioGroup.Root defaultValue="1">
-                    <Stack gap="6" direction="row">
-                      {[
-                        { value: 'light', label: 'Light' },
-                        { value: 'dark', label: 'Dark' },
-                      ].map((item) => (
-                        <RadioGroup.Item key={item.value} value={item.value}>
-                          <RadioGroup.ItemHiddenInput />
-                          <RadioGroup.ItemIndicator />
-                          <RadioGroup.ItemText>{item.label}</RadioGroup.ItemText>
-                        </RadioGroup.Item>
-                      ))}
-                    </Stack>
-                  </RadioGroup.Root>
-                </Setting>
+                <ThemeSetting />
               </Stack>
             </Dialog.Body>
             <Dialog.CloseTrigger asChild>

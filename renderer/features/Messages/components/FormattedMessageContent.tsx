@@ -1,6 +1,6 @@
 import { Image, Text, TextProps } from '@chakra-ui/react';
 import Link from '@renderer/ui/Link';
-import { Fragment, ReactNode, RefAttributes, useMemo } from 'react';
+import { Fragment, memo, ReactNode, RefAttributes, useMemo } from 'react';
 import reactStringReplace from 'react-string-replace';
 import { useMessageContext } from '../context';
 import Mention from './Mention';
@@ -10,7 +10,7 @@ export type FormattedMessageContentProps = FormattedMessageContentBaseProps &
   TextProps &
   RefAttributes<HTMLParagraphElement>;
 
-export default function FormattedMessageContent({ rawContent, oneLine, ...props }: FormattedMessageContentProps) {
+const FormattedMessageContent = ({ rawContent, oneLine, ...props }: FormattedMessageContentProps) => {
   const { channels, users, roles } = useMessageContext();
 
   const formattedContent = useMemo(() => {
@@ -86,11 +86,13 @@ export default function FormattedMessageContent({ rawContent, oneLine, ...props 
     );
 
     return tokenized;
-  }, [rawContent, channels, users, roles]);
+  }, [rawContent, oneLine, channels, users, roles]);
 
   return (
     <Text as="span" fontSize="md" {...props}>
       {formattedContent}
     </Text>
   );
-}
+};
+
+export default memo(FormattedMessageContent);

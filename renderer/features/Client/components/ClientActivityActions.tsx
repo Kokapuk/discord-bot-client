@@ -11,8 +11,8 @@ export default function ClientActivityActions(props: StackProps & RefAttributes<
     <Stack direction="row" {...props}>
       <ToggleSendVoiceButton />
       <ToggleReceiveVoiceButton />
-      <SettingsModal>
-        <ClientActivityActionButton variant="ghost" tooltip="Settings">
+      <SettingsModal triggerTooltip="Settings">
+        <ClientActivityActionButton variant="ghost">
           <FaGear />
         </ClientActivityActionButton>
       </SettingsModal>

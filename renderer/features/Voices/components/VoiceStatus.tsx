@@ -77,12 +77,13 @@ export default function VoiceStatus(props: StackProps & RefAttributes<HTMLDivEle
         )}
       </Stack>
 
-      <Tooltip content='Disconnect'>
+      <Tooltip content="Disconnect">
         <IconButton
           onClick={() => window.ipcRenderer.invoke('leaveVoice')}
           colorPalette="red"
           variant="surface"
           marginLeft="auto"
+          size="xs"
         >
           <FaPhoneSlash />
         </IconButton>

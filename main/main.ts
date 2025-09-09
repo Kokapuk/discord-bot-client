@@ -5,6 +5,7 @@ import { handleIpcMainAutoInvokeEvents, handleIpcMainEvents } from './ipc';
 import { logout } from './ipc/client/utils';
 import createAppWindow from './windows/app';
 import createBackgroundThrottlingBlocker from './windows/backgroundThrottlingBlocker';
+import settingsStore from './utils/settingsStore';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -36,7 +37,7 @@ app.on('activate', () => {
 });
 
 app.whenReady().then(() => {
-  nativeTheme.themeSource = 'dark';
+  nativeTheme.themeSource = settingsStore.get('theme');
 
   appWindow = createAppWindow();
   createBackgroundThrottlingBlocker(appWindow);
