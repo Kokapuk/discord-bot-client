@@ -1,4 +1,4 @@
-import { VoiceConnectionStatus } from '@main/ipc/voice/types';
+import { VoiceConnectionStatus } from '@main/features/voice/types';
 import ClientActivityActionButton, {
   ClientActivityActionButtonProps,
 } from '@renderer/features/Client/components/ClientActivityActionButton';

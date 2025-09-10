@@ -1,5 +1,5 @@
+import { Attachment } from '@main/features/messages/types';
 import useClientStore from '@renderer/features/Client/store';
-import { Attachment } from 'discord.js';
 
 export type AudioAttachmentProps = { attachment: Pick<Attachment, 'url'> };
 

@@ -1,4 +1,4 @@
-import { VoiceMember } from '@main/ipc/voice/types';
+import { VoiceMember } from '@main/features/voice/types';
 import { createContext, useContext } from 'react';
 
 export type VoiceContext = {

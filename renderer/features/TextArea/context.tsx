@@ -1,6 +1,7 @@
-import { User } from '@main/ipc/client/types';
-import { Channel, GuildMember, Role } from '@main/ipc/guilds/types';
-import { Message } from '@main/ipc/messages/types';
+import { Channel } from '@main/features/channels/types';
+import { GuildMember, Role } from '@main/features/guilds/types';
+import { Message } from '@main/features/messages/types';
+import { User } from '@main/features/users/types';
 import { createContext, useContext } from 'react';
 
 export type TextareaContext = {

@@ -1,7 +1,10 @@
-import { createIpcMain } from '../../utils/createIpcMain';
+import { User } from '@main/features/users/types';
 import { ActivityType, PresenceUpdateStatus } from 'discord.js';
 import { ClientIpcSlice } from '.';
-import { client, structUser } from './utils';
+import { IpcApiResponse } from '..';
+import { structUser } from '../../features/users/utils';
+import { createIpcMain } from '../../utils/createIpcMain';
+import { client } from './utils';
 
 const ipcMain = createIpcMain<ClientIpcSlice>();
 
@@ -21,26 +24,26 @@ export const handleIpcMainEvents = () => {
         ],
       });
 
-      return { success: true };
+      return { success: true } as IpcApiResponse;
     } catch (err: any) {
-      return { success: false, error: err.message };
+      return { success: false, error: err.message } as IpcApiResponse;
     }
   });
 
-  ipcMain.handle('getClientUser', () => {
+  ipcMain.handle('getClientUser', async () => {
     if (!client.user) {
-      return { success: false, error: 'Client user does not exist' };
+      return { success: false, error: 'Client user does not exist' } as IpcApiResponse<User>;
     }
 
-    return { success: true, payload: structUser(client.user) };
+    return { success: true, payload: structUser(client.user) } as IpcApiResponse<User>;
   });
 
-  ipcMain.handle('setClientStatus', (_, status) => {
+  ipcMain.handle('setClientStatus', async (_, status) => {
     if (!client.user) {
-      return { success: false, error: 'Client user does not exist' };
+      return { success: false, error: 'Client user does not exist' } as IpcApiResponse;
     }
 
-    let newStatus: PresenceUpdateStatus;
+    let newStatus = PresenceUpdateStatus.Online;
 
     switch (status) {
       case 'online':
@@ -59,6 +62,6 @@ export const handleIpcMainEvents = () => {
 
     client.user.setPresence({ status: newStatus });
 
-    return { success: true };
+    return { success: true } as IpcApiResponse;
   });
 };

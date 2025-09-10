@@ -1,5 +1,5 @@
 import { Image, Stack, StackProps, Text } from '@chakra-ui/react';
-import { type EmbedAuthor } from '@main/ipc/messages/types';
+import { type EmbedAuthor } from '@main/features/messages/types';
 import Link from '@renderer/ui/Link';
 import { RefAttributes } from 'react';
 

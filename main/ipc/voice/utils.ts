@@ -1,10 +1,8 @@
 import { createAudioPlayer, NoSubscriberBehavior } from '@discordjs/voice';
-import { VoiceState as DiscordVoiceState, GuildMember, PermissionFlagsBits } from 'discord.js';
 import { BrowserWindow, session, WebContents } from 'electron';
 import { PassThrough } from 'stream';
 import createMiniBrowserWindow from '../../windows/miniBrowser';
 import { ipcMain } from './handle';
-import { VoiceMember, VoiceState } from './types';
 
 let audioCaptureWindow: BrowserWindow | null = null;
 
@@ -14,23 +12,6 @@ export const audioPlayer = createAudioPlayer({
   },
 });
 export const audioOutputStream: { current: PassThrough | null } = { current: null };
-
-export const structVoiceMember = (user: GuildMember): VoiceMember => ({
-  id: user.id,
-  displayName: user.displayName,
-  displayAvatarUrl: user.displayAvatarURL({ size: 64 }),
-  selfMute: user.voice.selfMute,
-  selfDeaf: user.voice.selfDeaf,
-  serverMute: user.voice.serverMute,
-  serverDeaf: user.voice.serverDeaf,
-  canSpeak: user.voice.channel?.permissionsFor(user).has(PermissionFlagsBits.Speak) ?? false,
-});
-
-export const structVoiceState = (voiceState: DiscordVoiceState): VoiceState => ({
-  guildId: voiceState.guild.id,
-  channelId: voiceState.channelId,
-  member: voiceState.member ? structVoiceMember(voiceState.member) : null,
-});
 
 export const startHandlingOutputAudioSystemwideSource = async () => {
   session.defaultSession.setDisplayMediaRequestHandler((_, callback) => {

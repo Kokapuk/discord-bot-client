@@ -1,4 +1,4 @@
-import { User } from '../client/types';
+import { User } from '@main/features/users/types';
 
 export interface VoiceMember extends Pick<User, 'id' | 'displayName' | 'displayAvatarUrl'> {
   selfMute: boolean | null;

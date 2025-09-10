@@ -1,5 +1,5 @@
 import { Image, ImageProps } from '@chakra-ui/react';
-import { Attachment } from '@main/ipc/messages/types';
+import { Attachment } from '@main/features/messages/types';
 import Link from '@renderer/ui/Link';
 import useClampedSize from '@renderer/utils/useClampedSize';
 import { RefAttributes } from 'react';

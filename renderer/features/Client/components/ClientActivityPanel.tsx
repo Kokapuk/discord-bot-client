@@ -1,5 +1,5 @@
 import { Card, Separator, Stack } from '@chakra-ui/react';
-import { VoiceConnectionStatus } from '@main/ipc/voice/types';
+import { VoiceConnectionStatus } from '@main/features/voice/types';
 import VoiceStatus from '@renderer/features/Voices/components/VoiceStatus';
 import useVoicesStore from '@renderer/features/Voices/store';
 import { RefAttributes } from 'react';

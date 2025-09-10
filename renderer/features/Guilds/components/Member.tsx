@@ -1,5 +1,5 @@
 import { Stack, StackProps, Text } from '@chakra-ui/react';
-import { GuildMember } from '@main/ipc/guilds/types';
+import { GuildMember } from '@main/features/guilds/types';
 import AvatarWithStatus from '@renderer/ui/AvatarWithStatus';
 import { memo, RefAttributes } from 'react';
 

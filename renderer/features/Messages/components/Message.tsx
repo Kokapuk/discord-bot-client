@@ -1,6 +1,6 @@
 import { Stack, StackProps, Text } from '@chakra-ui/react';
-import { GuildMember } from '@main/ipc/guilds/types';
-import { type Message } from '@main/ipc/messages/types';
+import { GuildMember } from '@main/features/guilds/types';
+import { type Message } from '@main/features/messages/types';
 import Avatar from '@renderer/ui/Avatar';
 import { useColorMode } from '@renderer/ui/ColorMode';
 import dayjs from 'dayjs';

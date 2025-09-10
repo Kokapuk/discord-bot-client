@@ -1,5 +1,5 @@
 import { Box, Wrap, WrapProps } from '@chakra-ui/react';
-import { Status as StatusType } from '@main/ipc/client/types';
+import { Status as StatusType } from '@main/features/users/types';
 import { RefAttributes } from 'react';
 import Avatar, { AvatarBaseProps, AvatarProps } from './Avatar';
 import Status, { StatusProps } from './Status';

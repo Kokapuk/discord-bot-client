@@ -1,36 +1,39 @@
-import { createIpcMain } from '../../utils/createIpcMain';
 import { WebContents } from 'electron';
 import { GuildsIpcSlice } from '.';
+import { IpcApiResponse } from '..';
+import { ChannelType, GuildChannel } from '../../features/channels/types';
+import { structGuildChannel } from '../../features/channels/utils';
+import { Guild, GuildMember, Role } from '../../features/guilds/types';
+import { structGuild, structGuildMember, structRole } from '../../features/guilds/utils';
+import { createIpcMain } from '../../utils/createIpcMain';
 import { client } from '../client/utils';
-import { Channel, Guild, GuildMember, Role, SupportedChannelType } from './types';
-import { structChannel, structGuild, structGuildMember, structRole } from './utils';
 
 const ipcMain = createIpcMain<GuildsIpcSlice>();
 const PRIORITY_STATUSES = ['online', 'dnd', 'idle'] as const;
 
 export const handleIpcMainEvents = () => {
-  ipcMain.handle('getGuilds', () => {
+  ipcMain.handle('getGuilds', async () => {
     const guilds: Guild[] = client.guilds.cache.map(structGuild);
 
-    return { success: true, payload: guilds };
+    return { success: true, payload: guilds } as IpcApiResponse<Guild[]>;
   });
 
-  ipcMain.handle('getGuildsChannels', () => {
+  ipcMain.handle('getGuildsChannels', async () => {
     const guilds = client.guilds.cache;
-    const guildsChannels: Record<string, Channel[]> = {};
+    const guildsChannels: Record<string, GuildChannel[]> = {};
 
     guilds.forEach((guild) => {
       guildsChannels[guild.id] = guild.channels.cache
-        .filter((channel) => (Object.values(SupportedChannelType) as number[]).includes(channel.type))
+        .filter((channel) => (Object.values(ChannelType) as number[]).includes(channel.type))
         .sort((channelA, channelB) => channelA.type - channelB.type)
-        .map(structChannel)
-        .filter(Boolean) as Channel[];
+        .map(structGuildChannel)
+        .filter(Boolean) as unknown as GuildChannel[];
     });
 
-    return { success: true, payload: guildsChannels };
+    return { success: true, payload: guildsChannels } as IpcApiResponse<Record<string, GuildChannel[]>>;
   });
 
-  ipcMain.handle('getGuildsMembers', () => {
+  ipcMain.handle('getGuildsMembers', async () => {
     const guilds = client.guilds.cache;
     const guildsMembers: Record<string, GuildMember[]> = {};
 
@@ -50,10 +53,10 @@ export const handleIpcMainEvents = () => {
       });
     });
 
-    return { success: true, payload: guildsMembers };
+    return { success: true, payload: guildsMembers } as IpcApiResponse<Record<string, GuildMember[]>>;
   });
 
-  ipcMain.handle('getGuildsRoles', () => {
+  ipcMain.handle('getGuildsRoles', async () => {
     const guilds = client.guilds.cache;
     const guildsRoles: Record<string, Role[]> = {};
 
@@ -61,7 +64,7 @@ export const handleIpcMainEvents = () => {
       guildsRoles[guild.id] = guild.roles.cache.map(structRole);
     });
 
-    return { success: true, payload: guildsRoles };
+    return { success: true, payload: guildsRoles } as IpcApiResponse<Record<string, Role[]>>;
   });
 };
 

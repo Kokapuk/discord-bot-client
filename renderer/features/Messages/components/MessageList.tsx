@@ -1,5 +1,5 @@
 import { Center, Spinner, Stack, StackProps } from '@chakra-ui/react';
-import { Message as MessageType } from '@main/ipc/messages/types';
+import { Message as MessageType } from '@main/features/messages/types';
 import dayjs from 'dayjs';
 import { memo, ReactNode, RefAttributes, useEffect, useMemo, useRef } from 'react';
 import Message from './Message';

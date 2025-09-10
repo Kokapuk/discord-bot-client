@@ -1,5 +1,5 @@
 import { Button, ButtonProps, Icon, Text } from '@chakra-ui/react';
-import { type VoiceMember } from '@main/ipc/voice/types';
+import { type VoiceMember } from '@main/features/voice/types';
 import Avatar from '@renderer/ui/Avatar';
 import { RefAttributes } from 'react';
 import { FaMicrophoneSlash, FaVolumeXmark } from 'react-icons/fa6';

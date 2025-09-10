@@ -1,8 +1,8 @@
-import { Channel } from '@main/ipc/guilds/types';
+import { Channel, GuildChannel } from '@main/features/channels/types';
 import { createContext, useContext } from 'react';
 
 export type ChannelContext = {
-  channels: Channel[];
+  channels?: GuildChannel[];
   activeChannel?: Channel;
   unreadChannels?: string[];
 };

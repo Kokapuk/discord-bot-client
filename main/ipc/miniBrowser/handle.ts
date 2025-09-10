@@ -6,9 +6,9 @@ import { isStringUrl, structNavigationData } from './utils';
 export const ipcMain = createIpcMain<MiniBrowserIpcSlice>();
 
 export const handleIpcMainEvents = (viewWebContents: WebContents) => {
-  ipcMain.handle('getInitialNavigationData', () => structNavigationData(viewWebContents));
+  ipcMain.handle('getInitialNavigationData', async () => structNavigationData(viewWebContents));
 
-  ipcMain.handle('loadUrl', (_, url) => {
+  ipcMain.handle('loadUrl', async (_, url) => {
     if (isStringUrl(url)) {
       viewWebContents.loadURL(url);
     } else {
@@ -16,15 +16,15 @@ export const handleIpcMainEvents = (viewWebContents: WebContents) => {
     }
   });
 
-  ipcMain.handle('goBack', () => {
+  ipcMain.handle('goBack', async () => {
     viewWebContents.navigationHistory.goBack();
   });
 
-  ipcMain.handle('goForward', () => {
+  ipcMain.handle('goForward', async () => {
     viewWebContents.navigationHistory.goForward();
   });
 
-  ipcMain.handle('reload', () => {
+  ipcMain.handle('reload', async () => {
     viewWebContents.reload();
   });
 

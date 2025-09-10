@@ -1,4 +1,4 @@
-import { Message } from '@main/ipc/messages/types';
+import { Message } from '@main/features/messages/types';
 import { create } from 'zustand';
 
 interface MessagesState {

@@ -1,22 +1,22 @@
 import { Button, ButtonProps, Text } from '@chakra-ui/react';
-import { SupportedChannelType, type BaseChannel } from '@main/ipc/guilds/types';
+import { ChannelType, GuildChannel } from '@main/features/channels/types';
 import UnreadIndicator from '@renderer/ui/UnreadIndicator';
 import { RefAttributes, useMemo } from 'react';
 import { FaCodeBranch, FaHashtag, FaVolumeLow } from 'react-icons/fa6';
 
-export type BaseChannelBaseProps = { channel: BaseChannel; active?: boolean; unread?: boolean };
-export type BaseChannelProps = BaseChannelBaseProps & ButtonProps & RefAttributes<HTMLButtonElement>;
+export type GuildBaseChannelBaseProps = { channel: GuildChannel; active?: boolean; unread?: boolean };
+export type GuildBaseChannelProps = GuildBaseChannelBaseProps & ButtonProps & RefAttributes<HTMLButtonElement>;
 
-export default function BaseChannel({ channel, active, unread, ...props }: BaseChannelProps) {
+export default function GuildBaseChannel({ channel, active, unread, ...props }: GuildBaseChannelProps) {
   const channelTypeIcon = useMemo(() => {
     switch (channel.type) {
-      case SupportedChannelType.GuildAnnouncement:
-      case SupportedChannelType.GuildText:
+      case ChannelType.GuildAnnouncement:
+      case ChannelType.GuildText:
         return <FaHashtag />;
-      case SupportedChannelType.GuildVoice:
+      case ChannelType.GuildVoice:
         return <FaVolumeLow />;
-      case SupportedChannelType.PublicThread:
-      case SupportedChannelType.PrivateThread:
+      case ChannelType.PublicThread:
+      case ChannelType.PrivateThread:
         return <FaCodeBranch />;
     }
   }, [channel.type]);

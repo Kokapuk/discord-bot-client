@@ -1,5 +1,5 @@
 import { Box, Stack, Text } from '@chakra-ui/react';
-import { VoiceConnectionStatus } from '@main/ipc/voice/types';
+import { VoiceConnectionStatus } from '@main/features/voice/types';
 import ClientActivityPanel from '@renderer/features/Client/components/ClientActivityPanel';
 import useClientStore from '@renderer/features/Client/store';
 import GuildList from '@renderer/features/Guilds/components/GuildList';

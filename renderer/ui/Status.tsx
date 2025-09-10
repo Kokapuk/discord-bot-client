@@ -1,8 +1,8 @@
 import { BoxProps, Status as ChakraStatus } from '@chakra-ui/react';
-import { Status as StatusType } from '@main/ipc/client/types';
+import { type Status } from '@main/features/users/types';
 import { RefAttributes, useMemo } from 'react';
 
-export type StatusBaseProps = { status: StatusType | undefined; size?: BoxProps['width'] };
+export type StatusBaseProps = { status: Status | undefined; size?: BoxProps['width'] };
 export type StatusProps = StatusBaseProps & {
   indicatorProps?: ChakraStatus.IndicatorProps & RefAttributes<HTMLDivElement>;
 } & ChakraStatus.RootProps &

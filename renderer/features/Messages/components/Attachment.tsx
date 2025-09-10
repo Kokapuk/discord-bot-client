@@ -1,4 +1,4 @@
-import { type Attachment } from '@main/ipc/messages/types';
+import { type Attachment } from '@main/features/messages/types';
 import AudioAttachment from './AudioAttachment';
 import FileAttachment from './FileAttachment';
 import ImageAttachment from './ImageAttachment';

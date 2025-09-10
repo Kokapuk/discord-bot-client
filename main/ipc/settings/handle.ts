@@ -6,15 +6,15 @@ import settingsStore from '../../utils/settingsStore';
 export const ipcMain = createIpcMain<SettingsIpcSlice>();
 
 export const handleIpcMainEvents = () => {
-  ipcMain.handle('getTheme', () => settingsStore.get('theme'));
+  ipcMain.handle('getTheme', async () => settingsStore.get('theme'));
 
-  ipcMain.handle('setTheme', (_, theme) => {
+  ipcMain.handle('setTheme', async (_, theme) => {
     nativeTheme.themeSource = theme;
     settingsStore.set('theme', theme);
   });
 
-  ipcMain.handle('getAccentColor', () => settingsStore.get('accentColor'));
-  ipcMain.handle('setAccentColor', (_, accentColor) => settingsStore.set('accentColor', accentColor));
+  ipcMain.handle('getAccentColor', async () => settingsStore.get('accentColor'));
+  ipcMain.handle('setAccentColor', async (_, accentColor) => settingsStore.set('accentColor', accentColor));
 };
 
 export const handleIpcMainAutoInvokeEvents = (webContents: WebContents) => {

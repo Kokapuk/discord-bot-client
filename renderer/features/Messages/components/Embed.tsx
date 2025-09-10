@@ -1,4 +1,4 @@
-import { type Embed } from '@main/ipc/messages/types';
+import { type Embed } from '@main/features/messages/types';
 import ImageAttachment from './ImageAttachment';
 import RichEmbed from './RichEmbed';
 import VideoAttachment from './VideoAttachment';

@@ -1,10 +1,11 @@
-import { Channel, Guild, GuildMember, Role } from '@main/ipc/guilds/types';
+import { GuildChannel } from '@main/features/channels/types';
+import { Guild, GuildMember, Role } from '@main/features/guilds/types';
 import { create } from 'zustand';
 
 interface GuildsState {
   guilds: Guild[] | null;
   pullGuilds(): Promise<void>;
-  channels: Record<string, Channel[]>;
+  channels: Record<string, GuildChannel[]>;
   pullChannels(): Promise<void>;
   members: Record<string, GuildMember[]>;
   pullMembers(): Promise<void>;

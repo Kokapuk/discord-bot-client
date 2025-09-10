@@ -1,12 +1,12 @@
-import { type TextChannel } from '@main/ipc/guilds/types';
+import { GuildTextChannel } from '@main/features/channels/types';
 import Link from '@renderer/ui/Link';
-import BaseChannel, { BaseChannelProps } from './BaseChannel';
+import GuildBaseChannel, { GuildBaseChannelProps } from './GuildBaseChannel';
 
-export type TextChannelBaseProps = { channel: TextChannel };
-export type TextChannelProps = TextChannelBaseProps & BaseChannelProps;
+export type TextChannelBaseProps = { channel: GuildTextChannel };
+export type TextChannelProps = TextChannelBaseProps & GuildBaseChannelProps;
 
 export default function TextChannel({ channel, ...props }: TextChannelProps) {
-  const channelNode = <BaseChannel channel={channel} disabled={!channel.viewChannelPermission} {...props} />;
+  const channelNode = <GuildBaseChannel channel={channel} disabled={!channel.viewChannelPermission} {...props} />;
 
   if (channel.viewChannelPermission && !props.disabled) {
     return (

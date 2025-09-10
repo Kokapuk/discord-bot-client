@@ -16,7 +16,7 @@ export const createIpcMain = <T extends IpcSlice>() => {
 
     handle: <C extends keyof RendererToMain>(
       channel: C,
-      listener: (event: IpcMainInvokeEvent, ...args: Parameters<RendererToMain[C]>) => void
+      listener: (event: IpcMainInvokeEvent, ...args: Parameters<RendererToMain[C]>) => ReturnType<RendererToMain[C]>
     ) => {
       ipcMain.handle(channel as string, listener);
     },

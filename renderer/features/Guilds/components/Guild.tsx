@@ -1,5 +1,5 @@
 import { Avatar, Image } from '@chakra-ui/react';
-import { type Guild } from '@main/ipc/guilds/types';
+import { type Guild } from '@main/features/guilds/types';
 import Link from '@renderer/ui/Link';
 import { Tooltip } from '@renderer/ui/Tooltip';
 import UnreadIndicator from '@renderer/ui/UnreadIndicator';

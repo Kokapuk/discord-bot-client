@@ -7,6 +7,7 @@ import {
   Stack,
   useFileUpload,
 } from '@chakra-ui/react';
+import { isChannelDmBased } from '@main/features/channels/rendererSafeUtils';
 import { EditMessageDTO, SendMessageDTO, SendMessageFileDTO } from '@main/ipc/messages/types';
 import fileSchema from '@renderer/utils/fileSchema';
 import dayjs from 'dayjs';
@@ -34,7 +35,7 @@ export default function Textarea({ textareaProps, ...props }: TextareaProps) {
   const { channel, editingMessage, onEditClose, replyingMessage, onReplyClose } = useTextareaContext();
   const form = useRef<HTMLFormElement>(null);
   const textarea = useRef<HTMLTextAreaElement>(null);
-  const canAttachFiles = channel.attachFilesPermission && !editingMessage;
+  const canAttachFiles = (isChannelDmBased(channel) ? true : channel.attachFilesPermission) && !editingMessage;
   const sending = useRef(false);
   const attached = useMemo(() => !!editingMessage || !!replyingMessage, [!!editingMessage, !!replyingMessage]);
 
@@ -180,7 +181,7 @@ export default function Textarea({ textareaProps, ...props }: TextareaProps) {
     fileUpload.setFiles([...fileUpload.acceptedFiles, ...newFiles]);
   };
 
-  if (!channel.sendMessagePermission && !editingMessage) {
+  if (!isChannelDmBased(channel) && !channel.sendMessagePermission && !editingMessage) {
     return null;
   }
 

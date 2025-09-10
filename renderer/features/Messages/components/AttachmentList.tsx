@@ -1,5 +1,5 @@
 import { Stack, StackProps } from '@chakra-ui/react';
-import { Attachment as AttachmentType } from '@main/ipc/messages/types';
+import { Attachment as AttachmentType } from '@main/features/messages/types';
 import { RefAttributes } from 'react';
 import Attachment from './Attachment';
 

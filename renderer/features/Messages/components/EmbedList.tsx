@@ -1,5 +1,5 @@
 import { Stack, StackProps } from '@chakra-ui/react';
-import { Embed as EmbedType } from '@main/ipc/messages/types';
+import { Embed as EmbedType } from '@main/features/messages/types';
 import { RefAttributes } from 'react';
 import Embed from './Embed';
 

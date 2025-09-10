@@ -1,4 +1,4 @@
-import { User } from '@main/ipc/client/types';
+import { User } from '@main/features/users/types';
 import { create } from 'zustand';
 
 interface ClientState {

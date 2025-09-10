@@ -10,17 +10,17 @@ import { BrowserWindow, WebContents } from 'electron';
 import { createRequire } from 'module';
 import { PassThrough } from 'stream';
 import { VoiceIpcSlice } from '.';
+import { IpcApiResponse } from '..';
+import { VoiceConnectionStatus, VoiceMember } from '../../features/voice/types';
+import { structVoiceMember, structVoiceState } from '../../features/voice/utils';
 import { createIpcMain } from '../../utils/createIpcMain';
 import { client } from '../client/utils';
-import { VoiceConnectionStatus, VoiceMember } from './types';
 import {
   audioOutputStream,
   audioPlayer,
   startHandlingOutputAudioIsolatedExternalSource,
   startHandlingOutputAudioSystemwideSource,
   stopHandlingAudioOutputSource,
-  structVoiceMember,
-  structVoiceState,
 } from './utils';
 
 const require = createRequire(import.meta.url);
@@ -88,7 +88,7 @@ const handleConnectionStateChangeEvent = (
 };
 
 export const handleIpcMainEvents = () => {
-  ipcMain.handle('getGuildsVoiceChannelsMembers', () => {
+  ipcMain.handle('getGuildsVoiceChannelsMembers', async () => {
     const guilds = client.guilds.cache;
     const guildVoiceChannelsMembers: Record<string, Record<string, VoiceMember[]>> = {};
 
@@ -108,10 +108,12 @@ export const handleIpcMainEvents = () => {
       });
     });
 
-    return { success: true, payload: guildVoiceChannelsMembers };
+    return { success: true, payload: guildVoiceChannelsMembers } as IpcApiResponse<
+      Record<string, Record<string, VoiceMember[]>>
+    >;
   });
 
-  ipcMain.handle('enableReceiver', (event) => {
+  ipcMain.handle('enableReceiver', async (event) => {
     if (!connection || receiverEnabled) {
       return;
     }
@@ -171,9 +173,9 @@ export const handleIpcMainEvents = () => {
     });
   });
 
-  ipcMain.handle('disableReceiver', disableReceiver);
+  ipcMain.handle('disableReceiver', async () => disableReceiver());
 
-  ipcMain.handle('joinVoice', (event, guildId, channelId) => {
+  ipcMain.handle('joinVoice', async (event, guildId, channelId) => {
     const guild = client.guilds.cache.get(guildId);
 
     if (!guild) {
@@ -202,7 +204,7 @@ export const handleIpcMainEvents = () => {
     handleConnectionStateChangeEvent(connection, event.sender, { guildId: guild.id, channelId: channel.id });
   });
 
-  ipcMain.handle('leaveVoice', () => {
+  ipcMain.handle('leaveVoice', async () => {
     if (!connection) {
       return;
     }
@@ -210,7 +212,7 @@ export const handleIpcMainEvents = () => {
     connection.destroy();
   });
 
-  ipcMain.handle('startHandlingOutputAudioSource', (event, source) => {
+  ipcMain.handle('startHandlingOutputAudioSource', async (event, source) => {
     if (source === 'systemwide') {
       startHandlingOutputAudioSystemwideSource();
     } else if (source === 'isolatedExternal') {
@@ -224,21 +226,21 @@ export const handleIpcMainEvents = () => {
     audioPlayer.play(resource);
   });
 
-  ipcMain.handle('stopHandlingOutputAudioSource', (event) => {
+  ipcMain.handle('stopHandlingOutputAudioSource', async (event) => {
     stopHandlingAudioOutputSource(event.sender);
     audioPlayer.stop();
     audioOutputStream.current = null;
   });
 
-  ipcMain.handle('voiceChunk', (_, buffer) => {
+  ipcMain.handle('voiceChunk', async (_, buffer) => {
     audioOutputStream.current?.write(Buffer.from(buffer));
   });
 
-  ipcMain.handle('getUserVolume', (_, userId) => {
+  ipcMain.handle('getUserVolume', async (_, userId) => {
     return userVolumes[userId] ?? 1;
   });
 
-  ipcMain.handle('setUserVolume', (_, userId, volume) => {
+  ipcMain.handle('setUserVolume', async (_, userId, volume) => {
     userVolumes[userId] = volume;
   });
 };

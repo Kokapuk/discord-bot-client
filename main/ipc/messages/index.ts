@@ -1,6 +1,7 @@
+import { Message } from '@main/features/messages/types';
 import { IpcApiResponse } from '..';
 import { CreateIpcSlice } from '../../utils/ipc';
-import { EditMessageDTO, Message, SendMessageDTO } from './types';
+import { EditMessageDTO, SendMessageDTO } from './types';
 
 export type MessagesIpcSlice = CreateIpcSlice<{
   rendererToMain: {

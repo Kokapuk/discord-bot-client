@@ -1,15 +1,15 @@
 import { Box, Stack, StackProps, Text } from '@chakra-ui/react';
-import { type VoiceChannel } from '@main/ipc/guilds/types';
-import BaseChannel, { BaseChannelProps } from '@renderer/features/Channels/components/BaseChannel';
+import { GuildVoiceChannel } from '@main/features/channels/types';
+import GuildBaseChannel, { GuildBaseChannelProps } from '@renderer/features/Channels/components/GuildBaseChannel';
 import ChannelAdditionalActions from '@renderer/features/Channels/components/ChannelAdditionalActions';
 import VoiceMemberList from '@renderer/features/Voices/components/VoiceMemberList';
 import { useVoiceContext } from '@renderer/features/Voices/context';
 import { RefAttributes } from 'react';
 
-export type VoiceChannelBaseProps = { channel: VoiceChannel };
+export type VoiceChannelBaseProps = { channel: GuildVoiceChannel };
 export type VoiceChannelProps = VoiceChannelBaseProps & {
   wrapperProps?: StackProps & RefAttributes<HTMLDivElement>;
-} & BaseChannelProps;
+} & GuildBaseChannelProps;
 
 export default function VoiceChannel({ channel, wrapperProps, ...props }: VoiceChannelProps) {
   const { voiceMembers } = useVoiceContext();
@@ -19,7 +19,7 @@ export default function VoiceChannel({ channel, wrapperProps, ...props }: VoiceC
   return (
     <Stack gap="1" {...wrapperProps}>
       <Box className="group" width="100%" position="relative">
-        <BaseChannel
+        <GuildBaseChannel
           channel={channel}
           disabled={!channel.connectPermission || !channel.viewChannelPermission || userLimitReached}
           onClick={() => window.ipcRenderer.invoke('joinVoice', channel.guidId, channel.id)}

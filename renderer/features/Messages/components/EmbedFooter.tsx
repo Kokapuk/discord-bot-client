@@ -1,5 +1,5 @@
 import { Image, Stack, StackProps, Text } from '@chakra-ui/react';
-import { type EmbedFooter } from '@main/ipc/messages/types';
+import { type EmbedFooter } from '@main/features/messages/types';
 import { RefAttributes } from 'react';
 
 export type EmbedFooterBaseProps = { footer?: EmbedFooter | null; timestamp?: string | null };

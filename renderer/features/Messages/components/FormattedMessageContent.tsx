@@ -1,4 +1,5 @@
 import { Image, Text, TextProps } from '@chakra-ui/react';
+import { isChannelDmBased } from '@main/features/channels/rendererSafeUtils';
 import Link from '@renderer/ui/Link';
 import { Fragment, memo, ReactNode, RefAttributes, useMemo } from 'react';
 import reactStringReplace from 'react-string-replace';
@@ -59,16 +60,20 @@ const FormattedMessageContent = ({ rawContent, oneLine, ...props }: FormattedMes
     tokenized = reactStringReplace(tokenized, /@(everyone|here)/, (token, index) => (
       <Mention key={`everyoneHere-${index}`}>@{token}</Mention>
     ));
-    tokenized = reactStringReplace(tokenized, /<#(\d+?)>/, (channelId, index) => (
-      <Mention key={`channel-${index}`}>
-        #{channels?.find((channel) => channel.id === channelId)?.name ?? 'unknown-channel'}
-      </Mention>
-    ));
+
+    tokenized = reactStringReplace(tokenized, /<#(\d+?)>/, (channelId, index) => {
+      const channel = channels?.find((channel) => channel.id === channelId);
+      const channelName = channel ? (!isChannelDmBased(channel) ? channel?.name : null) : null;
+
+      return <Mention key={`channel-${index}`}>#{channelName ?? 'unknown-channel'}</Mention>;
+    });
+
     tokenized = reactStringReplace(tokenized, /<@!?(\d+?)>/, (userId, index) => (
       <Mention key={`user-${index}`}>
         @{users?.find((user) => user.id === userId)?.displayName ?? 'unknown-user'}
       </Mention>
     ));
+
     tokenized = reactStringReplace(tokenized, /<@&(\d+?)>/, (roleId, index) => (
       <Mention key={`role-${index}`}>@{roles?.find((role) => role.id === roleId)?.name ?? 'unknown-role'}</Mention>
     ));

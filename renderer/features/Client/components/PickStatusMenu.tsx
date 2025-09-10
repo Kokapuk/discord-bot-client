@@ -1,5 +1,5 @@
 import { Menu, Portal } from '@chakra-ui/react';
-import { Status as StatusType } from '@main/ipc/client/types';
+import { Status as StatusType } from '@main/features/users/types';
 import Status from '@renderer/ui/Status';
 import { ReactNode, RefAttributes } from 'react';
 import { useShallow } from 'zustand/shallow';

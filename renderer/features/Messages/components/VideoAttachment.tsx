@@ -1,4 +1,4 @@
-import { Attachment } from '@main/ipc/messages/types';
+import { Attachment } from '@main/features/messages/types';
 import useClientStore from '@renderer/features/Client/store';
 import useClampedSize from '@renderer/utils/useClampedSize';
 import { useEffect, useRef } from 'react';

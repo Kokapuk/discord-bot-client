@@ -1,5 +1,5 @@
 import { Box, Heading, Stack } from '@chakra-ui/react';
-import { isChannelVoiceBased } from '@main/ipc/voice/rendererSafeUtils';
+import { isChannelGuildVoiceBased } from '@main/features/channels/rendererSafeUtils';
 import ChannelList from '@renderer/features/Channels/components/ChannelList';
 import { ChannelContext, ChannelProvider } from '@renderer/features/Channels/context';
 import MemberList from '@renderer/features/Guilds/components/MemberList';
@@ -67,7 +67,7 @@ export default function GuildLayout() {
     channelId &&
     (!activeChannel ||
       !activeChannel.viewChannelPermission ||
-      (isChannelVoiceBased(activeChannel) && !activeChannel.connectPermission))
+      (isChannelGuildVoiceBased(activeChannel) && !activeChannel.connectPermission))
   ) {
     return <Navigate to={`/guilds/${activeGuild.id}`} />;
   }

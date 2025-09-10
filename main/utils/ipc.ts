@@ -5,8 +5,6 @@ export type IpcSlice = {
 
 export type CreateIpcSlice<T extends IpcSlice> = T;
 
-export const createIpcSlice = <T extends IpcSlice>(ipc: T) => ipc;
-
 type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (k: infer I) => void ? I : never;
 
 export type MergeSlices<T extends IpcSlice> = {

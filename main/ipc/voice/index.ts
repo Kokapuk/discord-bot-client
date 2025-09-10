@@ -1,6 +1,6 @@
 import { IpcApiResponse } from '..';
 import { CreateIpcSlice } from '../../utils/ipc';
-import { OutputAudioSource, VoiceConnectionStatus, VoiceMember, VoiceState } from './types';
+import { OutputAudioSource, VoiceConnectionStatus, VoiceMember, VoiceState } from '../../features/voice/types';
 
 export type VoiceIpcSlice = CreateIpcSlice<{
   rendererToMain: {
@@ -13,7 +13,7 @@ export type VoiceIpcSlice = CreateIpcSlice<{
     stopHandlingOutputAudioSource: () => Promise<void>;
     voiceChunk: (buffer: ArrayBuffer) => Promise<void>;
     getUserVolume: (userId: string) => Promise<number>;
-    setUserVolume: (userId: string, volume: number) => Promise<number>;
+    setUserVolume: (userId: string, volume: number) => Promise<void>;
   };
   mainToRenderer: {
     voiceStateUpdate: (oldState: VoiceState, newState: VoiceState) => void;

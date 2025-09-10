@@ -1,5 +1,5 @@
 import { Stack, StackProps, Text } from '@chakra-ui/react';
-import { type EmbedField } from '@main/ipc/messages/types';
+import { type EmbedField } from '@main/features/messages/types';
 import { RefAttributes } from 'react';
 
 export type EmbedFieldBaseProps = { field: EmbedField };

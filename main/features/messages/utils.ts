@@ -4,11 +4,11 @@ import {
   Embed as DiscordEmbed,
   EmbedAssetData as DiscordEmbedAssetData,
   Message as DiscordMessage,
+  MessageSnapshot as DiscordMessageSnapshot,
   EmbedAuthorData,
   EmbedFooterData,
-  MessageSnapshot as DiscordMessageSnapshot,
 } from 'discord.js';
-import { structUser } from '../client/utils';
+import { structUser } from '../users/utils';
 import {
   Attachment,
   Embed,
@@ -18,7 +18,7 @@ import {
   EmbedFooter,
   Message,
   MessageSnapshot,
-  SupportedMessageType,
+  MessageType,
 } from './types';
 
 export const structAttachment = (attachment: DiscordAttachment): Attachment => ({
@@ -93,6 +93,6 @@ export const structMessage = (message: DiscordMessage): Message => ({
   referenceMessageId: message.reference?.messageId ?? null,
   clientMentioned: message.mentions.has(message.client.user),
   messageSnapshots: message.messageSnapshots
-    .filter((message) => (Object.values(SupportedMessageType) as number[]).includes(message.type))
+    .filter((message) => (Object.values(MessageType) as number[]).includes(message.type))
     .map(structMessageSnapshot),
 });

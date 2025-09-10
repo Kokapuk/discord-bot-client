@@ -1,4 +1,4 @@
-import { VoiceConnectionStatus, VoiceMember } from '@main/ipc/voice/types';
+import { VoiceConnectionStatus, VoiceMember } from '@main/features/voice/types';
 import { create } from 'zustand';
 
 interface VoicesState {

@@ -1,5 +1,5 @@
 import { Box, Stack, StackProps, Text } from '@chakra-ui/react';
-import { GuildMember } from '@main/ipc/guilds/types';
+import { GuildMember } from '@main/features/guilds/types';
 import { RefAttributes, useMemo } from 'react';
 import { useMessageContext } from '../context';
 import FormattedMessageContent from './FormattedMessageContent';

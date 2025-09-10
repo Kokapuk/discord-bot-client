@@ -1,6 +1,6 @@
+import { Status, User } from '@main/features/users/types';
 import { IpcApiResponse } from '..';
 import { CreateIpcSlice } from '../../utils/ipc';
-import { Status, User } from './types';
 
 export type ClientIpcSlice = CreateIpcSlice<{
   rendererToMain: {

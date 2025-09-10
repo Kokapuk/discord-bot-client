@@ -1,6 +1,6 @@
 import { Text } from '@chakra-ui/react';
-import { GuildMember } from '@main/ipc/guilds/types';
-import { Message } from '@main/ipc/messages/types';
+import { GuildMember } from '@main/features/guilds/types';
+import { Message } from '@main/features/messages/types';
 import { useMemo } from 'react';
 import { useTextareaContext } from '../context';
 import TextareaActionContext, { TextareaActionContextProps } from './TextareaActionContext';

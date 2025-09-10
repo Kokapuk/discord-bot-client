@@ -1,11 +1,12 @@
+import { GuildChannel } from '@main/features/channels/types';
+import { Guild, GuildMember, Role } from '@main/features/guilds/types';
 import { IpcApiResponse } from '..';
 import { CreateIpcSlice } from '../../utils/ipc';
-import { Channel, Guild, GuildMember, Role } from './types';
 
 export type GuildsIpcSlice = CreateIpcSlice<{
   rendererToMain: {
     getGuilds: () => Promise<IpcApiResponse<Guild[]>>;
-    getGuildsChannels: () => Promise<IpcApiResponse<Record<string, Channel[]>>>;
+    getGuildsChannels: () => Promise<IpcApiResponse<Record<string, GuildChannel[]>>>;
     getGuildsMembers: () => Promise<IpcApiResponse<Record<string, GuildMember[]>>>;
     getGuildsRoles: () => Promise<IpcApiResponse<Record<string, Role[]>>>;
   };

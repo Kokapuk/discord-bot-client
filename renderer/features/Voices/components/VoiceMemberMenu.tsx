@@ -1,5 +1,5 @@
 import { Menu, Portal, Slider, Stack } from '@chakra-ui/react';
-import { VoiceMember } from '@main/ipc/voice/types';
+import { VoiceMember } from '@main/features/voice/types';
 import { ReactNode, useEffect, useState } from 'react';
 
 export type VoiceMemberMenuBaseProps = { member: VoiceMember; children: ReactNode };

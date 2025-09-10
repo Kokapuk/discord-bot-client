@@ -1,10 +1,10 @@
 import { Stack, StackProps } from '@chakra-ui/react';
-import { Channel } from '@main/ipc/guilds/types';
+import { GuildVoiceChannel } from '@main/features/channels/types';
 import { RefAttributes } from 'react';
 import { useVoiceContext } from '../context';
 import VoiceMember from './VoiceMember';
 
-export type VoiceMemberListBaseProps = { channel: Channel };
+export type VoiceMemberListBaseProps = { channel: GuildVoiceChannel };
 export type VoiceMemberListProps = VoiceMemberListBaseProps & StackProps & RefAttributes<HTMLDivElement>;
 
 export default function VoiceMemberList({ channel, ...props }: VoiceMemberListProps) {

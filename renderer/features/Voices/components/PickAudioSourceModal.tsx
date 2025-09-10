@@ -1,5 +1,5 @@
 import { Button, CloseButton, Dialog, IconButton, Portal, Spinner, Stack, Text } from '@chakra-ui/react';
-import { OutputAudioSource } from '@main/ipc/voice/types';
+import { OutputAudioSource } from '@main/features/voice/types';
 import { ReactNode, RefAttributes, useEffect, useState } from 'react';
 import { FaCircleNodes, FaGear, FaMicrophoneLines, FaSquareArrowUpRight } from 'react-icons/fa6';
 import { useShallow } from 'zustand/shallow';

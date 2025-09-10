@@ -1,5 +1,6 @@
 import { Group, GroupProps } from '@chakra-ui/react';
-import { Message } from '@main/ipc/messages/types';
+import { isChannelGuildBased } from '@main/features/channels/rendererSafeUtils';
+import { Message } from '@main/features/messages/types';
 import { RefAttributes, useMemo, useState } from 'react';
 import { FaPen, FaReply, FaTrash } from 'react-icons/fa6';
 import { useMessageContext } from '../context';
@@ -40,7 +41,7 @@ export default function ManageMessageActionList({ message, ...props }: ManageMes
           <FaPen />
         </ManageMessageActionButton>
       )}
-      {(client.id === author.id || channel.manageMessagesPermission) && (
+      {(client.id === author.id || (isChannelGuildBased(channel) && channel.manageMessagesPermission)) && (
         <ManageMessageActionButton tooltip="Delete" onClick={deleteMessage} loading={deleting} colorPalette="red">
           <FaTrash />
         </ManageMessageActionButton>

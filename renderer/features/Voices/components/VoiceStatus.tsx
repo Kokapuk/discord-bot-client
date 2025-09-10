@@ -1,5 +1,5 @@
 import { IconButton, Stack, StackProps, Text } from '@chakra-ui/react';
-import { VoiceConnectionStatus } from '@main/ipc/voice/types';
+import { VoiceConnectionStatus } from '@main/features/voice/types';
 import useGuildsStore from '@renderer/features/Guilds/store';
 import Link from '@renderer/ui/Link';
 import { Tooltip } from '@renderer/ui/Tooltip';
