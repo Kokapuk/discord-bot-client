@@ -1,6 +1,7 @@
 import { BrowserWindow, shell } from 'electron';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { handleIpcMainAutoInvokeEvents, handleIpcMainEvents } from '../ipc';
 import { RENDERER_DIST, VITE_DEV_SERVER_URL } from '../main';
 import handleThemeUpdate from '../utils/handleThemeUpdate';
 
@@ -35,6 +36,9 @@ const createAppWindow = () => {
   } else {
     window.loadFile(path.join(RENDERER_DIST, 'index.html'), { hash: 'auth' });
   }
+
+  handleIpcMainEvents();
+  handleIpcMainAutoInvokeEvents(window.webContents);
 
   handleThemeUpdate(window, 32);
   handleThirdPartyLinks(window);

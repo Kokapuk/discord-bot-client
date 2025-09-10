@@ -2,7 +2,7 @@ import { createAudioPlayer, NoSubscriberBehavior } from '@discordjs/voice';
 import { VoiceState as DiscordVoiceState, GuildMember, PermissionFlagsBits } from 'discord.js';
 import { BrowserWindow, session, WebContents } from 'electron';
 import { PassThrough } from 'stream';
-import createAudioCaptureWindow from '../../windows/audioCapture';
+import createMiniBrowserWindow from '../../windows/miniBrowser';
 import { ipcMain } from './handle';
 import { VoiceMember, VoiceState } from './types';
 
@@ -41,7 +41,7 @@ export const startHandlingOutputAudioSystemwideSource = async () => {
 export const startHandlingOutputAudioIsolatedExternalSource = async (window: BrowserWindow, enableLocalEcho?: true) => {
   return await new Promise<void>((resolve) =>
     session.defaultSession.setDisplayMediaRequestHandler((_, callback) => {
-      const audioCaptureWindowData = createAudioCaptureWindow(window);
+      const audioCaptureWindowData = createMiniBrowserWindow(window);
       audioCaptureWindow = audioCaptureWindowData.window;
 
       callback({ audio: audioCaptureWindowData.webFrameMain, enableLocalEcho: enableLocalEcho });

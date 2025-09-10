@@ -1,11 +1,10 @@
 import { app, BrowserWindow, nativeTheme } from 'electron';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { handleIpcMainAutoInvokeEvents, handleIpcMainEvents } from './ipc';
 import { logout } from './ipc/client/utils';
+import settingsStore from './utils/settingsStore';
 import createAppWindow from './windows/app';
 import createBackgroundThrottlingBlocker from './windows/backgroundThrottlingBlocker';
-import settingsStore from './utils/settingsStore';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -41,7 +40,4 @@ app.whenReady().then(() => {
 
   appWindow = createAppWindow();
   createBackgroundThrottlingBlocker(appWindow);
-
-  handleIpcMainEvents();
-  handleIpcMainAutoInvokeEvents(appWindow.webContents);
 });

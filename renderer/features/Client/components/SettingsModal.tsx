@@ -1,6 +1,7 @@
 import { CloseButton, Dialog, Portal, Stack } from '@chakra-ui/react';
 import { Tooltip } from '@renderer/ui/Tooltip';
 import { ReactNode, RefAttributes } from 'react';
+import AccentColorSetting from './AccentColorSetting';
 import ThemeSetting from './ThemeSetting';
 
 export type SettingsModalBaseProps = { children: ReactNode; triggerTooltip?: string };
@@ -26,6 +27,7 @@ export default function SettingsModal({ children, triggerTooltip, ...props }: Se
             <Dialog.Body>
               <Stack gap="5">
                 <ThemeSetting />
+                <AccentColorSetting />
               </Stack>
             </Dialog.Body>
             <Dialog.CloseTrigger asChild>

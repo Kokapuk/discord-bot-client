@@ -12,10 +12,22 @@ export const handleIpcMainEvents = () => {
     nativeTheme.themeSource = theme;
     settingsStore.set('theme', theme);
   });
+
+  ipcMain.handle('getAccentColor', () => settingsStore.get('accentColor'));
+  ipcMain.handle('setAccentColor', (_, accentColor) => settingsStore.set('accentColor', accentColor));
 };
 
 export const handleIpcMainAutoInvokeEvents = (webContents: WebContents) => {
-  settingsStore.onDidChange('theme', (newValue, oldValue) =>
-    ipcMain.send(webContents, 'themeUpdate', newValue!, oldValue!)
+  const unsubscribeThemeUpdate = settingsStore.onDidChange('theme', (newTheme, oldTheme) =>
+    ipcMain.send(webContents, 'themeUpdate', newTheme!, oldTheme!)
   );
+
+  const unsubscribeAccentUpdate = settingsStore.onDidChange('accentColor', (newColor, oldColor) =>
+    ipcMain.send(webContents, 'accentColorUpdate', newColor!, oldColor!)
+  );
+
+  return () => {
+    unsubscribeThemeUpdate();
+    unsubscribeAccentUpdate();
+  };
 };

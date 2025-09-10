@@ -109,10 +109,7 @@ export default function AppLayout() {
       pullRoles
     );
 
-    console.log('sub', 'voiceStateUpdate');
-
     const unsubscribeVoiceStateUpdate = window.ipcRenderer.on('voiceStateUpdate', async (_, oldState, newState) => {
-      console.log('trigger', 'voiceStateUpdate');
       pullVoiceMembers();
 
       const clientUser = useClientStore.getState().clientUser;

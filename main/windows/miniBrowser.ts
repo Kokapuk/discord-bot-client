@@ -2,6 +2,7 @@ import { BrowserWindow, WebContentsView } from 'electron';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { handleIpcMainAutoInvokeEvents, handleIpcMainEvents } from '../ipc/miniBrowser/handle';
+import { handleIpcMainAutoInvokeEvents as handleIpcMainAutoInvokeSettingsEvents } from '../ipc/settings/handle';
 import { RENDERER_DIST, VITE_DEV_SERVER_URL } from '../main';
 import handleThemeUpdate from '../utils/handleThemeUpdate';
 
@@ -22,7 +23,7 @@ const fitWebContentsViewToWindow = (webContentsView: WebContentsView, window: Br
   webContentsView.setBounds({ x: 0, y: TITLE_BAR_HEIGHT, width, height: height - TITLE_BAR_HEIGHT });
 };
 
-const createAudioCaptureWindow = (parent: BrowserWindow) => {
+const createMiniBrowserWindow = (parent: BrowserWindow) => {
   const window = new BrowserWindow({
     icon: path.join(process.env.VITE_PUBLIC, '/images/icon.ico'),
     width: 900,
@@ -49,7 +50,8 @@ const createAudioCaptureWindow = (parent: BrowserWindow) => {
   fitWebContentsViewToWindow(view, window);
 
   const removeHandlers = handleIpcMainEvents(view.webContents);
-  const unsubscribe = handleIpcMainAutoInvokeEvents(window.webContents, view.webContents);
+  const unsubscribeMiniBrowserEvents = handleIpcMainAutoInvokeEvents(window.webContents, view.webContents);
+  const unsubscribeSettingsEvents = handleIpcMainAutoInvokeSettingsEvents(window.webContents);
 
   const handleParentClose = () => {
     window.close();
@@ -63,10 +65,11 @@ const createAudioCaptureWindow = (parent: BrowserWindow) => {
     }
 
     removeHandlers();
-    unsubscribe();
+    unsubscribeMiniBrowserEvents();
+    unsubscribeSettingsEvents();
   });
 
   return { window, webFrameMain: view.webContents.mainFrame };
 };
 
-export default createAudioCaptureWindow;
+export default createMiniBrowserWindow;

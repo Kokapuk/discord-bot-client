@@ -15,7 +15,10 @@ export const createIpcRenderer = <T extends IpcSlice>() => {
       listener: (event: IpcRendererEvent, ...args: Parameters<MainToRenderer[C]>) => ReturnType<MainToRenderer[C]>
     ) => {
       ipcRenderer.on(channel as string, listener);
-      return () => ipcRenderer.off(channel as string, listener);
+
+      return () => {
+        ipcRenderer.off(channel as string, listener);
+      };
     },
 
     once: <C extends keyof MainToRenderer>(

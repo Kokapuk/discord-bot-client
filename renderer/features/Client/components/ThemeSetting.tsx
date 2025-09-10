@@ -15,9 +15,7 @@ export default function ThemeSetting(props: Partial<SettingProps>) {
 
     const unsubscribe = window.ipcRenderer.on('themeUpdate', (_, theme) => setTheme(theme));
 
-    return () => {
-      unsubscribe();
-    };
+    return unsubscribe;
   }, []);
 
   return (

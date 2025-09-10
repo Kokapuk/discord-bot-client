@@ -13,7 +13,7 @@ export default function ClientUserButton(props: ButtonProps & RefAttributes<HTML
   return (
     <Button variant="ghost" justifyContent="flex-start" padding="0" {...props}>
       <AvatarWithStatus src={client.displayAvatarUrl} status={client.status} />
-      <Text fontSize="md" fontWeight="600">
+      <Text fontSize="md" fontWeight="600" color='fg'>
         {client.displayName}
       </Text>
     </Button>
