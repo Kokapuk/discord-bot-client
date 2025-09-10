@@ -24,7 +24,7 @@ const fitWebContentsViewToWindow = (webContentsView: WebContentsView, window: Br
 
 const createAudioCaptureWindow = (parent: BrowserWindow) => {
   const window = new BrowserWindow({
-    icon: path.join(process.env.VITE_PUBLIC, 'electron-vite.svg'),
+    icon: path.join(process.env.VITE_PUBLIC, 'icon.png'),
     width: 900,
     height: 600,
     titleBarStyle: 'hidden',
