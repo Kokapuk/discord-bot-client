@@ -3,6 +3,7 @@ import { Message as MessageType } from '@main/ipc/messages/types';
 import dayjs from 'dayjs';
 import { memo, ReactNode, RefAttributes, useEffect, useMemo, useRef } from 'react';
 import Message from './Message';
+import TimeSeparator from './TimeSeparator';
 
 export type MessageListBaseProps = { messages: MessageType[]; onPaginate?(): void };
 export type MessageListProps = MessageListBaseProps & StackProps & RefAttributes<HTMLDivElement>;
@@ -23,23 +24,12 @@ const MessageList = ({ messages, onPaginate, ...props }: MessageListProps) => {
         !dayjs(message.createdTimestamp).isSame(dayjs(lastStructuredMessage.createdTimestamp), 'day')
       ) {
         chainedMessages.push(
-          <Stack
+          <TimeSeparator
             key={`timeSeparator-${message.id}`}
-            direction="row"
-            flexShrink="0"
+            timestamp={message.createdTimestamp}
             marginTop="4.5"
             marginInline="2.5"
-            position="relative"
-            whiteSpace="nowrap"
-            alignItems="center"
-            fontSize="xs"
-            fontWeight="600"
-            color="fg.muted"
-            _before={{ content: '""', width: '100%', height: '1px', backgroundColor: 'bg.inverted/15' }}
-            _after={{ content: '""', width: '100%', height: '1px', backgroundColor: 'bg.inverted/15' }}
-          >
-            {dayjs(message.createdTimestamp).format('DD MMMM YYYY')}
-          </Stack>
+          />
         );
       }
 

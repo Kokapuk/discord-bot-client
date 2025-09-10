@@ -13,7 +13,7 @@ export type UnreadIndicatorProps = UnreadIndicatorBaseProps & {
 };
 
 export default function UnreadIndicator({
-  placement = 'middle-center',
+  placement = 'middle-start',
   size = '2',
   color = 'colorPalette.fg',
   wrapperProps,

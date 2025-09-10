@@ -143,7 +143,7 @@ export default function AppLayout() {
         if (status === VoiceConnectionStatus.Ready) {
           playAudio(resolvePublicUrl('./audios/user-join.mp3'));
         } else if (status === VoiceConnectionStatus.Disconnected || status === VoiceConnectionStatus.Destroyed) {
-          playAudio(resolvePublicUrl('./audios/user-leave.mp3'));
+          playAudio(resolvePublicUrl('./audios/self-disconnect.mp3'));
         }
 
         setConnectionStatus(status);

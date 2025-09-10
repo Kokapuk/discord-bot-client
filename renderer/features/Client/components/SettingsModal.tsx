@@ -25,7 +25,7 @@ export default function SettingsModal({ children, triggerTooltip, ...props }: Se
               <Dialog.Title>Settings</Dialog.Title>
             </Dialog.Header>
             <Dialog.Body>
-              <Stack gap="5">
+              <Stack gap="8">
                 <ThemeSetting />
                 <AccentColorSetting />
               </Stack>

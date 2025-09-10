@@ -25,7 +25,9 @@ export default function ToggleReceiveVoiceButton(props: ClientActivityActionButt
       return null;
     }
 
-    return members[activeChannelData.guildId][activeChannelData.channelId].find((member) => member.id === client?.id);
+    return members[activeChannelData.guildId]?.[activeChannelData.channelId]?.find(
+      (member) => member.id === client?.id
+    );
   }, [connectionStatus, activeChannelData, !!client, members]);
 
   useEffect(() => {

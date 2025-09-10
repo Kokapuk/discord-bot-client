@@ -1,9 +1,10 @@
-import { Input, Stack } from '@chakra-ui/react';
+import { Stack } from '@chakra-ui/react';
 import { NavigationData } from '@main/ipc/miniBrowser';
 import Titlebar from '@renderer/ui/Titlebar';
 import { CSSProperties, useEffect, useState } from 'react';
 import { FaArrowLeft, FaArrowRight, FaArrowRotateRight } from 'react-icons/fa6';
 import MiniBrowserActionButton from './MiniBrowserActionButton';
+import UrlInput from './UrlInput';
 
 export default function MiniBrowser() {
   const [navigationData, setNavigationData] = useState<NavigationData>({
@@ -66,15 +67,13 @@ export default function MiniBrowser() {
           </MiniBrowserActionButton>
         </Stack>
 
-        <Input
-          style={{ WebkitAppRegion: 'no-drag' } as CSSProperties}
-          size="xs"
-          width="96"
-          marginInline="auto"
-          type="url"
+        <UrlInput
           value={navigationData.url}
           onChange={(e) => setNavigationData((prev) => ({ ...prev, url: e.target.value }))}
           onKeyDown={handleInputKeyDown}
+          style={{ WebkitAppRegion: 'no-drag' } as CSSProperties}
+          width="96"
+          marginInline="auto"
         />
       </Stack>
     </Titlebar>
