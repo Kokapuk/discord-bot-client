@@ -19,7 +19,7 @@ const handleThirdPartyLinks = (window: BrowserWindow) => {
 
 const createAppWindow = () => {
   const window = new BrowserWindow({
-    icon: path.join(process.env.VITE_PUBLIC, 'icon.png'),
+    icon: path.join(process.env.VITE_PUBLIC, '/images/icon.ico'),
     titleBarStyle: 'hidden',
     titleBarOverlay: {},
     width: 1200,

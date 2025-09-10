@@ -10,6 +10,7 @@ import RouteSpinner from '@renderer/ui/RouteSpinner';
 import { toaster } from '@renderer/ui/Toaster';
 import handleIpcRendererAutoInvokeEvents from '@renderer/utils/handleIpcRendererAutoInvokeEvents';
 import playAudio from '@renderer/utils/playAudio';
+import resolvePublicUrl from '@renderer/utils/resolvePublicUrl';
 import { Suspense, useEffect, useMemo } from 'react';
 import { Outlet, useNavigate, useParams } from 'react-router';
 import { useShallow } from 'zustand/react/shallow';
@@ -108,7 +109,10 @@ export default function AppLayout() {
       pullRoles
     );
 
+    console.log('sub', 'voiceStateUpdate');
+
     const unsubscribeVoiceStateUpdate = window.ipcRenderer.on('voiceStateUpdate', async (_, oldState, newState) => {
+      console.log('trigger', 'voiceStateUpdate');
       pullVoiceMembers();
 
       const clientUser = useClientStore.getState().clientUser;
@@ -130,9 +134,9 @@ export default function AppLayout() {
         oldState.channelId !== newState.channelId && oldState.channelId === activeChannel.channelId;
 
       if (shouldPlayConnectEffect) {
-        playAudio('/user-join.mp3');
+        playAudio(resolvePublicUrl('./audios/user-join.mp3'));
       } else if (shouldPlayDisconnectEffect) {
-        playAudio('/user-leave.mp3');
+        playAudio(resolvePublicUrl('./audios/user-leave.mp3'));
       }
     });
 
@@ -140,9 +144,9 @@ export default function AppLayout() {
       'voiceConnectionStatusUpdate',
       async (_, status, activeChannel) => {
         if (status === VoiceConnectionStatus.Ready) {
-          playAudio('/user-join.mp3');
+          playAudio(resolvePublicUrl('./audios/user-join.mp3'));
         } else if (status === VoiceConnectionStatus.Disconnected || status === VoiceConnectionStatus.Destroyed) {
-          playAudio('/user-leave.mp3');
+          playAudio(resolvePublicUrl('./audios/user-leave.mp3'));
         }
 
         setConnectionStatus(status);
@@ -186,7 +190,7 @@ export default function AppLayout() {
         addUnreadChannel(message.channelId);
 
         if (useClientStore.getState().clientUser?.status !== 'dnd') {
-          playAudio('/notification.mp3');
+          playAudio(resolvePublicUrl('./audios/notification.mp3'));
 
           toaster.create({
             title: message.fallbackAuthor.displayName,

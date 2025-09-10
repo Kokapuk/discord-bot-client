@@ -13,7 +13,14 @@ export default defineConfig({
         vite: {
           build: {
             rollupOptions: {
-              external: ['zlib-sync', 'bufferutil', 'utf-8-validate', '@snazzah/davey', '@discordjs/voice'],
+              external: [
+                'discord.js',
+                'zlib-sync',
+                'bufferutil',
+                'utf-8-validate',
+                '@discordjs/voice',
+                '@snazzah/davey',
+              ],
             },
           },
         },

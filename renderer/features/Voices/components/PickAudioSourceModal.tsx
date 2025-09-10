@@ -5,6 +5,7 @@ import { FaCircleNodes, FaGear, FaMicrophoneLines, FaSquareArrowUpRight } from '
 import { useShallow } from 'zustand/shallow';
 import useVoicesStore from '../store';
 import AudioToggleSettingsMenu, { AudioToggleSettings } from './AudioToggleSettingsMenu';
+import resolvePublicUrl from '@renderer/utils/resolvePublicUrl';
 
 const OUTPUT_AUDIO_SOURCES: Record<OutputAudioSource, { icon?: ReactNode; label: string }> = {
   systemwide: { icon: <FaCircleNodes />, label: 'Systemwide' },
@@ -39,7 +40,7 @@ export default function PickAudioSourceModal(
     props.onOpenChange?.({ open: false });
 
     const audioContext = new AudioContext({ sampleRate: 48000 });
-    await audioContext.audioWorklet.addModule('/pcm-processor.js');
+    await audioContext.audioWorklet.addModule(resolvePublicUrl('./scripts/pcm-processor.js'));
 
     const source = audioContext.createMediaStreamSource(stream);
     const workletNode = new AudioWorkletNode(audioContext, 'pcm-processor');
