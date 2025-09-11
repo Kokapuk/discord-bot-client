@@ -1,17 +1,18 @@
-import { Box, Stack, Text } from '@chakra-ui/react';
+import { Box, Separator, Stack, Text } from '@chakra-ui/react';
 import { VoiceConnectionStatus } from '@main/features/voice/types';
 import ClientActivityPanel from '@renderer/features/Client/components/ClientActivityPanel';
 import useClientStore from '@renderer/features/Client/store';
-import GuildList from '@renderer/features/Guilds/components/GuildList';
+import AddDmChannelButton from '@renderer/features/Dms/components/AddDmChannelButton';
 import useGuildsStore from '@renderer/features/Guilds/store';
 import useMessagesStore from '@renderer/features/Messages/store';
 import useVoicesStore from '@renderer/features/Voices/store';
+import GuildDmList from '@renderer/ui/GuildDmList';
 import RouteSpinner from '@renderer/ui/RouteSpinner';
 import { toaster } from '@renderer/ui/Toaster';
 import handleIpcRendererAutoInvokeEvents from '@renderer/utils/handleIpcRendererAutoInvokeEvents';
 import playAudio from '@renderer/utils/playAudio';
 import resolvePublicUrl from '@renderer/utils/resolvePublicUrl';
-import { Suspense, useEffect, useMemo } from 'react';
+import { Suspense, useEffect } from 'react';
 import { Outlet, useNavigate, useParams } from 'react-router';
 import { useShallow } from 'zustand/react/shallow';
 
@@ -20,20 +21,18 @@ export default function AppLayout() {
   const pullClientUser = useClientStore((s) => s.pullClientUser);
   const navigate = useNavigate();
 
-  const { guilds, pullGuilds, channels, pullChannels, pullMembers, pullRoles } = useGuildsStore(
+  const { guilds, pullGuilds, pullChannels, pullMembers, pullRoles } = useGuildsStore(
     useShallow((s) => ({
       guilds: s.guilds,
       pullGuilds: s.pullGuilds,
-      channels: s.channels,
       pullChannels: s.pullChannels,
       pullMembers: s.pullMembers,
       pullRoles: s.pullRoles,
     }))
   );
 
-  const { unreadChannels, updateMessage, addMessage, removeMessage, addUnreadChannel } = useMessagesStore(
+  const { updateMessage, addMessage, removeMessage, addUnreadChannel } = useMessagesStore(
     useShallow((s) => ({
-      unreadChannels: s.unreadChannels,
       updateMessage: s.updateMessage,
       addMessage: s.addMessage,
       removeMessage: s.removeMessage,
@@ -59,14 +58,6 @@ export default function AppLayout() {
       removeSpeakingMember: s.removeSpeakingMember,
       resetSpeakingMembers: s.resetSpeakingMembers,
     }))
-  );
-
-  const unreadGuilds = useMemo(
-    () =>
-      guilds
-        ?.filter((guild) => channels[guild.id]?.some((channel) => unreadChannels.includes(channel.id)))
-        .map((guild) => guild.id),
-    [guilds, channels, unreadChannels]
   );
 
   useEffect(() => {
@@ -196,9 +187,13 @@ export default function AppLayout() {
                 {message.content}
               </Text>
             ),
-            action: message.guildId
-              ? { label: 'View', onClick: () => navigate(`/guilds/${message.guildId}/${message.channelId}`) }
-              : undefined,
+            action: {
+              label: 'View',
+              onClick: () =>
+                navigate(
+                  message.guildId ? `/guilds/${message.guildId}/${message.channelId}` : `/dm/${message.channelId}`
+                ),
+            },
             closable: true,
           });
         }
@@ -228,8 +223,13 @@ export default function AppLayout() {
         <>
           <Stack height="100%" gap="0">
             <Stack height="100%" minHeight="0" direction="row" gap="0">
-              <GuildList guilds={guilds} unreadGuilds={unreadGuilds} />
-              <Box as="aside" id="leftSidebar" height="100%" width="60" flexShrink="0"></Box>
+              <Stack height="100%" paddingInline="2.5">
+                <GuildDmList />
+                <Separator />
+                <AddDmChannelButton />
+              </Stack>
+
+              <Box as="aside" id="leftSidebar" height="100%" width="60" flexShrink="0" />
             </Stack>
             <ClientActivityPanel margin="2" />
           </Stack>

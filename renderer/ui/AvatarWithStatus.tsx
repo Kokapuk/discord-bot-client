@@ -33,7 +33,15 @@ export default function AvatarWithStatus({
         position="absolute"
         inset="0"
       >
-        <Avatar src={src} position="absolute" inset="0" borderRadius="full" {...avatarProps} />
+        <Avatar
+          src={src}
+          position="absolute"
+          inset="0"
+          borderRadius="full"
+          width="100%"
+          height="100%"
+          {...avatarProps}
+        />
       </Box>
       <Status
         status={status}

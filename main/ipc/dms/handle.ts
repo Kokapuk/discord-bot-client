@@ -1,13 +1,18 @@
-import { structDmChannel } from '@main/features/channels/utils';
-import { createIpcMain } from '@main/utils/createIpcMain';
 import { DmsIpcSlice } from '.';
-import { client } from '../client/utils';
 import { IpcApiResponse } from '..';
-import { DmChannel } from '@main/features/channels/types';
+import { DmChannel } from '../../features/channels/types';
+import { structDmChannel } from '../../features/channels/utils';
+import { structUser } from '../../features/users/utils';
+import { createIpcMain } from '../../utils/createIpcMain';
+import { client } from '../client/utils';
 
 const ipcMain = createIpcMain<DmsIpcSlice>();
 
 export const handleIpcMainEvents = () => {
+  ipcMain.handle('getCachedUsers', async () => {
+    return client.users.cache.map((user) => structUser(user)).filter((user) => user.id !== client.user?.id);
+  });
+
   ipcMain.handle('getDmChannel', async (_, userId) => {
     try {
       const user = await client.users.fetch(userId);

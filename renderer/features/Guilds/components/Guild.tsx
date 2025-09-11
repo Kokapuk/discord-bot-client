@@ -6,7 +6,7 @@ import UnreadIndicator from '@renderer/ui/UnreadIndicator';
 import { RefAttributes } from 'react';
 
 export type GuildBaseProps = { guild: Guild; unread?: boolean };
-export type GuildProps = { guild: Guild; unread?: boolean } & Avatar.RootProps & RefAttributes<HTMLDivElement>;
+export type GuildProps = GuildBaseProps & Avatar.RootProps & RefAttributes<HTMLDivElement>;
 
 export default function Guild({ guild, unread, ...props }: GuildProps) {
   return (

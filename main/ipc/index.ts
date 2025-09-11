@@ -16,6 +16,7 @@ import {
   handleIpcMainAutoInvokeEvents as handleIpcMainAutoInvokeVoiceEvents,
   handleIpcMainEvents as handleIpcMainVoiceEvents,
 } from './voice/handle';
+import { handleIpcMainEvents as handleIpcMainDmsEvents } from './dms/handle';
 
 export type IpcApiResponse<T = void> =
   | (T extends void ? { success: true } : { success: true; payload: T })
@@ -27,6 +28,7 @@ export const handleIpcMainEvents = () => {
   handleIpcMainMessagesEvents();
   handleIpcMainVoiceEvents();
   handleIpcMainSettingsEvents();
+  handleIpcMainDmsEvents();
 };
 
 export const handleIpcMainAutoInvokeEvents = (webContents: WebContents) => {

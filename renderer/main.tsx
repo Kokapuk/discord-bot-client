@@ -10,9 +10,10 @@ const Auth = lazy(() => import('./routes/Auth'));
 const AppLayout = lazy(() => import('./layouts/AppLayout'));
 const Home = lazy(() => import('./routes/Home'));
 const GuildLayout = lazy(() => import('./layouts/GuildLayout'));
-const Guild = lazy(() => import('./routes/Home/Guild'));
-const Channel = lazy(() => import('./routes/Home/Guild/Channel'));
+const GuildChannel = lazy(() => import('./routes/Home/Guild/Channel'));
 const MiniBrowser = lazy(() => import('./routes/MiniBrowser'));
+const DmLayout = lazy(() => import('./layouts/DmLayout'));
+const DmChannel = lazy(() => import('./routes/Home/Dm/Channel'));
 
 const router = createHashRouter([
   {
@@ -35,12 +36,18 @@ const router = createHashRouter([
             element: <GuildLayout />,
             children: [
               {
-                index: true,
-                element: <Guild />,
+                path: ':channelId',
+                element: <GuildChannel />,
               },
+            ],
+          },
+          {
+            path: 'dm',
+            element: <DmLayout />,
+            children: [
               {
                 path: ':channelId',
-                element: <Channel />,
+                element: <DmChannel />,
               },
             ],
           },
