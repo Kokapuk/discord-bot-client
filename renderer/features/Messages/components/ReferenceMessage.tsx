@@ -1,23 +1,20 @@
 import { Box, Stack, StackProps, Text } from '@chakra-ui/react';
 import { GuildMember } from '@main/features/guilds/types';
-import { RefAttributes, useMemo } from 'react';
-import { useMessageContext } from '../context';
+import { RefAttributes } from 'react';
+import { useContextSelector } from 'use-context-selector';
+import { MessageContext } from '../context';
 import FormattedMessageContent from './FormattedMessageContent';
 
 export type ReferenceMessageBaseProps = { referenceMessageId: string };
 export type ReferenceMessageProps = ReferenceMessageBaseProps & StackProps & RefAttributes<HTMLDivElement>;
 
 export default function ReferenceMessage({ referenceMessageId, ...props }: ReferenceMessageProps) {
-  const { messages, users } = useMessageContext();
-
-  const referenceMessage = useMemo(
-    () => messages.find((message) => message.id === referenceMessageId),
-    [messages, referenceMessageId]
+  const referenceMessage = useContextSelector(MessageContext, (c) =>
+    c?.messages.find((message) => message.id === referenceMessageId)
   );
-
-  const referenceMessageAuthor = useMemo(
-    () => users?.find((user) => user.id === referenceMessage?.authorId) ?? referenceMessage?.fallbackAuthor,
-    [users, referenceMessage]
+  const referenceMessageAuthor = useContextSelector(
+    MessageContext,
+    (c) => c?.users?.find((user) => user.id === referenceMessage?.authorId) ?? referenceMessage?.fallbackAuthor
   );
 
   return (

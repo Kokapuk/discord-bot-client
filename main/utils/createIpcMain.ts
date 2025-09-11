@@ -1,4 +1,4 @@
-import { ipcMain, IpcMainInvokeEvent, WebContents } from 'electron';
+import { ipcMain, IpcMainEvent, IpcMainInvokeEvent, WebContents } from 'electron';
 import { IpcSlice } from './ipc';
 
 export const createIpcMain = <T extends IpcSlice>() => {
@@ -22,5 +22,14 @@ export const createIpcMain = <T extends IpcSlice>() => {
     },
 
     removeHandler: <C extends keyof RendererToMain>(channel: C) => ipcMain.removeHandler(channel as string),
+
+    on: <C extends keyof RendererToMain>(
+      channel: C,
+      listener: (event: IpcMainEvent, ...args: Parameters<RendererToMain[C]>) => any
+    ) => {
+      ipcMain.on(channel as string, listener);
+
+      return () => ipcMain.off(channel as string, listener);
+    },
   };
 };

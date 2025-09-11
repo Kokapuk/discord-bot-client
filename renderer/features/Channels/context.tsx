@@ -1,5 +1,5 @@
 import { Channel, GuildChannel } from '@main/features/channels/types';
-import { createContext, useContext } from 'react';
+import { createContext } from 'use-context-selector';
 
 export type ChannelContext = {
   channels?: GuildChannel[];
@@ -7,16 +7,4 @@ export type ChannelContext = {
   unreadChannels?: string[];
 };
 
-const ChannelContext = createContext<ChannelContext | null>(null);
-
-export const useChannelContext = () => {
-  const ctx = useContext(ChannelContext);
-
-  if (!ctx) {
-    throw Error('useChannelContext must be used inside ChannelProvider');
-  }
-
-  return ctx;
-};
-
-export const ChannelProvider = ChannelContext.Provider;
+export const ChannelContext = createContext<ChannelContext | null>(null);

@@ -2,15 +2,16 @@ import { Center, Spinner, Stack, StackProps } from '@chakra-ui/react';
 import { Message as MessageType } from '@main/features/messages/types';
 import dayjs from 'dayjs';
 import { memo, ReactNode, RefAttributes, useEffect, useMemo, useRef } from 'react';
+import { useContextSelector } from 'use-context-selector';
+import { MessageContext } from '../context';
 import Message from './Message';
 import TimeSeparator from './TimeSeparator';
 
-export type MessageListBaseProps = { messages: MessageType[]; onPaginate?(): void };
-export type MessageListProps = MessageListBaseProps & StackProps & RefAttributes<HTMLDivElement>;
-
 export const CHAIN_MESSAGES_TIME_GAP = 1000 * 60 * 5; // 5 minutes
 
-const MessageList = ({ messages, onPaginate, ...props }: MessageListProps) => {
+const MessageList = (props: StackProps & RefAttributes<HTMLDivElement>) => {
+  const messages = useContextSelector(MessageContext, (c) => c?.messages ?? []);
+  const onPaginate = useContextSelector(MessageContext, (c) => c?.onPaginate);
   const paginationTrigger = useRef<HTMLDivElement>(null);
 
   const chainedMessages = useMemo(() => {

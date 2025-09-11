@@ -3,7 +3,8 @@ import { isChannelDmBased } from '@main/features/channels/rendererSafeUtils';
 import Link from '@renderer/ui/Link';
 import { Fragment, memo, ReactNode, RefAttributes, useMemo } from 'react';
 import reactStringReplace from 'react-string-replace';
-import { useMessageContext } from '../context';
+import { useContextSelector } from 'use-context-selector';
+import { MessageContext } from '../context';
 import Mention from './Mention';
 
 export type FormattedMessageContentBaseProps = { rawContent: string; oneLine?: boolean };
@@ -12,7 +13,9 @@ export type FormattedMessageContentProps = FormattedMessageContentBaseProps &
   RefAttributes<HTMLParagraphElement>;
 
 const FormattedMessageContent = ({ rawContent, oneLine, ...props }: FormattedMessageContentProps) => {
-  const { channels, users, roles } = useMessageContext();
+  const channels = useContextSelector(MessageContext, (c) => c?.channels);
+  const users = useContextSelector(MessageContext, (c) => c?.users);
+  const roles = useContextSelector(MessageContext, (c) => c?.roles);
 
   const formattedContent = useMemo(() => {
     let tokenized: ReactNode[] = [rawContent];

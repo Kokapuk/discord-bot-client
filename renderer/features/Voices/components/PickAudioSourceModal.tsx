@@ -1,11 +1,11 @@
 import { Button, CloseButton, Dialog, IconButton, Portal, Spinner, Stack, Text } from '@chakra-ui/react';
 import { OutputAudioSource } from '@main/features/voice/types';
+import resolvePublicUrl from '@renderer/utils/resolvePublicUrl';
 import { ReactNode, RefAttributes, useEffect, useState } from 'react';
 import { FaCircleNodes, FaGear, FaMicrophoneLines, FaSquareArrowUpRight } from 'react-icons/fa6';
 import { useShallow } from 'zustand/shallow';
 import useVoicesStore from '../store';
 import AudioToggleSettingsMenu, { AudioToggleSettings } from './AudioToggleSettingsMenu';
-import resolvePublicUrl from '@renderer/utils/resolvePublicUrl';
 
 const OUTPUT_AUDIO_SOURCES: Record<OutputAudioSource, { icon?: ReactNode; label: string }> = {
   systemwide: { icon: <FaCircleNodes />, label: 'Systemwide' },
@@ -45,15 +45,16 @@ export default function PickAudioSourceModal(
     const source = audioContext.createMediaStreamSource(stream);
     const workletNode = new AudioWorkletNode(audioContext, 'pcm-processor');
 
-    workletNode.port.onmessage = (event) => {
-      window.ipcRenderer.invoke('voiceChunk', event.data);
-    };
+    const { port1, port2 } = new MessageChannel();
+    window.postMessage({ type: 'port' }, '*', [port1]);
+    workletNode.port.postMessage({ type: 'init', port: port2 }, [port2]);
 
     source.connect(workletNode).connect(audioContext.destination);
 
     window.ipcRenderer.once('audioOutputHandlingStop', () => {
       source.disconnect();
       workletNode.disconnect();
+      port1.close();
       audioContext.close();
       stream.getTracks().forEach((track) => track.stop());
       setSending(false);

@@ -5,22 +5,22 @@ import Avatar from '@renderer/ui/Avatar';
 import { useColorMode } from '@renderer/ui/ColorMode';
 import dayjs from 'dayjs';
 import { memo, RefAttributes, useMemo } from 'react';
-import { useMessageContext } from '../context';
+import { useContextSelector } from 'use-context-selector';
+import { MessageContext } from '../context';
 import AttachmentList from './AttachmentList';
 import EmbedList from './EmbedList';
 import FormattedMessageContent from './FormattedMessageContent';
-import ManageMessageActionList from './ManageMessageActions';
+import ManageMessageActionList from './ManageMessageActionList';
 import ReferenceMessage from './ReferenceMessage';
 
 export type MessageBaseProps = { message: Message; chain?: boolean };
 export type MessageProps = MessageBaseProps & StackProps & RefAttributes<HTMLDivElement>;
 
 const Message = ({ message, chain, ...props }: MessageProps) => {
-  const { users } = useMessageContext();
   const { colorMode } = useColorMode();
-  const author = useMemo(
-    () => users?.find((user) => user.id === message.authorId) ?? message.fallbackAuthor,
-    [users, message.authorId, message.fallbackAuthor]
+  const author = useContextSelector(
+    MessageContext,
+    (c) => c?.users?.find((user) => user.id === message.authorId) ?? message.fallbackAuthor
   );
 
   const createdAtFormattedFull = useMemo(

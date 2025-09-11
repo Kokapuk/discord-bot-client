@@ -1,13 +1,14 @@
 import { Box, Heading } from '@chakra-ui/react';
+import { Message } from '@main/features/messages/types';
 import useClientStore from '@renderer/features/Client/store';
 import useGuildsStore from '@renderer/features/Guilds/store';
 import MessageList from '@renderer/features/Messages/components/MessageList';
-import { MessageContext, MessageProvider } from '@renderer/features/Messages/context';
+import { MessageContext } from '@renderer/features/Messages/context';
 import useMessagesStore from '@renderer/features/Messages/store';
 import Textarea from '@renderer/features/TextArea/components/Textarea';
-import { TextareaContext, TextareaProvider } from '@renderer/features/TextArea/context';
+import { TextareaContext } from '@renderer/features/TextArea/context';
 import useTextAreaStore from '@renderer/features/TextArea/store';
-import { useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { useParams } from 'react-router';
 import { useShallow } from 'zustand/react/shallow';
 
@@ -76,19 +77,39 @@ export default function Channel() {
     throw Error(`Roles in guild with id ${guildId} do not exist`);
   }
 
+  const handlePaginate = useMemo(
+    () => (topReachedChannels[channelId] ? undefined : () => fetchMessages(channelId)),
+    [!!topReachedChannels[channelId]]
+  );
+  const handleEdit = useCallback((message: Message) => setEditingMessage(message), []);
+  const handleReply = useCallback((message: Message) => setReplyingMessage(message), []);
+
   const messageContext = useMemo<MessageContext>(
     () => ({
       clientUser: client,
       channel: activeChannel,
       messages: activeChannelMessages ?? [],
+      onPaginate: handlePaginate,
       channels: guildChannels,
       users: guildMembers,
       roles: guildRoles,
-      onEdit: (message) => setEditingMessage(message),
-      onReply: (message) => setReplyingMessage(message),
+      onEdit: handleEdit,
+      onReply: handleReply,
     }),
-    [client, activeChannel, activeChannelMessages, guildChannels, guildMembers, guildRoles]
+    [
+      client,
+      activeChannel,
+      activeChannelMessages,
+      handlePaginate,
+      guildChannels,
+      guildMembers,
+      guildRoles,
+      handleEdit,
+      handleReply,
+    ]
   );
+  const handleEditClose = useCallback(() => setEditingMessage(null), []);
+  const handleReplyClose = useCallback(() => setReplyingMessage(null), []);
 
   const textareaContext = useMemo<TextareaContext>(
     () => ({
@@ -96,11 +117,11 @@ export default function Channel() {
       users: guildMembers,
       roles: guildRoles,
       editingMessage,
-      onEditClose: () => setEditingMessage(null),
+      onEditClose: handleEditClose,
       replyingMessage,
-      onReplyClose: () => setReplyingMessage(null),
+      onReplyClose: handleReplyClose,
     }),
-    [activeChannel, guildMembers, guildRoles, editingMessage, replyingMessage]
+    [activeChannel, guildMembers, guildRoles, editingMessage, handleEditClose, replyingMessage, handleReplyClose]
   );
 
   return (
@@ -108,19 +129,12 @@ export default function Channel() {
       <Box as="header" paddingBottom="2.5" flexShrink="0">
         <Heading as="h2">{activeChannel.name}</Heading>
       </Box>
-      <MessageProvider value={messageContext}>
-        <MessageList
-          key={channelId}
-          height="100%"
-          minHeight="0"
-          marginBottom="4"
-          messages={messages[channelId] ?? []}
-          onPaginate={topReachedChannels[channelId] ? undefined : () => fetchMessages(channelId)}
-        />
-      </MessageProvider>
-      <TextareaProvider value={textareaContext}>
+      <MessageContext.Provider value={messageContext}>
+        <MessageList key={channelId} height="100%" minHeight="0" marginBottom="4" />
+      </MessageContext.Provider>
+      <TextareaContext.Provider value={textareaContext}>
         <Textarea flexShrink="0" marginBottom="2" paddingInline="2.5" width="100%" />
-      </TextareaProvider>
+      </TextareaContext.Provider>
     </Box>
   );
 }

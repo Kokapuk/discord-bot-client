@@ -1,8 +1,8 @@
 import { Text } from '@chakra-ui/react';
 import { GuildMember } from '@main/features/guilds/types';
 import { Message } from '@main/features/messages/types';
-import { useMemo } from 'react';
-import { useTextareaContext } from '../context';
+import { useContextSelector } from 'use-context-selector';
+import { TextareaContext } from '../context';
 import TextareaActionContext, { TextareaActionContextProps } from './TextareaActionContext';
 
 export type TextareaReplyContextBaseProps = { message: Message };
@@ -10,8 +10,11 @@ export type TextareaReplyContextProps = TextareaReplyContextBaseProps &
   Omit<TextareaActionContextProps, 'label' | 'onCancel'>;
 
 export default function TextareaReplyContext({ message, ...props }: TextareaReplyContextProps) {
-  const { users, onReplyClose } = useTextareaContext();
-  const author = useMemo(() => users?.find((user) => user.id === message.authorId) ?? message.fallbackAuthor, []);
+  const author = useContextSelector(
+    TextareaContext,
+    (c) => c?.users?.find((user) => user.id === message.authorId) ?? message.fallbackAuthor
+  );
+  const onReplyClose = useContextSelector(TextareaContext, (c) => c?.onReplyClose);
 
   return (
     <TextareaActionContext

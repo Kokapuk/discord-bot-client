@@ -226,14 +226,21 @@ export const handleIpcMainEvents = () => {
     audioPlayer.play(resource);
   });
 
+  ipcMain.on('sendAudioPort', (event) => {
+    const port = event.ports[0];
+
+    port.on('message', (e) => {
+      const buffer = Buffer.from(e.data);
+      audioOutputStream.current?.write(buffer);
+    });
+
+    port.start();
+  });
+
   ipcMain.handle('stopHandlingOutputAudioSource', async (event) => {
     stopHandlingAudioOutputSource(event.sender);
     audioPlayer.stop();
     audioOutputStream.current = null;
-  });
-
-  ipcMain.handle('voiceChunk', async (_, buffer) => {
-    audioOutputStream.current?.write(Buffer.from(buffer));
   });
 
   ipcMain.handle('getUserVolume', async (_, userId) => {

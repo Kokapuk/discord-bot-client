@@ -25,6 +25,8 @@ const createAppWindow = () => {
     titleBarOverlay: {},
     width: 1200,
     height: 750,
+    minWidth: 800,
+    minHeight: 500,
     backgroundMaterial: 'mica',
     webPreferences: {
       preload: path.join(__dirname, 'preload.mjs'),

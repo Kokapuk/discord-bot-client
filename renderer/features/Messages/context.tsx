@@ -2,29 +2,19 @@ import { Channel } from '@main/features/channels/types';
 import { GuildMember, Role } from '@main/features/guilds/types';
 import { Message } from '@main/features/messages/types';
 import { User } from '@main/features/users/types';
-import { createContext, useContext } from 'react';
+import { createContext } from 'use-context-selector';
 
 export type MessageContext = {
   clientUser: User;
   channel: Channel;
   messages: Message[];
+  onPaginate?(): void;
   channels?: Channel[];
   users?: (User | GuildMember)[];
   roles?: Role[];
   onEdit?(message: Message): void;
   onReply?(message: Message): void;
+  
 };
 
-const MessageContext = createContext<MessageContext | null>(null);
-
-export const useMessageContext = () => {
-  const ctx = useContext(MessageContext);
-
-  if (!ctx) {
-    throw Error('useMessageContext must be used inside MessageProvider');
-  }
-
-  return ctx;
-};
-
-export const MessageProvider = MessageContext.Provider;
+export const MessageContext = createContext<MessageContext | null>(null);

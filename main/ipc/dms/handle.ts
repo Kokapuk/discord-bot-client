@@ -10,7 +10,10 @@ const ipcMain = createIpcMain<DmsIpcSlice>();
 
 export const handleIpcMainEvents = () => {
   ipcMain.handle('getCachedUsers', async () => {
-    return client.users.cache.map((user) => structUser(user)).filter((user) => user.id !== client.user?.id);
+    return client.users.cache
+      .filter((user) => !user.bot)
+      .map((user) => structUser(user))
+      .filter((user) => user.id !== client.user?.id);
   });
 
   ipcMain.handle('getDmChannel', async (_, userId) => {

@@ -5,6 +5,13 @@ export const createIpcRenderer = <T extends IpcSlice>() => {
   type RendererToMain = NonNullable<T['rendererToMain']>;
   type MainToRenderer = NonNullable<T['mainToRenderer']>;
 
+  window.addEventListener('message', (event) => {
+    if (event.data.type == 'port') {
+      const port = event.ports[0];
+      ipcRenderer.postMessage('sendAudioPort', null, [port]);
+    }
+  });
+
   return {
     invoke: <C extends keyof RendererToMain>(channel: C, ...args: Parameters<RendererToMain[C]>) => {
       return ipcRenderer.invoke(channel as string, ...args) as ReturnType<RendererToMain[C]>;

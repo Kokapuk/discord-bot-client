@@ -1,13 +1,14 @@
 import { ChannelType } from '@main/features/channels/types';
 import VoiceChannel from '@renderer/features/Channels/components/VoiceChannel';
-import { useChannelContext } from '../context';
+import { memo } from 'react';
+import { useContextSelector } from 'use-context-selector';
+import { ChannelContext } from '../context';
 import { GuildBaseChannelProps } from './GuildBaseChannel';
 import TextChannel from './TextChannel';
 
-export default function GuildChannel({ channel, ...props }: GuildBaseChannelProps) {
-  const { activeChannel, unreadChannels } = useChannelContext();
-  const active = activeChannel?.id === channel.id;
-  const unread = unreadChannels?.includes(channel.id);
+const GuildChannel = ({ channel, ...props }: GuildBaseChannelProps) => {
+  const active = useContextSelector(ChannelContext, (c) => c?.activeChannel?.id === channel.id);
+  const unread = useContextSelector(ChannelContext, (c) => c?.unreadChannels?.includes(channel.id));
 
   switch (channel.type) {
     case ChannelType.GuildText:
@@ -19,4 +20,6 @@ export default function GuildChannel({ channel, ...props }: GuildBaseChannelProp
     case ChannelType.GuildStageVoice:
       return <VoiceChannel channel={channel} active={active} unread={unread} {...props} />;
   }
-}
+};
+
+export default memo(GuildChannel);

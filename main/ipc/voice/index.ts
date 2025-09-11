@@ -1,6 +1,6 @@
 import { IpcApiResponse } from '..';
-import { CreateIpcSlice } from '../../utils/ipc';
 import { OutputAudioSource, VoiceConnectionStatus, VoiceMember, VoiceState } from '../../features/voice/types';
+import { CreateIpcSlice } from '../../utils/ipc';
 
 export type VoiceIpcSlice = CreateIpcSlice<{
   rendererToMain: {
@@ -10,8 +10,8 @@ export type VoiceIpcSlice = CreateIpcSlice<{
     joinVoice: (guildId: string, channelId: string) => Promise<void>;
     leaveVoice: () => Promise<void>;
     startHandlingOutputAudioSource: (source?: OutputAudioSource) => Promise<void>;
+    sendAudioPort: () => Promise<void>;
     stopHandlingOutputAudioSource: () => Promise<void>;
-    voiceChunk: (buffer: ArrayBuffer) => Promise<void>;
     getUserVolume: (userId: string) => Promise<number>;
     setUserVolume: (userId: string, volume: number) => Promise<void>;
   };

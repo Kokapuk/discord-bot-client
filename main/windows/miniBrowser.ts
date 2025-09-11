@@ -28,6 +28,8 @@ const createMiniBrowserWindow = (parent: BrowserWindow) => {
     icon: path.join(process.env.VITE_PUBLIC, '/images/icon.ico'),
     width: 900,
     height: 600,
+    minWidth: 500,
+    minHeight: 400,
     titleBarStyle: 'hidden',
     titleBarOverlay: {},
     backgroundMaterial: 'mica',

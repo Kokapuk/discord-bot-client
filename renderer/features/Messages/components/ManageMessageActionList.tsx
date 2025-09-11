@@ -1,21 +1,33 @@
 import { Group, GroupProps } from '@chakra-ui/react';
 import { isChannelGuildBased } from '@main/features/channels/rendererSafeUtils';
 import { Message } from '@main/features/messages/types';
-import { RefAttributes, useMemo, useState } from 'react';
+import { RefAttributes, useState } from 'react';
 import { FaPen, FaReply, FaTrash } from 'react-icons/fa6';
-import { useMessageContext } from '../context';
+import { useContextSelector } from 'use-context-selector';
+import { MessageContext } from '../context';
 import ManageMessageActionButton from './ManageMessageActionButton';
 
 export type ManageMessageActionsBaseProps = { message: Message };
 export type ManageMessageActionsProps = ManageMessageActionsBaseProps & GroupProps & RefAttributes<HTMLDivElement>;
 
 export default function ManageMessageActionList({ message, ...props }: ManageMessageActionsProps) {
-  const { users, clientUser: client, channel, onEdit, onReply } = useMessageContext();
-  const author = useMemo(
-    () => users?.find((user) => user.id === message.authorId) ?? message.fallbackAuthor,
-    [users, message.authorId, message.fallbackAuthor]
+  const author = useContextSelector(
+    MessageContext,
+    (c) => c?.users?.find((user) => user.id === message.authorId) ?? message.fallbackAuthor
   );
+  const clientUser = useContextSelector(MessageContext, (c) => c?.clientUser);
+  const channel = useContextSelector(MessageContext, (c) => c?.channel);
+  const onEdit = useContextSelector(MessageContext, (c) => c?.onEdit);
+  const onReply = useContextSelector(MessageContext, (c) => c?.onReply);
   const [deleting, setDeleting] = useState(false);
+
+  if (!clientUser) {
+    throw Error('Client user is not valid');
+  }
+
+  if (!channel) {
+    throw Error('Channel is not valid');
+  }
 
   const deleteMessage = async () => {
     setDeleting(true);
@@ -36,12 +48,12 @@ export default function ManageMessageActionList({ message, ...props }: ManageMes
           <FaReply />
         </ManageMessageActionButton>
       )}
-      {client.id === author.id && !!onEdit && (
+      {clientUser.id === author.id && !!onEdit && (
         <ManageMessageActionButton tooltip="Edit" onClick={() => onEdit(message)}>
           <FaPen />
         </ManageMessageActionButton>
       )}
-      {(client.id === author.id || (isChannelGuildBased(channel) && channel.manageMessagesPermission)) && (
+      {(clientUser.id === author.id || (isChannelGuildBased(channel) && channel.manageMessagesPermission)) && (
         <ManageMessageActionButton tooltip="Delete" onClick={deleteMessage} loading={deleting} colorPalette="red">
           <FaTrash />
         </ManageMessageActionButton>

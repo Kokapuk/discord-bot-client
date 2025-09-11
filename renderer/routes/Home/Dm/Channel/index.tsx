@@ -1,13 +1,14 @@
 import { Box, Heading } from '@chakra-ui/react';
+import { Message } from '@main/features/messages/types';
 import useClientStore from '@renderer/features/Client/store';
 import useDmsStore from '@renderer/features/Dms/store';
 import MessageList from '@renderer/features/Messages/components/MessageList';
-import { MessageContext, MessageProvider } from '@renderer/features/Messages/context';
+import { MessageContext } from '@renderer/features/Messages/context';
 import useMessagesStore from '@renderer/features/Messages/store';
 import Textarea from '@renderer/features/TextArea/components/Textarea';
-import { TextareaContext, TextareaProvider } from '@renderer/features/TextArea/context';
+import { TextareaContext } from '@renderer/features/TextArea/context';
 import useTextAreaStore from '@renderer/features/TextArea/store';
-import { useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { useParams } from 'react-router';
 import { useShallow } from 'zustand/react/shallow';
 
@@ -58,26 +59,37 @@ export default function Channel() {
     throw Error('Channel do not exist');
   }
 
+  const handlePaginate = useMemo(
+    () => (topReachedChannels[channelId] ? undefined : () => fetchMessages(channelId)),
+    [!!topReachedChannels[channelId]]
+  );
+  const handleEdit = useCallback((message: Message) => setEditingMessage(message), []);
+  const handleReply = useCallback((message: Message) => setReplyingMessage(message), []);
+
   const messageContext = useMemo<MessageContext>(
     () => ({
       clientUser: client,
       channel: activeChannel,
       messages: activeChannelMessages ?? [],
-      onEdit: (message) => setEditingMessage(message),
-      onReply: (message) => setReplyingMessage(message),
+      onPaginate: handlePaginate,
+      onEdit: handleEdit,
+      onReply: handleReply,
     }),
     [client, activeChannel, activeChannelMessages]
   );
+
+  const handleEditClose = useCallback(() => setEditingMessage(null), []);
+  const handleReplyClose = useCallback(() => setReplyingMessage(null), []);
 
   const textareaContext = useMemo<TextareaContext>(
     () => ({
       channel: activeChannel,
       editingMessage,
-      onEditClose: () => setEditingMessage(null),
+      onEditClose: handleEditClose,
       replyingMessage,
-      onReplyClose: () => setReplyingMessage(null),
+      onReplyClose: handleReplyClose,
     }),
-    [activeChannel, editingMessage, replyingMessage]
+    [activeChannel, editingMessage, handleEditClose, replyingMessage, handleReplyClose]
   );
 
   return (
@@ -85,19 +97,12 @@ export default function Channel() {
       <Box as="header" paddingBottom="2.5" flexShrink="0">
         <Heading as="h2">{activeChannel.recipient?.displayName}</Heading>
       </Box>
-      <MessageProvider value={messageContext}>
-        <MessageList
-          key={channelId}
-          height="100%"
-          minHeight="0"
-          marginBottom="4"
-          messages={messages[channelId] ?? []}
-          onPaginate={topReachedChannels[channelId] ? undefined : () => fetchMessages(channelId)}
-        />
-      </MessageProvider>
-      <TextareaProvider value={textareaContext}>
+      <MessageContext.Provider value={messageContext}>
+        <MessageList key={channelId} height="100%" minHeight="0" marginBottom="4" />
+      </MessageContext.Provider>
+      <TextareaContext.Provider value={textareaContext}>
         <Textarea flexShrink="0" marginBottom="2" paddingInline="2.5" width="100%" />
-      </TextareaProvider>
+      </TextareaContext.Provider>
     </Box>
   );
 }

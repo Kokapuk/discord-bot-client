@@ -3,6 +3,7 @@ import { VoiceConnectionStatus } from '@main/features/voice/types';
 import ClientActivityPanel from '@renderer/features/Client/components/ClientActivityPanel';
 import useClientStore from '@renderer/features/Client/store';
 import AddDmChannelButton from '@renderer/features/Dms/components/AddDmChannelButton';
+import useDmsStore from '@renderer/features/Dms/store';
 import useGuildsStore from '@renderer/features/Guilds/store';
 import useMessagesStore from '@renderer/features/Messages/store';
 import useVoicesStore from '@renderer/features/Voices/store';
@@ -177,6 +178,12 @@ export default function AppLayout() {
       if (channelId !== message.channelId) {
         addUnreadChannel(message.channelId);
 
+        const dmStore = useDmsStore.getState();
+
+        if (!message.guildId && !Object.values(dmStore.channels).some((channel) => channel.id === message.channelId)) {
+          dmStore.pullChannel(message.authorId);
+        }
+
         if (useClientStore.getState().clientUser?.status !== 'dnd') {
           playAudio(resolvePublicUrl('./audios/notification.mp3'));
 
@@ -223,10 +230,10 @@ export default function AppLayout() {
         <>
           <Stack height="100%" gap="0">
             <Stack height="100%" minHeight="0" direction="row" gap="0">
-              <Stack height="100%" paddingInline="2.5">
-                <GuildDmList />
-                <Separator />
-                <AddDmChannelButton />
+              <Stack height="100%">
+                <GuildDmList paddingInline="2.5" />
+                <Separator marginInline="2.5" />
+                <AddDmChannelButton marginInline="2.5" />
               </Stack>
 
               <Box as="aside" id="leftSidebar" height="100%" width="60" flexShrink="0" />

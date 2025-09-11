@@ -1,19 +1,22 @@
 import { Box, Stack, StackProps, Text } from '@chakra-ui/react';
 import { GuildVoiceChannel } from '@main/features/channels/types';
-import GuildBaseChannel, { GuildBaseChannelProps } from '@renderer/features/Channels/components/GuildBaseChannel';
 import ChannelAdditionalActions from '@renderer/features/Channels/components/ChannelAdditionalActions';
+import GuildBaseChannel, { GuildBaseChannelProps } from '@renderer/features/Channels/components/GuildBaseChannel';
 import VoiceMemberList from '@renderer/features/Voices/components/VoiceMemberList';
-import { useVoiceContext } from '@renderer/features/Voices/context';
-import { RefAttributes } from 'react';
+import { VoiceContext } from '@renderer/features/Voices/context';
+import { memo, RefAttributes } from 'react';
+import { useContextSelector } from 'use-context-selector';
 
 export type VoiceChannelBaseProps = { channel: GuildVoiceChannel };
 export type VoiceChannelProps = VoiceChannelBaseProps & {
   wrapperProps?: StackProps & RefAttributes<HTMLDivElement>;
 } & GuildBaseChannelProps;
 
-export default function VoiceChannel({ channel, wrapperProps, ...props }: VoiceChannelProps) {
-  const { voiceMembers } = useVoiceContext();
-  const membersInVoice = voiceMembers?.[channel.guidId]?.[channel.id]?.length ?? 0;
+const VoiceChannel = ({ channel, wrapperProps, ...props }: VoiceChannelProps) => {
+  const membersInVoice = useContextSelector(
+    VoiceContext,
+    (c) => c?.voiceMembers?.[channel.guidId]?.[channel.id]?.length ?? 0
+  );
   const userLimitReached = channel.userLimit ? (membersInVoice ?? 0) >= channel.userLimit : false;
 
   return (
@@ -34,7 +37,7 @@ export default function VoiceChannel({ channel, wrapperProps, ...props }: VoiceC
           visibility="hidden"
           _groupHover={{ visibility: 'visible' }}
         />
-        {!!channel.userLimit && !!voiceMembers && (
+        {!!channel.userLimit && (
           <Text
             fontSize="xs"
             color="colorPalette.fg"
@@ -45,11 +48,13 @@ export default function VoiceChannel({ channel, wrapperProps, ...props }: VoiceC
             transform="translateY(-50%)"
             _groupHover={{ visibility: 'hidden' }}
           >
-            {membersInVoice ?? 0} / {channel.userLimit}
+            {membersInVoice} / {channel.userLimit}
           </Text>
         )}
       </Box>
       <VoiceMemberList channel={channel} marginLeft="7" />
     </Stack>
   );
-}
+};
+
+export default memo(VoiceChannel);

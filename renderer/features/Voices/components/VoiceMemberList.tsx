@@ -1,15 +1,16 @@
 import { Stack, StackProps } from '@chakra-ui/react';
 import { GuildVoiceChannel } from '@main/features/channels/types';
 import { RefAttributes } from 'react';
-import { useVoiceContext } from '../context';
+import { useContextSelector } from 'use-context-selector';
+import { VoiceContext } from '../context';
 import VoiceMember from './VoiceMember';
 
 export type VoiceMemberListBaseProps = { channel: GuildVoiceChannel };
 export type VoiceMemberListProps = VoiceMemberListBaseProps & StackProps & RefAttributes<HTMLDivElement>;
 
 export default function VoiceMemberList({ channel, ...props }: VoiceMemberListProps) {
-  const { voiceMembers, speakingMemberIds } = useVoiceContext();
-  const channelMembers = voiceMembers?.[channel.guidId]?.[channel.id];
+  const channelMembers = useContextSelector(VoiceContext, (c) => c?.voiceMembers?.[channel.guidId]?.[channel.id]);
+  const speakingMemberIds = useContextSelector(VoiceContext, (c) => c?.speakingMemberIds);
 
   if (!channelMembers) {
     return null;

@@ -1,11 +1,11 @@
 import { Box, Heading, Stack } from '@chakra-ui/react';
 import { isChannelGuildVoiceBased } from '@main/features/channels/rendererSafeUtils';
 import ChannelList from '@renderer/features/Channels/components/ChannelList';
-import { ChannelContext, ChannelProvider } from '@renderer/features/Channels/context';
+import { ChannelContext } from '@renderer/features/Channels/context';
 import MemberList from '@renderer/features/Guilds/components/MemberList';
 import useGuildsStore from '@renderer/features/Guilds/store';
 import useMessagesStore from '@renderer/features/Messages/store';
-import { VoiceContext, VoiceProvider } from '@renderer/features/Voices/context';
+import { VoiceContext } from '@renderer/features/Voices/context';
 import useVoicesStore from '@renderer/features/Voices/store';
 import RouteSpinner from '@renderer/ui/RouteSpinner';
 import { Suspense, useMemo } from 'react';
@@ -88,11 +88,11 @@ export default function GuildLayout() {
           >
             {activeGuild.name}
           </Heading>
-          <ChannelProvider value={channelContext}>
-            <VoiceProvider value={voiceContext}>
+          <ChannelContext.Provider value={channelContext}>
+            <VoiceContext.Provider value={voiceContext}>
               <ChannelList height="100%" width="100%" minHeight="0" />
-            </VoiceProvider>
-          </ChannelProvider>
+            </VoiceContext.Provider>
+          </ChannelContext.Provider>
         </Stack>,
         document.getElementById('leftSidebar')!
       )}

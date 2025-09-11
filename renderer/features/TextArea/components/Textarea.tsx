@@ -9,12 +9,14 @@ import {
 } from '@chakra-ui/react';
 import { isChannelDmBased } from '@main/features/channels/rendererSafeUtils';
 import { EditMessageDTO, SendMessageDTO, SendMessageFileDTO } from '@main/ipc/messages/types';
+import { Tooltip } from '@renderer/ui/Tooltip';
 import fileSchema from '@renderer/utils/fileSchema';
 import dayjs from 'dayjs';
-import React, { RefAttributes, useEffect, useMemo, useRef } from 'react';
-import { FaFileCirclePlus } from 'react-icons/fa6';
+import React, { memo, RefAttributes, useEffect, useMemo, useRef, useState } from 'react';
+import { FaFileCirclePlus, FaPaperPlane } from 'react-icons/fa6';
+import { useContextSelector } from 'use-context-selector';
 import z from 'zod';
-import { useTextareaContext } from '../context';
+import { TextareaContext } from '../context';
 import FileUploadList from './FileUploadList';
 import MentionMenu from './MentionMenu';
 import TextareaActionContext from './TextareaActionContext';
@@ -31,12 +33,16 @@ export const messageFormDataSchema = z.object({
   files: z.array(fileSchema, { error: 'Files are invalid' }).optional(),
 });
 
-export default function Textarea({ textareaProps, ...props }: TextareaProps) {
-  const { channel, editingMessage, onEditClose, replyingMessage, onReplyClose } = useTextareaContext();
+const Textarea = ({ textareaProps, ...props }: TextareaProps) => {
+  const channel = useContextSelector(TextareaContext, (c) => c!.channel);
+  const editingMessage = useContextSelector(TextareaContext, (c) => c?.editingMessage);
+  const onEditClose = useContextSelector(TextareaContext, (c) => c?.onEditClose);
+  const replyingMessage = useContextSelector(TextareaContext, (c) => c?.replyingMessage);
+  const onReplyClose = useContextSelector(TextareaContext, (c) => c?.onReplyClose);
   const form = useRef<HTMLFormElement>(null);
   const textarea = useRef<HTMLTextAreaElement>(null);
   const canAttachFiles = (isChannelDmBased(channel) ? true : channel.attachFilesPermission) && !editingMessage;
-  const sending = useRef(false);
+  const [isSending, setSending] = useState(false);
   const attached = useMemo(() => !!editingMessage || !!replyingMessage, [!!editingMessage, !!replyingMessage]);
 
   const fileUpload = useFileUpload({
@@ -81,7 +87,7 @@ export default function Textarea({ textareaProps, ...props }: TextareaProps) {
       return;
     }
 
-    sending.current = true;
+    setSending(true);
 
     const files: SendMessageFileDTO[] = [];
 
@@ -101,7 +107,7 @@ export default function Textarea({ textareaProps, ...props }: TextareaProps) {
       ? await window.ipcRenderer.invoke('replyToMessage', replyingMessage.id, channel.id, message)
       : await window.ipcRenderer.invoke('sendMessage', channel.id, message);
 
-    sending.current = false;
+    setSending(false);
 
     if (!response.success) {
       console.error(`Failed to send message: ${response.error}`);
@@ -127,7 +133,7 @@ export default function Textarea({ textareaProps, ...props }: TextareaProps) {
       return;
     }
 
-    sending.current = true;
+    setSending(true);
 
     const message: EditMessageDTO = {
       content: messageFormData.content,
@@ -135,7 +141,7 @@ export default function Textarea({ textareaProps, ...props }: TextareaProps) {
 
     const response = await window.ipcRenderer.invoke('editMessage', editingMessage.id, channel.id, message);
 
-    sending.current = false;
+    setSending(false);
 
     if (!response.success) {
       console.error(`Failed to edit message: ${response.error}`);
@@ -148,7 +154,7 @@ export default function Textarea({ textareaProps, ...props }: TextareaProps) {
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (sending.current) {
+    if (isSending) {
       return;
     }
 
@@ -206,18 +212,15 @@ export default function Textarea({ textareaProps, ...props }: TextareaProps) {
           <Stack gap="1.5" direction="row">
             <FileUpload.HiddenInput />
             {canAttachFiles && (
-              <FileUpload.Trigger asChild>
-                <IconButton
-                  aria-label="Add attachment"
-                  variant="ghost"
-                  borderRadius="full"
-                  marginLeft="2.5"
-                  marginTop="1.5"
-                >
-                  <FaFileCirclePlus />
-                </IconButton>
-              </FileUpload.Trigger>
+              <Tooltip content="Attach files">
+                <FileUpload.Trigger asChild>
+                  <IconButton variant="ghost" borderRadius="full" marginLeft="2.5" marginTop="1.5">
+                    <FaFileCirclePlus />
+                  </IconButton>
+                </FileUpload.Trigger>
+              </Tooltip>
             )}
+
             <ChakraTextarea
               key={editingMessage?.id ?? 'newMessage'}
               ref={textarea}
@@ -236,9 +239,24 @@ export default function Textarea({ textareaProps, ...props }: TextareaProps) {
               border="0"
               {...textareaProps}
             />
+
+            <Tooltip content="Send">
+              <IconButton
+                onClick={() => form.current?.requestSubmit()}
+                loading={isSending}
+                variant="ghost"
+                borderRadius="full"
+                marginRight="2.5"
+                marginTop="1.5"
+              >
+                <FaPaperPlane />
+              </IconButton>
+            </Tooltip>
           </Stack>
         </Stack>
       </Stack>
     </FileUpload.RootProvider>
   );
-}
+};
+
+export default memo(Textarea);
