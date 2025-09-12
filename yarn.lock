@@ -2412,6 +2412,11 @@ app-builder-lib@26.0.12:
     temp-file "^3.4.0"
     tiny-async-pool "1.3.0"
 
+application-loopback@1.1.5:
+  version "1.1.5"
+  resolved "https://registry.yarnpkg.com/application-loopback/-/application-loopback-1.1.5.tgz#dd5200f525bdd6c3e5ca8e9f21f8e6733527a14e"
+  integrity sha512-9PFfOFRwu+vFku8zXdiqJJ3bxA6ejn39G8Z8rJBSf1z9oGTiKKrjtWKYOYqFhtBfZHXNBl/hN8SIDu8TuCKaIg==
+
 "aproba@^1.0.3 || ^2.0.0":
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/aproba/-/aproba-2.1.0.tgz#75500a190313d95c64e871e7e4284c6ac219f0b1"

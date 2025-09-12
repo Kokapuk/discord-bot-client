@@ -6,26 +6,32 @@ import {
   StreamType,
   VoiceConnection,
 } from '@discordjs/voice';
-import { BrowserWindow, WebContents } from 'electron';
+import { app, BrowserWindow, WebContents } from 'electron';
 import { createRequire } from 'module';
 import { PassThrough } from 'stream';
 import { VoiceIpcSlice } from '.';
 import { IpcApiResponse } from '..';
-import { VoiceConnectionStatus, VoiceMember } from '../../features/voice/types';
+import { OutputAudioWindowSource, VoiceConnectionStatus, VoiceMember } from '../../features/voice/types';
 import { structVoiceMember, structVoiceState } from '../../features/voice/utils';
 import { createIpcMain } from '../../utils/createIpcMain';
 import { client } from '../client/utils';
 import {
   audioOutputStream,
   audioPlayer,
+  startHandlingOutputAudioIsolatedCaptureSource,
   startHandlingOutputAudioIsolatedExternalSource,
   startHandlingOutputAudioSystemwideSource,
   stopHandlingAudioOutputSource,
 } from './utils';
+import path from 'path';
 
 const require = createRequire(import.meta.url);
 const prism = require('prism-media');
 const Speaker = require('speaker');
+
+const { getActiveWindowProcessIds } = require(process.env['VITE_DEV_SERVER_URL']
+  ? 'application-loopback'
+  : path.join(path.parse(app.getPath('exe')).dir, './resources/app.asar.unpacked/node_modules/application-loopback'));
 
 export const ipcMain = createIpcMain<VoiceIpcSlice>();
 
@@ -212,13 +218,34 @@ export const handleIpcMainEvents = () => {
     connection.destroy();
   });
 
-  ipcMain.handle('startHandlingOutputAudioSource', async (event, source) => {
-    if (source === 'systemwide') {
-      startHandlingOutputAudioSystemwideSource();
-    } else if (source === 'isolatedExternal') {
-      startHandlingOutputAudioIsolatedExternalSource(BrowserWindow.fromWebContents(event.sender)!);
-    } else if (source === 'isolatedExternalWithLocalEcho') {
-      startHandlingOutputAudioIsolatedExternalSource(BrowserWindow.fromWebContents(event.sender)!, true);
+  ipcMain.handle('getAudioCaptureWindows', async () => {
+    try {
+      const windows: OutputAudioWindowSource[] = await getActiveWindowProcessIds();
+      return {
+        success: true,
+        payload: windows.filter(
+          (window, index) => !windows.slice(0, index).some((cmpWindow) => cmpWindow.processId === window.processId)
+        ),
+      } as IpcApiResponse<OutputAudioWindowSource[]>;
+    } catch (err: any) {
+      return { success: false, error: err.message } as IpcApiResponse<OutputAudioWindowSource[]>;
+    }
+  });
+
+  ipcMain.handle('startHandlingOutputAudioSource', async (event, source, processId) => {
+    switch (source) {
+      case 'systemwide':
+        startHandlingOutputAudioSystemwideSource();
+        break;
+      case 'isolatedExternal':
+        startHandlingOutputAudioIsolatedExternalSource(BrowserWindow.fromWebContents(event.sender)!);
+        break;
+      case 'isolatedExternalWithLocalEcho':
+        startHandlingOutputAudioIsolatedExternalSource(BrowserWindow.fromWebContents(event.sender)!, true);
+        break;
+      case 'isolatedCapture':
+        startHandlingOutputAudioIsolatedCaptureSource(processId!);
+        break;
     }
 
     audioOutputStream.current = new PassThrough({ highWaterMark: 1024 });

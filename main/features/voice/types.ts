@@ -26,4 +26,9 @@ export interface VoiceState {
   member: VoiceMember | null;
 }
 
-export type OutputAudioSource = 'systemwide' | 'isolatedExternal' | 'isolatedExternalWithLocalEcho';
+export type OutputAudioSource = 'systemwide' | 'isolatedExternal' | 'isolatedExternalWithLocalEcho' | 'isolatedCapture';
+
+export interface OutputAudioWindowSource {
+  title: string;
+  processId: string;
+}

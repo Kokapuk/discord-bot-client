@@ -18,6 +18,7 @@
     "@discordjs/voice": "0.19.0",
     "@emotion/react": "11.14.0",
     "@snazzah/davey": "0.1.6",
+    "application-loopback": "1.1.5",
     "dayjs": "1.11.18",
     "discord.js": "14.22.1",
     "electron-store": "10.1.0",

@@ -1,17 +1,17 @@
 import { Button, CloseButton, Dialog, IconButton, Portal, Spinner, Stack, Text } from '@chakra-ui/react';
-import { OutputAudioSource } from '@main/features/voice/types';
+import { OutputAudioSource, OutputAudioWindowSource } from '@main/features/voice/types';
 import resolvePublicUrl from '@renderer/utils/resolvePublicUrl';
 import { ReactNode, RefAttributes, useEffect, useState } from 'react';
-import { FaCircleNodes, FaGear, FaMicrophoneLines, FaSquareArrowUpRight } from 'react-icons/fa6';
+import { FaCircleNodes, FaGear, FaMicrophoneLines, FaRegWindowMaximize, FaSquareArrowUpRight } from 'react-icons/fa6';
 import { useShallow } from 'zustand/shallow';
 import useVoicesStore from '../store';
 import AudioToggleSettingsMenu, { AudioToggleSettings } from './AudioToggleSettingsMenu';
 
-const OUTPUT_AUDIO_SOURCES: Record<OutputAudioSource, { icon?: ReactNode; label: string }> = {
+const OUTPUT_AUDIO_SOURCES = {
   systemwide: { icon: <FaCircleNodes />, label: 'Systemwide' },
   isolatedExternal: { icon: <FaSquareArrowUpRight />, label: 'Isolated external' },
   isolatedExternalWithLocalEcho: { icon: <FaSquareArrowUpRight />, label: 'Isolated external with local echo' },
-};
+} as const satisfies Partial<Record<OutputAudioSource, { icon?: ReactNode; label: string }>>;
 
 export default function PickAudioSourceModal(
   props: Omit<Dialog.RootProps, 'children'> & RefAttributes<HTMLDivElement>
@@ -23,6 +23,7 @@ export default function PickAudioSourceModal(
     echoCancellation: false,
   }));
   const [audioInputDevices, setAudioInputDevices] = useState<MediaDeviceInfo[] | null>(null);
+  const [windows, setWindows] = useState<OutputAudioWindowSource[] | null>(null);
 
   useEffect(() => {
     if (props.open) {
@@ -32,6 +33,24 @@ export default function PickAudioSourceModal(
     (async () => {
       const devices = await navigator.mediaDevices.enumerateDevices();
       setAudioInputDevices(devices.filter((device) => device.kind === 'audioinput'));
+    })();
+  }, [props.open]);
+
+  useEffect(() => {
+    if (props.open) {
+      return;
+    }
+
+    (async () => {
+      const response = await window.ipcRenderer.invoke('getAudioCaptureWindows');
+
+      if (!response.success) {
+        console.error('Failed to get audio capture windows:', response.error);
+        setWindows([]);
+        return;
+      }
+
+      setWindows(response.payload);
     })();
   }, [props.open]);
 
@@ -83,6 +102,17 @@ export default function PickAudioSourceModal(
     startAudioOutput(stream);
   };
 
+  const startAudioOutputWithWindow = async (processId: string) => {
+    await window.ipcRenderer.invoke('startHandlingOutputAudioSource', 'isolatedCapture', processId);
+
+    setSending(true);
+    props.onOpenChange?.({ open: false });
+
+    window.ipcRenderer.once('audioOutputHandlingStop', () => {
+      setSending(false);
+    });
+  };
+
   return (
     <Dialog.Root placement="center" unmountOnExit {...props}>
       <Portal>
@@ -92,7 +122,7 @@ export default function PickAudioSourceModal(
             <Dialog.Header>
               <Dialog.Title>Pick a source you want to use as an audio output</Dialog.Title>
             </Dialog.Header>
-            <Dialog.Body>
+            <Dialog.Body maxHeight="70vh" overflow="auto">
               <Text marginBottom="3">System</Text>
               <Stack gap="3" marginBottom="5">
                 {Object.entries(OUTPUT_AUDIO_SOURCES).map(([outputAudioSource, { icon, label }]) => (
@@ -105,6 +135,19 @@ export default function PickAudioSourceModal(
                     {icon}
                     <Text textAlign="start" width="100%" overflow="hidden" textOverflow="ellipsis">
                       {label}
+                    </Text>
+                  </Button>
+                ))}
+                {windows?.map((window) => (
+                  <Button
+                    key={window.processId}
+                    variant="subtle"
+                    justifyContent="flex-start"
+                    onClick={() => startAudioOutputWithWindow(window.processId)}
+                  >
+                    <FaRegWindowMaximize />
+                    <Text textAlign="start" width="100%" overflow="hidden" textOverflow="ellipsis">
+                      {window.title}
                     </Text>
                   </Button>
                 ))}
