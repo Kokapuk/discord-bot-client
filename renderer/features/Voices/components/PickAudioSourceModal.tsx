@@ -1,4 +1,4 @@
-import { Button, CloseButton, Dialog, IconButton, Portal, Spinner, Stack, Text } from '@chakra-ui/react';
+import { Button, CloseButton, Dialog, IconButton, Image, Portal, Spinner, Stack, Text } from '@chakra-ui/react';
 import { OutputAudioSource, OutputAudioWindowSource } from '@main/features/voice/types';
 import resolvePublicUrl from '@renderer/utils/resolvePublicUrl';
 import { ReactNode, RefAttributes, useEffect, useState } from 'react';
@@ -26,7 +26,7 @@ export default function PickAudioSourceModal(
   const [windows, setWindows] = useState<OutputAudioWindowSource[] | null>(null);
 
   useEffect(() => {
-    if (props.open) {
+    if (!props.open) {
       return;
     }
 
@@ -37,7 +37,7 @@ export default function PickAudioSourceModal(
   }, [props.open]);
 
   useEffect(() => {
-    if (props.open) {
+    if (!props.open) {
       return;
     }
 
@@ -102,8 +102,13 @@ export default function PickAudioSourceModal(
     startAudioOutput(stream);
   };
 
-  const startAudioOutputWithWindow = async (processId: string) => {
-    await window.ipcRenderer.invoke('startHandlingOutputAudioSource', 'isolatedCapture', processId);
+  const startAudioOutputWithWindow = async (processId: number) => {
+    const response = await window.ipcRenderer.invoke('startHandlingOutputAudioSource', 'isolatedCapture', processId);
+
+    if (!response.success) {
+      console.error('Failed to start capturing:', response.error);
+      return;
+    }
 
     setSending(true);
     props.onOpenChange?.({ open: false });
@@ -145,7 +150,7 @@ export default function PickAudioSourceModal(
                     justifyContent="flex-start"
                     onClick={() => startAudioOutputWithWindow(window.processId)}
                   >
-                    <FaRegWindowMaximize />
+                    {window.icon ? <Image src={window.icon} width="5" height="5" /> : <FaRegWindowMaximize />}
                     <Text textAlign="start" width="100%" overflow="hidden" textOverflow="ellipsis">
                       {window.title}
                     </Text>

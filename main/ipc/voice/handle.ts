@@ -6,7 +6,7 @@ import {
   StreamType,
   VoiceConnection,
 } from '@discordjs/voice';
-import { app, BrowserWindow, WebContents } from 'electron';
+import { BrowserWindow, nativeImage, WebContents } from 'electron';
 import { createRequire } from 'module';
 import { PassThrough } from 'stream';
 import { VoiceIpcSlice } from '.';
@@ -23,15 +23,11 @@ import {
   startHandlingOutputAudioSystemwideSource,
   stopHandlingAudioOutputSource,
 } from './utils';
-import path from 'path';
 
 const require = createRequire(import.meta.url);
 const prism = require('prism-media');
 const Speaker = require('speaker');
-
-const { getActiveWindowProcessIds } = require(process.env['VITE_DEV_SERVER_URL']
-  ? 'application-loopback'
-  : path.join(path.parse(app.getPath('exe')).dir, './resources/app.asar.unpacked/node_modules/application-loopback'));
+const { getVisibleWindows } = require('@kokapuk/application-loopback');
 
 export const ipcMain = createIpcMain<VoiceIpcSlice>();
 
@@ -220,12 +216,26 @@ export const handleIpcMainEvents = () => {
 
   ipcMain.handle('getAudioCaptureWindows', async () => {
     try {
-      const windows: OutputAudioWindowSource[] = await getActiveWindowProcessIds();
+      const windows = getVisibleWindows();
+
       return {
         success: true,
-        payload: windows.filter(
-          (window, index) => !windows.slice(0, index).some((cmpWindow) => cmpWindow.processId === window.processId)
-        ),
+        payload: windows
+          .filter(
+            (window: any, index: number) =>
+              !windows.slice(0, index).some((cmpWindow: any) => cmpWindow.processId === window.processId)
+          )
+          .map((window: any) => ({
+            ...window,
+            icon: window.icon
+              ? nativeImage
+                  .createFromBitmap(window.icon.buffer, {
+                    width: window.icon.width,
+                    height: window.icon.height,
+                  })
+                  .toDataURL()
+              : null,
+          })),
       } as IpcApiResponse<OutputAudioWindowSource[]>;
     } catch (err: any) {
       return { success: false, error: err.message } as IpcApiResponse<OutputAudioWindowSource[]>;
@@ -233,24 +243,30 @@ export const handleIpcMainEvents = () => {
   });
 
   ipcMain.handle('startHandlingOutputAudioSource', async (event, source, processId) => {
-    switch (source) {
-      case 'systemwide':
-        startHandlingOutputAudioSystemwideSource();
-        break;
-      case 'isolatedExternal':
-        startHandlingOutputAudioIsolatedExternalSource(BrowserWindow.fromWebContents(event.sender)!);
-        break;
-      case 'isolatedExternalWithLocalEcho':
-        startHandlingOutputAudioIsolatedExternalSource(BrowserWindow.fromWebContents(event.sender)!, true);
-        break;
-      case 'isolatedCapture':
-        startHandlingOutputAudioIsolatedCaptureSource(processId!);
-        break;
+    try {
+      switch (source) {
+        case 'systemwide':
+          startHandlingOutputAudioSystemwideSource();
+          break;
+        case 'isolatedExternal':
+          startHandlingOutputAudioIsolatedExternalSource(BrowserWindow.fromWebContents(event.sender)!);
+          break;
+        case 'isolatedExternalWithLocalEcho':
+          startHandlingOutputAudioIsolatedExternalSource(BrowserWindow.fromWebContents(event.sender)!, true);
+          break;
+        case 'isolatedCapture':
+          startHandlingOutputAudioIsolatedCaptureSource(processId!);
+          break;
+      }
+    } catch (err: any) {
+      return { success: false, error: err.message } as IpcApiResponse;
     }
 
     audioOutputStream.current = new PassThrough({ highWaterMark: 1024 });
     const resource = createAudioResource(audioOutputStream.current, { inputType: StreamType.Raw });
     audioPlayer.play(resource);
+
+    return { success: true } as IpcApiResponse;
   });
 
   ipcMain.on('sendAudioPort', (event) => {

@@ -17,8 +17,8 @@
     "@discordjs/opus": "0.10.0",
     "@discordjs/voice": "0.19.0",
     "@emotion/react": "11.14.0",
+    "@kokapuk/application-loopback": "1.0.0",
     "@snazzah/davey": "0.1.6",
-    "application-loopback": "1.1.5",
     "dayjs": "1.11.18",
     "discord.js": "14.22.1",
     "electron-store": "10.1.0",
@@ -37,7 +37,6 @@
     "zustand": "5.0.8"
   },
   "devDependencies": {
-    "@electron/rebuild": "4.0.1",
     "@types/lodash": "4.17.20",
     "@types/react": "19.1.12",
     "@types/react-dom": "19.1.9",

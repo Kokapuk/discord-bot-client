@@ -8,9 +8,9 @@ export type UserButtonProps = UserButtonBaseProps & ButtonProps & RefAttributes<
 
 export default function UserButton({ user, ...props }: UserButtonProps) {
   return (
-    <Button variant="ghost" justifyContent="flex-start" padding="0" {...props}>
-      <AvatarWithStatus src={user.displayAvatarUrl} status={user.status} />
-      <Text fontSize="md" fontWeight="600" color="fg">
+    <Button variant="ghost" justifyContent="flex-start" padding="0" width="100%" {...props}>
+      <AvatarWithStatus src={user.displayAvatarUrl} status={user.status} flexShrink="0" />
+      <Text fontSize="md" fontWeight="600" color="fg" overflow="hidden" textOverflow="ellipsis" textAlign="left">
         {user.displayName}
       </Text>
     </Button>

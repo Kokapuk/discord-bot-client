@@ -29,6 +29,8 @@ export interface VoiceState {
 export type OutputAudioSource = 'systemwide' | 'isolatedExternal' | 'isolatedExternalWithLocalEcho' | 'isolatedCapture';
 
 export interface OutputAudioWindowSource {
+  processId: number;
+  processName: string;
   title: string;
-  processId: string;
+  icon: string | null;
 }

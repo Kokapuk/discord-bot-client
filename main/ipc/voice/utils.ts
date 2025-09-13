@@ -1,20 +1,15 @@
 import { createAudioPlayer, NoSubscriberBehavior } from '@discordjs/voice';
-import { app, BrowserWindow, session, WebContents } from 'electron';
+import { BrowserWindow, session, WebContents } from 'electron';
 import { createRequire } from 'module';
-import path from 'path';
 import { PassThrough } from 'stream';
 import createMiniBrowserWindow from '../../windows/miniBrowser';
 import { ipcMain } from './handle';
 
 const require = createRequire(import.meta.url);
 
-const { startAudioCapture, stopAudioCapture } = require(process.env['VITE_DEV_SERVER_URL']
-  ? 'application-loopback'
-  : path.join(path.parse(app.getPath('exe')).dir, './resources/app.asar.unpacked/node_modules/application-loopback'));
+const { startLoopbackCapture, stopLoopbackCapture } = require('@kokapuk/application-loopback');
 
 let audioCaptureWindow: BrowserWindow | null = null;
-let capturingProcessId: string | null = null;
-let capturingSilenceInterval: NodeJS.Timeout | null = null;
 
 export const audioPlayer = createAudioPlayer({
   behaviors: {
@@ -48,27 +43,8 @@ export const startHandlingOutputAudioIsolatedExternalSource = async (window: Bro
   );
 };
 
-export const startHandlingOutputAudioIsolatedCaptureSource = async (processId: string) => {
-  if (capturingProcessId) {
-    return;
-  }
-
-  capturingProcessId = processId;
-
-  let lastDataTs = Date.now();
-
-  startAudioCapture(capturingProcessId, {
-    onData: (chunk: Uint8Array) => {
-      lastDataTs = Date.now();
-      audioOutputStream.current?.push(chunk);
-    },
-  });
-
-  capturingSilenceInterval = setInterval(() => {
-    if (Date.now() - lastDataTs > 30) {
-      audioOutputStream.current?.push(Buffer.alloc(3840));
-    }
-  }, 20);
+export const startHandlingOutputAudioIsolatedCaptureSource = (processId: number) => {
+  startLoopbackCapture(processId, (chunk: Uint8Array) => audioOutputStream.current?.push(chunk));
 };
 
 export const stopHandlingAudioOutputIsolatedExternalSource = () => {
@@ -80,11 +56,7 @@ export const stopHandlingAudioOutputIsolatedExternalSource = () => {
 };
 
 export const stopHandlingOutputAudioIsolatedCaptureSource = async () => {
-  capturingSilenceInterval && clearInterval(capturingSilenceInterval);
-  capturingProcessId && stopAudioCapture(capturingProcessId);
-
-  capturingSilenceInterval = null;
-  capturingProcessId = null;
+  stopLoopbackCapture();
 };
 
 export const stopHandlingAudioOutputSource = async (webContents: WebContents) => {
