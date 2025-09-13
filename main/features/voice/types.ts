@@ -26,11 +26,46 @@ export interface VoiceState {
   member: VoiceMember | null;
 }
 
-export type OutputAudioSource = 'systemwide' | 'isolatedExternal' | 'isolatedExternalWithLocalEcho' | 'isolatedCapture';
+export enum OutputAudioSourceType {
+  Systemwide = 'systemwide',
+  IsolatedExternal = 'isolatedExternal',
+  LoopbackCapture = 'isolatedCapture',
+  Device = 'device',
+}
 
-export interface OutputAudioWindowSource {
+export interface OutputAudioSourceBase {
+  type: OutputAudioSourceType;
+  name: string;
+}
+
+export interface OutputAudioSourceSystemwide extends OutputAudioSourceBase {
+  type: OutputAudioSourceType.Systemwide;
+}
+
+export interface OutputAudioSourceIsolatedExternal extends OutputAudioSourceBase {
+  type: OutputAudioSourceType.IsolatedExternal;
+  withLocalEcho?: boolean;
+}
+
+export interface LoopbackCaptureWindow {
   processId: number;
   processName: string;
   title: string;
   icon: string | null;
 }
+
+export interface OutputAudioSourceLoopbackCapture extends OutputAudioSourceBase {
+  type: OutputAudioSourceType.LoopbackCapture;
+  window: LoopbackCaptureWindow;
+}
+
+export interface OutputAudioSourceDevice extends OutputAudioSourceBase {
+  type: OutputAudioSourceType.Device;
+  device: MediaDeviceInfo;
+}
+
+export type OutputAudioSource =
+  | OutputAudioSourceSystemwide
+  | OutputAudioSourceIsolatedExternal
+  | OutputAudioSourceLoopbackCapture
+  | OutputAudioSourceDevice;

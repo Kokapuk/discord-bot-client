@@ -1,7 +1,7 @@
 import { IpcApiResponse } from '..';
 import {
   OutputAudioSource,
-  OutputAudioWindowSource,
+  LoopbackCaptureWindow,
   VoiceConnectionStatus,
   VoiceMember,
   VoiceState,
@@ -15,8 +15,8 @@ export type VoiceIpcSlice = CreateIpcSlice<{
     disableReceiver: () => Promise<void>;
     joinVoice: (guildId: string, channelId: string) => Promise<void>;
     leaveVoice: () => Promise<void>;
-    getAudioCaptureWindows: () => Promise<IpcApiResponse<OutputAudioWindowSource[]>>;
-    startHandlingOutputAudioSource: (source?: OutputAudioSource, processId?: number) => Promise<IpcApiResponse>;
+    getAudioCaptureWindows: () => Promise<IpcApiResponse<LoopbackCaptureWindow[]>>;
+    startHandlingOutputAudioSource: (source?: OutputAudioSource) => Promise<IpcApiResponse>;
     sendAudioPort: () => Promise<void>;
     stopHandlingOutputAudioSource: () => Promise<void>;
     getUserVolume: (userId: string) => Promise<number>;

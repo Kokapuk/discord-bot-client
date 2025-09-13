@@ -24,7 +24,7 @@ export const startHandlingOutputAudioSystemwideSource = async () => {
   });
 };
 
-export const startHandlingOutputAudioIsolatedExternalSource = async (window: BrowserWindow, enableLocalEcho?: true) => {
+export const startHandlingOutputAudioIsolatedExternalSource = async (window: BrowserWindow, enableLocalEcho?: boolean) => {
   return await new Promise<void>((resolve) =>
     session.defaultSession.setDisplayMediaRequestHandler((_, callback) => {
       const audioCaptureWindowData = createMiniBrowserWindow(window);

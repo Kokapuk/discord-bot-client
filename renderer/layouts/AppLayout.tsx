@@ -228,7 +228,7 @@ export default function AppLayout() {
     <Stack direction="row" gap="0" height="100%">
       {!!guilds ? (
         <>
-          <Stack height="100%" gap="0" width="19rem">
+          <Stack height="100%" gap="0" width="19rem" flexShrink="0">
             <Stack height="100%" minHeight="0" direction="row" gap="0">
               <Stack height="100%">
                 <GuildDmList paddingInline="2.5" />
@@ -236,7 +236,7 @@ export default function AppLayout() {
                 <AddDmChannelButton marginInline="2.5" />
               </Stack>
 
-              <Box as="aside" id="leftSidebar" height="100%" width="100%" minWidth='0' />
+              <Box as="aside" id="leftSidebar" height="100%" width="100%" minWidth="0" />
             </Stack>
             <ClientActivityPanel margin="2" />
           </Stack>

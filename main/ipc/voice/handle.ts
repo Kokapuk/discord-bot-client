@@ -11,7 +11,12 @@ import { createRequire } from 'module';
 import { PassThrough } from 'stream';
 import { VoiceIpcSlice } from '.';
 import { IpcApiResponse } from '..';
-import { OutputAudioWindowSource, VoiceConnectionStatus, VoiceMember } from '../../features/voice/types';
+import {
+  OutputAudioSourceType,
+  LoopbackCaptureWindow,
+  VoiceConnectionStatus,
+  VoiceMember,
+} from '../../features/voice/types';
 import { structVoiceMember, structVoiceState } from '../../features/voice/utils';
 import { createIpcMain } from '../../utils/createIpcMain';
 import { client } from '../client/utils';
@@ -236,26 +241,26 @@ export const handleIpcMainEvents = () => {
                   .toDataURL()
               : null,
           })),
-      } as IpcApiResponse<OutputAudioWindowSource[]>;
+      } as IpcApiResponse<LoopbackCaptureWindow[]>;
     } catch (err: any) {
-      return { success: false, error: err.message } as IpcApiResponse<OutputAudioWindowSource[]>;
+      return { success: false, error: err.message } as IpcApiResponse<LoopbackCaptureWindow[]>;
     }
   });
 
-  ipcMain.handle('startHandlingOutputAudioSource', async (event, source, processId) => {
+  ipcMain.handle('startHandlingOutputAudioSource', async (event, source) => {
     try {
-      switch (source) {
-        case 'systemwide':
+      switch (source?.type) {
+        case OutputAudioSourceType.Systemwide:
           startHandlingOutputAudioSystemwideSource();
           break;
-        case 'isolatedExternal':
-          startHandlingOutputAudioIsolatedExternalSource(BrowserWindow.fromWebContents(event.sender)!);
+        case OutputAudioSourceType.IsolatedExternal:
+          startHandlingOutputAudioIsolatedExternalSource(
+            BrowserWindow.fromWebContents(event.sender)!,
+            source.withLocalEcho
+          );
           break;
-        case 'isolatedExternalWithLocalEcho':
-          startHandlingOutputAudioIsolatedExternalSource(BrowserWindow.fromWebContents(event.sender)!, true);
-          break;
-        case 'isolatedCapture':
-          startHandlingOutputAudioIsolatedCaptureSource(processId!);
+        case OutputAudioSourceType.LoopbackCapture:
+          startHandlingOutputAudioIsolatedCaptureSource(source.window.processId);
           break;
       }
     } catch (err: any) {

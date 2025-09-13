@@ -79,7 +79,7 @@ export default function Channel() {
 
   const handlePaginate = useMemo(
     () => (topReachedChannels[channelId] ? undefined : () => fetchMessages(channelId)),
-    [!!topReachedChannels[channelId]]
+    [topReachedChannels[channelId]]
   );
   const handleEdit = useCallback((message: Message) => setEditingMessage(message), []);
   const handleReply = useCallback((message: Message) => setReplyingMessage(message), []);

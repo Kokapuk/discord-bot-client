@@ -1,22 +1,12 @@
-import { BrowserWindow, shell } from 'electron';
+import { BrowserWindow } from 'electron';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { handleIpcMainAutoInvokeEvents, handleIpcMainEvents } from '../ipc';
 import { RENDERER_DIST, VITE_DEV_SERVER_URL } from '../main';
 import handleThemeUpdate from '../utils/handleThemeUpdate';
+import handleThirdPartyLinks from '../utils/handleThirdPartyLinks';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
-const handleThirdPartyLinks = (window: BrowserWindow) => {
-  window.webContents.setWindowOpenHandler(({ url, referrer }) => {
-    if (new URL(url).origin !== new URL(referrer.url).origin) {
-      shell.openExternal(url);
-      return { action: 'deny' };
-    }
-
-    return { action: 'allow' };
-  });
-};
 
 const createAppWindow = () => {
   const window = new BrowserWindow({

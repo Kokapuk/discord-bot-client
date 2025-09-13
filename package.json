@@ -7,7 +7,7 @@
     "dev": "vite",
     "voice-test": "node ./main/ipc/voice/test.js",
     "rebuild": "npm rebuild @discordjs/opus --runtime=electron --target=38.0.0 --disturl=https://electronjs.org/headers --update-binary",
-    "build": "yarn rebuild && tsc && vite build && electron-builder",
+    "build": "tsc && vite build && electron-builder",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "tsc": "tsc"
