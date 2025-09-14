@@ -7,10 +7,15 @@ import { RefAttributes, useMemo } from 'react';
 import { FaPhoneSlash } from 'react-icons/fa6';
 import { useShallow } from 'zustand/shallow';
 import useVoicesStore from '../store';
+import OutputAudioVisualizer from './OutputAudioVisualizer';
 
 export default function VoiceStatus(props: StackProps & RefAttributes<HTMLDivElement>) {
-  const { connectionStatus, activeChannelData } = useVoicesStore(
-    useShallow((s) => ({ connectionStatus: s.connectionStatus, activeChannelData: s.activeChannel }))
+  const { connectionStatus, activeChannelData, activeOutputAudioSource } = useVoicesStore(
+    useShallow((s) => ({
+      connectionStatus: s.connectionStatus,
+      activeChannelData: s.activeChannel,
+      activeOutputAudioSource: s.activeOutputAudioSource,
+    }))
   );
   const { guilds, channels } = useGuildsStore(useShallow((s) => ({ guilds: s.guilds, channels: s.channels })));
 
@@ -64,8 +69,8 @@ export default function VoiceStatus(props: StackProps & RefAttributes<HTMLDivEle
   }
 
   return (
-    <Stack direction="row" alignItems="center" {...props}>
-      <Stack gap="0">
+    <Stack direction="row" alignItems="center" gap="5" {...props}>
+      <Stack gap="0" width="100%" minWidth="0">
         <Text color={statusColor} fontSize="sm" fontWeight="500">
           {statusLabel}
         </Text>
@@ -74,6 +79,15 @@ export default function VoiceStatus(props: StackProps & RefAttributes<HTMLDivEle
           <Link to={`/guilds/${activeGuild.id}/${activeChannel.id}`} fontSize="sm">
             {activeChannel.name} / {activeGuild.name}
           </Link>
+        )}
+
+        {activeOutputAudioSource && (
+          <Stack direction="row">
+            <Text color="fg.muted" fontSize="xs" whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis">
+              {activeOutputAudioSource.name}
+            </Text>
+            <OutputAudioVisualizer color="fg.subtle" />
+          </Stack>
         )}
       </Stack>
 

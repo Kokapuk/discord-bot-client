@@ -1,4 +1,4 @@
-import { VoiceConnectionStatus, VoiceMember } from '@main/features/voice/types';
+import { OutputAudioSource, VoiceConnectionStatus, VoiceMember } from '@main/features/voice/types';
 import { create } from 'zustand';
 
 interface VoicesState {
@@ -12,6 +12,8 @@ interface VoicesState {
   setReceiving(receiving: boolean): void;
   sending: boolean;
   setSending(sending: boolean): void;
+  activeOutputAudioSource: OutputAudioSource | null;
+  setActiveOutputAudioSource(activeOutputAudioSource: OutputAudioSource | null): void;
   speakingMemberIds: string[];
   addSpeakingMember(memberId: string): void;
   removeSpeakingMember(memberId: string): void;
@@ -46,6 +48,10 @@ const useVoicesStore = create<VoicesState>()((set) => ({
   sending: false,
   setSending: (sending) => {
     set({ sending });
+  },
+  activeOutputAudioSource: null,
+  setActiveOutputAudioSource: (activeOutputAudioSource) => {
+    set({ activeOutputAudioSource });
   },
   speakingMemberIds: [],
   addSpeakingMember(memberId) {

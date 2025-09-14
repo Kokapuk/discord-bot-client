@@ -12,8 +12,8 @@ import { PassThrough } from 'stream';
 import { VoiceIpcSlice } from '.';
 import { IpcApiResponse } from '..';
 import {
-  OutputAudioSourceType,
   LoopbackCaptureWindow,
+  OutputAudioSourceType,
   VoiceConnectionStatus,
   VoiceMember,
 } from '../../features/voice/types';
@@ -225,22 +225,17 @@ export const handleIpcMainEvents = () => {
 
       return {
         success: true,
-        payload: windows
-          .filter(
-            (window: any, index: number) =>
-              !windows.slice(0, index).some((cmpWindow: any) => cmpWindow.processId === window.processId)
-          )
-          .map((window: any) => ({
-            ...window,
-            icon: window.icon
-              ? nativeImage
-                  .createFromBitmap(window.icon.buffer, {
-                    width: window.icon.width,
-                    height: window.icon.height,
-                  })
-                  .toDataURL()
-              : null,
-          })),
+        payload: windows.map((window: any) => ({
+          ...window,
+          icon: window.icon
+            ? nativeImage
+                .createFromBitmap(window.icon.buffer, {
+                  width: window.icon.width,
+                  height: window.icon.height,
+                })
+                .toDataURL()
+            : null,
+        })),
       } as IpcApiResponse<LoopbackCaptureWindow[]>;
     } catch (err: any) {
       return { success: false, error: err.message } as IpcApiResponse<LoopbackCaptureWindow[]>;
@@ -268,6 +263,10 @@ export const handleIpcMainEvents = () => {
     }
 
     audioOutputStream.current = new PassThrough({ highWaterMark: 1024 });
+    audioOutputStream.current.on('data', (chunk: Buffer) =>
+      ipcMain.send(event.sender, 'outputAudioChunkProcessed', new Uint8Array(chunk))
+    );
+
     const resource = createAudioResource(audioOutputStream.current, { inputType: StreamType.Raw });
     audioPlayer.play(resource);
 

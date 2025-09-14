@@ -4,8 +4,11 @@ import {
   OutputAudioSourceDevice,
   OutputAudioSourceLoopbackCapture,
   OutputAudioSourceType,
+  VoiceConnectionStatus,
 } from '@main/features/voice/types';
+import playAudio from '@renderer/utils/playAudio';
 import resolvePublicUrl from '@renderer/utils/resolvePublicUrl';
+import omit from 'lodash/omit';
 import { ReactNode, RefAttributes, useEffect, useState } from 'react';
 import { FaCircleNodes, FaGear, FaMicrophoneLines, FaRegWindowMaximize, FaSquareArrowUpRight } from 'react-icons/fa6';
 import { useShallow } from 'zustand/shallow';
@@ -26,7 +29,9 @@ const STATIC_SYSTEM_OUTPUT_AUDIO_SOURCES = [
 export default function PickAudioSourceModal(
   props: Omit<Dialog.RootProps, 'children'> & RefAttributes<HTMLDivElement>
 ) {
-  const setSending = useVoicesStore(useShallow((s) => s.setSending));
+  const { setSending, setActiveOutputAudioSource } = useVoicesStore(
+    useShallow((s) => ({ setSending: s.setSending, setActiveOutputAudioSource: s.setActiveOutputAudioSource }))
+  );
   const [audioOutputSettings, setAudioOutputSettings] = useState<AudioToggleSettings>(() => ({
     autoGainControl: false,
     noiseSuppression: false,
@@ -34,6 +39,16 @@ export default function PickAudioSourceModal(
   }));
   const [windows, setWindows] = useState<OutputAudioSourceLoopbackCapture[] | null>(null);
   const [audioInputDevices, setAudioInputDevices] = useState<OutputAudioSourceDevice[] | null>(null);
+
+  const setSendingWithAudioEffect = (sending: boolean) => {
+    setSending(sending);
+
+    if (sending) {
+      playAudio(resolvePublicUrl('./audios/unmute.mp3'));
+    } else {
+      playAudio(resolvePublicUrl('./audios/mute.mp3'));
+    }
+  };
 
   useEffect(() => {
     if (!props.open) {
@@ -50,7 +65,11 @@ export default function PickAudioSourceModal(
       }
 
       setWindows(
-        response.payload.map((window) => ({ type: OutputAudioSourceType.LoopbackCapture, name: window.title, window }))
+        response.payload.map((window) => ({
+          type: OutputAudioSourceType.LoopbackCapture,
+          name: window.processName.replace('.exe', ''),
+          window,
+        }))
       );
     })();
   }, [props.open]);
@@ -74,8 +93,9 @@ export default function PickAudioSourceModal(
     })();
   }, [props.open]);
 
-  const startAudioOutput = async (stream: MediaStream) => {
-    setSending(true);
+  const startAudioOutput = async (stream: MediaStream, outputAudioSource: OutputAudioSource) => {
+    setSendingWithAudioEffect(true);
+    setActiveOutputAudioSource(outputAudioSource);
     props.onOpenChange?.({ open: false });
 
     const audioContext = new AudioContext({ sampleRate: 48000 });
@@ -96,19 +116,20 @@ export default function PickAudioSourceModal(
       port1.close();
       audioContext.close();
       stream.getTracks().forEach((track) => track.stop());
-      setSending(false);
+      setSendingWithAudioEffect(false);
+      setActiveOutputAudioSource(null);
     });
   };
 
-  const startAudioOutputWithSource = async (outputAudioSource: OutputAudioSource) => {
-    await window.ipcRenderer.invoke('startHandlingOutputAudioSource', outputAudioSource);
+  const startAudioOutputWithSource = async (source: OutputAudioSource) => {
+    await window.ipcRenderer.invoke('startHandlingOutputAudioSource', source);
 
     const stream = await navigator.mediaDevices.getDisplayMedia({
       audio: { ...audioOutputSettings },
       video: false,
     });
 
-    startAudioOutput(stream);
+    startAudioOutput(stream, source);
   };
 
   const startAudioOutputWithWindow = async (source: OutputAudioSourceLoopbackCapture) => {
@@ -119,11 +140,18 @@ export default function PickAudioSourceModal(
       return;
     }
 
-    setSending(true);
+    setSendingWithAudioEffect(true);
+    setActiveOutputAudioSource(source);
     props.onOpenChange?.({ open: false });
 
     window.ipcRenderer.once('audioOutputHandlingStop', () => {
-      setSending(false);
+      if (useVoicesStore.getState().connectionStatus === VoiceConnectionStatus.Destroyed) {
+        setSending(false);
+      } else {
+        setSendingWithAudioEffect(false);
+      }
+
+      setActiveOutputAudioSource(null);
     });
   };
 
@@ -135,7 +163,7 @@ export default function PickAudioSourceModal(
       video: false,
     });
 
-    startAudioOutput(stream);
+    startAudioOutput(stream, source);
   };
 
   return (
@@ -152,10 +180,10 @@ export default function PickAudioSourceModal(
               <Stack gap="3" marginBottom="5">
                 {STATIC_SYSTEM_OUTPUT_AUDIO_SOURCES.map((source) => (
                   <Button
-                    key={source.type}
+                    key={source.name}
                     variant="subtle"
                     justifyContent="flex-start"
-                    onClick={() => startAudioOutputWithSource(source)}
+                    onClick={() => startAudioOutputWithSource(omit(source, 'icon'))}
                   >
                     {source.icon}
                     <Text textAlign="start" width="100%" overflow="hidden" textOverflow="ellipsis">
@@ -176,7 +204,7 @@ export default function PickAudioSourceModal(
                       <FaRegWindowMaximize />
                     )}
                     <Text textAlign="start" width="100%" overflow="hidden" textOverflow="ellipsis">
-                      {source.name}
+                      {source.window.title}
                     </Text>
                   </Button>
                 ))}

@@ -3,6 +3,8 @@ import ClientActivityActionButton, {
   ClientActivityActionButtonProps,
 } from '@renderer/features/Client/components/ClientActivityActionButton';
 import useClientStore from '@renderer/features/Client/store';
+import playAudio from '@renderer/utils/playAudio';
+import resolvePublicUrl from '@renderer/utils/resolvePublicUrl';
 import { useEffect, useMemo } from 'react';
 import { FaVolumeLow, FaVolumeXmark } from 'react-icons/fa6';
 import { useShallow } from 'zustand/shallow';
@@ -36,13 +38,23 @@ export default function ToggleReceiveVoiceButton(props: ClientActivityActionButt
     }
   }, [connectionStatus === VoiceConnectionStatus.Destroyed]);
 
+  const setReceivingWithAudioEffect = (receiving: boolean) => {
+    setReceiving(receiving);
+
+    if (receiving) {
+      playAudio(resolvePublicUrl('./audios/undeafen.mp3'));
+    } else {
+      playAudio(resolvePublicUrl('./audios/deafen.mp3'));
+    }
+  };
+
   const enableReceiver = () => {
     if (!clientVoiceMember || clientVoiceMember.serverDeaf) {
       return;
     }
 
     window.ipcRenderer.invoke('enableReceiver');
-    setReceiving(true);
+    setReceivingWithAudioEffect(true);
   };
 
   const disableReceiver = () => {
@@ -51,7 +63,7 @@ export default function ToggleReceiveVoiceButton(props: ClientActivityActionButt
     }
 
     window.ipcRenderer.invoke('disableReceiver');
-    setReceiving(false);
+    setReceivingWithAudioEffect(false);
   };
 
   useEffect(() => {
