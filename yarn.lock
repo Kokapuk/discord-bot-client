@@ -902,10 +902,10 @@
     "@jridgewell/resolve-uri" "^3.1.0"
     "@jridgewell/sourcemap-codec" "^1.4.14"
 
-"@kokapuk/application-loopback@1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@kokapuk/application-loopback/-/application-loopback-1.0.0.tgz#0cb157dc6cfd30798cdaeb0194532801f7f97065"
-  integrity sha512-dW+IfB/HRSOQZyOMILNRfuUL4CB4QRBdhYRImzdum5rKGlRlFXhDhCWRjKB4Bh3MEwOcwO5r+NSc+LMb3vHWZw==
+"@kokapuk/application-loopback@1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@kokapuk/application-loopback/-/application-loopback-1.0.1.tgz#6efca2b81b8a8ce0a7171afa036bd554314f1f2d"
+  integrity sha512-rMhIcrOG/zlquV8t6eoqiCTtaBs2YFz3MIdA9pq1QccdgEySTlkums1P/u+rCFx2FuB0hSEkdCInTmZcKtPi1g==
   dependencies:
     node-addon-api "8.5.0"
 

@@ -82,6 +82,7 @@ export default function ToggleReceiveVoiceButton(props: ClientActivityActionButt
       tooltip={receiving ? 'Deafen' : 'Undeafen'}
       onClick={receiving ? disableReceiver : enableReceiver}
       colorPalette={clientVoiceMember.serverDeaf ? 'red' : undefined}
+      disabled={clientVoiceMember.serverDeaf ?? false}
       {...props}
     >
       {receiving ? <FaVolumeLow /> : <FaVolumeXmark />}

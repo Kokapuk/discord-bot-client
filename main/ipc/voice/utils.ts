@@ -24,7 +24,10 @@ export const startHandlingOutputAudioSystemwideSource = async () => {
   });
 };
 
-export const startHandlingOutputAudioIsolatedExternalSource = async (window: BrowserWindow, enableLocalEcho?: boolean) => {
+export const startHandlingOutputAudioIsolatedExternalSource = async (
+  window: BrowserWindow,
+  enableLocalEcho?: boolean
+) => {
   return await new Promise<void>((resolve) =>
     session.defaultSession.setDisplayMediaRequestHandler((_, callback) => {
       const audioCaptureWindowData = createMiniBrowserWindow(window);
@@ -43,8 +46,8 @@ export const startHandlingOutputAudioIsolatedExternalSource = async (window: Bro
   );
 };
 
-export const startHandlingOutputAudioIsolatedCaptureSource = (processId: number) => {
-  startLoopbackCapture(processId, (chunk: Uint8Array) => audioOutputStream.current?.push(chunk));
+export const startHandlingOutputAudioIsolatedCaptureSource = (processId: number, onFinish?: () => void) => {
+  startLoopbackCapture(processId, (chunk: Uint8Array) => audioOutputStream.current?.push(chunk), onFinish);
 };
 
 export const stopHandlingAudioOutputIsolatedExternalSource = () => {

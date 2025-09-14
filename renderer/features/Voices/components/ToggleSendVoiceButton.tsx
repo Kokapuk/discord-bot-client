@@ -3,7 +3,7 @@ import ClientActivityActionButton, {
   ClientActivityActionButtonProps,
 } from '@renderer/features/Client/components/ClientActivityActionButton';
 import useClientStore from '@renderer/features/Client/store';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { FaMicrophone, FaMicrophoneSlash } from 'react-icons/fa6';
 import { useShallow } from 'zustand/shallow';
 import useVoicesStore from '../store';
@@ -31,6 +31,14 @@ export default function ToggleSendVoiceButton(props: ClientActivityActionButtonP
     );
   }, [connectionStatus, activeChannelData, !!client, members]);
 
+  useEffect(() => {
+    if (clientVoiceMember?.serverMute && sending) {
+      window.ipcRenderer.invoke('stopHandlingOutputAudioSource');
+    }
+
+    setModalOpen(false);
+  }, [clientVoiceMember]);
+
   if (!clientVoiceMember) {
     return null;
   }
@@ -40,8 +48,9 @@ export default function ToggleSendVoiceButton(props: ClientActivityActionButtonP
       <ClientActivityActionButton
         toggled={sending}
         tooltip={sending ? 'Mute' : 'Unmute'}
-        onClick={sending ? () => window.ipcRenderer.invoke('stopHandlingOutputAudioSource') : () => setModalOpen(true)}
+        onClick={() => (sending ? window.ipcRenderer.invoke('stopHandlingOutputAudioSource') : setModalOpen(true))}
         colorPalette={clientVoiceMember.serverMute ? 'red' : undefined}
+        disabled={clientVoiceMember.serverMute ?? false}
         {...props}
       >
         {sending ? <FaMicrophone /> : <FaMicrophoneSlash />}

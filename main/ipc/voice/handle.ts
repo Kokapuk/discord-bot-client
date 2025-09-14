@@ -255,7 +255,9 @@ export const handleIpcMainEvents = () => {
           );
           break;
         case OutputAudioSourceType.LoopbackCapture:
-          startHandlingOutputAudioIsolatedCaptureSource(source.window.processId);
+          startHandlingOutputAudioIsolatedCaptureSource(source.window.processId, () =>
+            stopHandlingAudioOutputSource(event.sender)
+          );
           break;
       }
     } catch (err: any) {
