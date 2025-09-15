@@ -7,6 +7,8 @@ const handleThemeUpdate = (window: BrowserWindow, titleBarHeight: number) => {
       symbolColor: nativeTheme.shouldUseDarkColors ? 'white' : 'black',
       height: titleBarHeight,
     });
+
+    window.setBackgroundMaterial(nativeTheme.shouldUseDarkColors ? 'mica' : 'tabbed')
   };
 
   nativeTheme.on('updated', themeUpdated);
