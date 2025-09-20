@@ -67,7 +67,7 @@ export default function AddDmChannelModal({ children, triggerTooltipProps, ...pr
             <Dialog.Body maxHeight="70vh" overflow="auto">
               <Stack>
                 {filteredUsers?.map((user) => (
-                  <UserButton key={user.id} user={user} onClick={() => handleUserClick(user)} />
+                  <UserButton key={user.id} user={user} hideStatus onClick={() => handleUserClick(user)} />
                 ))}
               </Stack>
             </Dialog.Body>

@@ -15,6 +15,11 @@ export const handleIpcMainEvents = () => {
 
   ipcMain.handle('getAccentColor', async () => settingsStore.get('accentColor'));
   ipcMain.handle('setAccentColor', async (_, accentColor) => settingsStore.set('accentColor', accentColor));
+
+  ipcMain.handle('getAudioEffectsVolume', async () => settingsStore.get('audioEffectsVolume'));
+  ipcMain.handle('setAudioEffectsVolume', async (_, audioEffectsVolume) =>
+    settingsStore.set('audioEffectsVolume', audioEffectsVolume)
+  );
 };
 
 export const handleIpcMainAutoInvokeEvents = (webContents: WebContents) => {
@@ -22,12 +27,17 @@ export const handleIpcMainAutoInvokeEvents = (webContents: WebContents) => {
     ipcMain.send(webContents, 'themeUpdate', newTheme!, oldTheme!)
   );
 
-  const unsubscribeAccentUpdate = settingsStore.onDidChange('accentColor', (newColor, oldColor) =>
+  const unsubscribeAccentColorUpdate = settingsStore.onDidChange('accentColor', (newColor, oldColor) =>
     ipcMain.send(webContents, 'accentColorUpdate', newColor!, oldColor!)
+  );
+
+  const unsubscribeAudioEffectsVolumeUpdate = settingsStore.onDidChange('audioEffectsVolume', (newVolume, oldVolume) =>
+    ipcMain.send(webContents, 'audioEffectsVolumeUpdate', newVolume!, oldVolume!)
   );
 
   return () => {
     unsubscribeThemeUpdate();
-    unsubscribeAccentUpdate();
+    unsubscribeAccentColorUpdate();
+    unsubscribeAudioEffectsVolumeUpdate();
   };
 };

@@ -19,8 +19,14 @@ import { useShallow } from 'zustand/react/shallow';
 
 export default function AppLayout() {
   const { channelId } = useParams();
-  const pullClientUser = useClientStore((s) => s.pullClientUser);
   const navigate = useNavigate();
+
+  const { pullClientUser, setAudioEffectsVolume } = useClientStore(
+    useShallow((s) => ({
+      pullClientUser: s.pullClientUser,
+      setAudioEffectsVolume: s.setAudioEffectsVolume,
+    }))
+  );
 
   const { guilds, pullGuilds, pullChannels, pullMembers, pullRoles } = useGuildsStore(
     useShallow((s) => ({
@@ -63,6 +69,10 @@ export default function AppLayout() {
 
   useEffect(() => {
     pullClientUser();
+
+    const unsubscribe = window.ipcRenderer.on('audioEffectsVolumeUpdate', (_, volume) => setAudioEffectsVolume(volume));
+
+    return unsubscribe;
   }, []);
 
   useEffect(() => {

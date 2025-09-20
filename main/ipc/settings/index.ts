@@ -7,9 +7,15 @@ export type SettingsIpcSlice = CreateIpcSlice<{
     setTheme: (theme: Settings['theme']) => Promise<void>;
     getAccentColor: () => Promise<Settings['accentColor']>;
     setAccentColor: (theme: Settings['accentColor']) => Promise<void>;
+    getAudioEffectsVolume: () => Promise<Settings['audioEffectsVolume']>;
+    setAudioEffectsVolume: (theme: Settings['audioEffectsVolume']) => Promise<void>;
   };
   mainToRenderer: {
     themeUpdate: (newTheme: Settings['theme'], oldTheme: Settings['theme']) => void;
     accentColorUpdate: (newColor: Settings['accentColor'], oldColor: Settings['accentColor']) => void;
+    audioEffectsVolumeUpdate: (
+      newVolume: Settings['audioEffectsVolume'],
+      oldVolume: Settings['audioEffectsVolume']
+    ) => void;
   };
 }>;

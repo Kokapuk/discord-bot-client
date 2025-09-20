@@ -1,4 +1,5 @@
 import { contextBridge } from 'electron';
+import { AppIpcSlice } from './ipc/app';
 import { ClientIpcSlice } from './ipc/client';
 import { DmsIpcSlice } from './ipc/dms';
 import { GuildsIpcSlice } from './ipc/guilds';
@@ -10,6 +11,7 @@ import { createIpcRenderer } from './utils/createIpcRenderer';
 import { MergeSlices } from './utils/ipc';
 
 type MergedSlices = MergeSlices<
+  | AppIpcSlice
   | ClientIpcSlice
   | GuildsIpcSlice
   | MessagesIpcSlice

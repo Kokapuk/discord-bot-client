@@ -6,6 +6,8 @@ interface ClientState {
   pullClientUser(): Promise<void>;
   mediaVolume: number;
   setMediaVolume(volume: number): void;
+  audioEffectsVolume: number;
+  setAudioEffectsVolume(audioEffectsVolume: number): void;
 }
 
 const useClientStore = create<ClientState>()((set) => ({
@@ -23,6 +25,8 @@ const useClientStore = create<ClientState>()((set) => ({
   },
   mediaVolume: 0.3,
   setMediaVolume: (mediaVolume) => set({ mediaVolume }),
+  audioEffectsVolume: 0.3,
+  setAudioEffectsVolume: (audioEffectsVolume) => set({ audioEffectsVolume }),
 }));
 
 export default useClientStore;
