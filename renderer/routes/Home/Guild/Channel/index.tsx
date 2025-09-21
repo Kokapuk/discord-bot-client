@@ -127,7 +127,9 @@ export default function Channel() {
   return (
     <Box height="100%" display="flex" flexDirection="column">
       <Box as="header" paddingBottom="2.5" flexShrink="0">
-        <Heading as="h2">{activeChannel.name}</Heading>
+        <Heading as="h2" size="lg">
+          {activeChannel.name}
+        </Heading>
       </Box>
       <MessageContext.Provider value={messageContext}>
         <MessageList key={channelId} height="100%" minHeight="0" marginBottom="4" />

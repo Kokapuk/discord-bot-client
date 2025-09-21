@@ -1,4 +1,4 @@
-import { Stack, StackProps } from '@chakra-ui/react';
+import { Box, Stack, StackProps } from '@chakra-ui/react';
 import { memo, RefAttributes } from 'react';
 import { useContextSelector } from 'use-context-selector';
 import { ChannelContext } from '../context';
@@ -10,7 +10,9 @@ const ChannelList = (props: StackProps & RefAttributes<HTMLDivElement>) => {
   return (
     <Stack overflow="auto" paddingInline="2.5" paddingBottom="2.5" gap="2.5" {...props}>
       {channels?.map((channel) => (
-        <GuildChannel key={channel.id} channel={channel} />
+        <Box contentVisibility="auto" containIntrinsicSize="auto 1.875rem">
+          <GuildChannel key={channel.id} channel={channel} />
+        </Box>
       ))}
     </Stack>
   );

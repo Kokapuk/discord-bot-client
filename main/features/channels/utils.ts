@@ -1,4 +1,5 @@
 import { Channel as DiscordChannel, DMChannel as DiscordDmChannel, PermissionFlagsBits } from 'discord.js';
+import { client } from '../../ipc/client/utils';
 import { structUser } from '../users/utils';
 import { ChannelType, DmChannel, GuildChannel, GuildTextChannel, GuildVoiceChannel } from './types';
 
@@ -35,14 +36,26 @@ export const structGuildChannel = (channel: DiscordChannel): GuildChannel | null
   return textChannel;
 };
 
-export const structDmChannel = (channel: DiscordDmChannel): DmChannel | null => {
+export const structDmChannel = async (channel: DiscordDmChannel): Promise<DmChannel | null> => {
   if (!channel.isDMBased() || !Object.values(ChannelType).includes(channel.type as number)) {
     return null;
+  }
+
+  let recipient = channel.recipient;
+
+  if (!recipient) {
+    const user = await client.users.fetch(channel.recipientId);
+
+    if (!user) {
+      return null;
+    }
+
+    recipient = user;
   }
 
   return {
     id: channel.id,
     type: channel.type as number,
-    recipient: channel.recipient ? structUser(channel.recipient) : null,
+    recipient: structUser(recipient),
   };
 };

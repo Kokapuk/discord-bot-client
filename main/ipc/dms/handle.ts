@@ -30,7 +30,13 @@ export const handleIpcMainEvents = () => {
         channel = await user.createDM();
       }
 
-      return { success: true, payload: structDmChannel(channel!)! } as IpcApiResponse<DmChannel>;
+      const structedDmChannel = await structDmChannel(channel!);
+
+      if (!structedDmChannel) {
+        throw Error('Failed to struct dm channel');
+      }
+
+      return { success: true, payload: structedDmChannel } as IpcApiResponse<DmChannel>;
     } catch (err: any) {
       return { success: false, error: err.members } as IpcApiResponse<DmChannel>;
     }

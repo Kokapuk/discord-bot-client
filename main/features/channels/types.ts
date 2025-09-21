@@ -47,7 +47,7 @@ export type GuildChannel = GuildTextChannel | GuildVoiceChannel;
 
 export interface DmChannel extends BaseChannel {
   type: ChannelType.DM;
-  recipient: User | null;
+  recipient: User;
 }
 
 export type Channel = GuildChannel | DmChannel;

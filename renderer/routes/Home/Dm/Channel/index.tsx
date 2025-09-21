@@ -1,4 +1,4 @@
-import { Box, Heading } from '@chakra-ui/react';
+import { Box, Heading, Stack } from '@chakra-ui/react';
 import { Message } from '@main/features/messages/types';
 import useClientStore from '@renderer/features/Client/store';
 import useDmsStore from '@renderer/features/Dms/store';
@@ -8,6 +8,7 @@ import useMessagesStore from '@renderer/features/Messages/store';
 import Textarea from '@renderer/features/TextArea/components/Textarea';
 import { TextareaContext } from '@renderer/features/TextArea/context';
 import useTextAreaStore from '@renderer/features/TextArea/store';
+import Avatar from '@renderer/ui/Avatar';
 import { useCallback, useEffect, useMemo } from 'react';
 import { useParams } from 'react-router';
 import { useShallow } from 'zustand/react/shallow';
@@ -94,9 +95,10 @@ export default function Channel() {
 
   return (
     <Box height="100%" display="flex" flexDirection="column">
-      <Box as="header" paddingBottom="2.5" flexShrink="0">
-        <Heading as="h2">{activeChannel.recipient?.displayName}</Heading>
-      </Box>
+      <Stack as="header" direction="row" alignItems="center" paddingBottom="2.5" flexShrink="0">
+        <Avatar size="6" src={activeChannel.recipient.displayAvatarUrl} alt="Avatar" />
+        <Heading as="h2" size='lg'>{activeChannel.recipient.displayName}</Heading>
+      </Stack>
       <MessageContext.Provider value={messageContext}>
         <MessageList key={channelId} height="100%" minHeight="0" marginBottom="4" />
       </MessageContext.Provider>
