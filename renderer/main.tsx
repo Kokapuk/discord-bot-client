@@ -8,12 +8,11 @@ import { Toaster } from './ui/Toaster';
 
 const Auth = lazy(() => import('./routes/Auth'));
 const AppLayout = lazy(() => import('./layouts/AppLayout'));
-const Home = lazy(() => import('./routes/Home'));
 const GuildLayout = lazy(() => import('./layouts/GuildLayout'));
 const GuildChannel = lazy(() => import('./routes/Home/Guild/Channel'));
-const MiniBrowser = lazy(() => import('./routes/MiniBrowser'));
 const DmLayout = lazy(() => import('./layouts/DmLayout'));
 const DmChannel = lazy(() => import('./routes/Home/Dm/Channel'));
+const MiniBrowser = lazy(() => import('./routes/MiniBrowser'));
 
 const router = createHashRouter([
   {
@@ -27,10 +26,6 @@ const router = createHashRouter([
         path: '/',
         element: <AppLayout />,
         children: [
-          {
-            index: true,
-            element: <Home />,
-          },
           {
             path: 'guilds/:guildId',
             element: <GuildLayout />,

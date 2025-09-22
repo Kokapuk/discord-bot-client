@@ -70,7 +70,7 @@ export default function ToggleReceiveVoiceButton(props: ClientActivityActionButt
     if (clientVoiceMember?.serverDeaf && receiving) {
       disableReceiver();
     }
-  }, [clientVoiceMember]);
+  }, [clientVoiceMember?.serverDeaf]);
 
   if (!clientVoiceMember) {
     return null;

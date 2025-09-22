@@ -35,9 +35,9 @@ export default function ToggleSendVoiceButton(props: ClientActivityActionButtonP
     if (clientVoiceMember?.serverMute && sending) {
       window.ipcRenderer.invoke('stopHandlingOutputAudioSource');
     }
-
+    
     setModalOpen(false);
-  }, [clientVoiceMember]);
+  }, [clientVoiceMember?.serverMute]);
 
   if (!clientVoiceMember) {
     return null;

@@ -6,5 +6,6 @@ export type AppIpcSlice = CreateIpcSlice<{
     getNodeVersion: () => Promise<string>;
     getElectronVersion: () => Promise<string>;
     getChromeVersion: () => Promise<string>;
+    flashFrame: (flash: boolean) => Promise<void>;
   };
 }>;

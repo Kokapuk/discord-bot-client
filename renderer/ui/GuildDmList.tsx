@@ -81,22 +81,10 @@ const GuildDmList = ({ ref, ...props }: StackProps & RefAttributes<HTMLDivElemen
       {...props}
     >
       {guilds?.map((guild) => (
-        <Guild
-          key={guild.id}
-          guild={guild}
-          unread={unreadGuilds?.includes(guild.id)}
-          contentVisibility="auto"
-          containIntrinsicSize="auto 2.5rem"
-        />
+        <Guild key={guild.id} guild={guild} unread={unreadGuilds?.includes(guild.id)} />
       ))}
       {Object.entries(dmChannels).map(([, channel]) => (
-        <DmChannel
-          key={channel.id}
-          channel={channel}
-          unread={unreadChannels.includes(channel.id)}
-          contentVisibility="auto"
-          containIntrinsicSize="auto 2.5rem"
-        />
+        <DmChannel key={channel.id} channel={channel} unread={unreadChannels.includes(channel.id)} />
       ))}
     </Stack>
   );

@@ -234,7 +234,7 @@ const Textarea = ({ textareaProps, ...props }: TextareaProps) => {
               backgroundColor="transparent"
               width="100%"
               minWidth="0"
-              maxHeight="96"
+              maxHeight="64"
               fontSize="md"
               border="0"
               {...textareaProps}

@@ -10,7 +10,7 @@ const ChannelList = (props: StackProps & RefAttributes<HTMLDivElement>) => {
   return (
     <Stack overflow="auto" paddingInline="2.5" paddingBottom="2.5" gap="2.5" {...props}>
       {channels?.map((channel) => (
-        <Box contentVisibility="auto" containIntrinsicSize="auto 1.875rem">
+        <Box key={channel.id}>
           <GuildChannel key={channel.id} channel={channel} />
         </Box>
       ))}

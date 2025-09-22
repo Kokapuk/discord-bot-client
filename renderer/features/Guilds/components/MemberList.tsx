@@ -10,7 +10,7 @@ const MemberList = ({ members, ...props }: MemberListProps) => {
   return (
     <Stack overflow="auto" paddingInline="2.5" paddingBottom="2.5" gap="4" {...props}>
       {members.map((member) => (
-        <Member key={member.id} member={member} contentVisibility="auto" containIntrinsicSize="auto 2rem" />
+        <Member key={member.id} member={member} />
       ))}
     </Stack>
   );

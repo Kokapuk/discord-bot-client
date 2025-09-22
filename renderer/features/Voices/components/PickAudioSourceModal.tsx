@@ -191,9 +191,9 @@ export default function PickAudioSourceModal(
                     </Text>
                   </Button>
                 ))}
-                {windows?.map((source) => (
+                {windows?.map((source, index) => (
                   <Button
-                    key={source.window.processId}
+                    key={index}
                     variant="subtle"
                     justifyContent="flex-start"
                     onClick={() => startAudioOutputWithWindow(source)}

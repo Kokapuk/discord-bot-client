@@ -185,36 +185,40 @@ export default function AppLayout() {
     const unsubscribeMessageCreate = window.ipcRenderer.on('messageCreate', async (_, message) => {
       addMessage(message);
 
-      if (channelId !== message.channelId) {
-        addUnreadChannel(message.channelId);
-
-        const dmStore = useDmsStore.getState();
-
-        if (!message.guildId && !Object.values(dmStore.channels).some((channel) => channel.id === message.channelId)) {
-          dmStore.pullChannel(message.authorId);
-        }
-
-        if (useClientStore.getState().clientUser?.status !== 'dnd') {
-          playAudio(resolvePublicUrl('./audios/notification.mp3'));
-
-          toaster.create({
-            title: message.fallbackAuthor.displayName,
-            description: (
-              <Text width="100%" overflow="hidden" textOverflow="ellipsis" whiteSpace="nowrap">
-                {message.content}
-              </Text>
-            ),
-            action: {
-              label: 'View',
-              onClick: () =>
-                navigate(
-                  message.guildId ? `/guilds/${message.guildId}/${message.channelId}` : `/dm/${message.channelId}`
-                ),
-            },
-            closable: true,
-          });
-        }
+      if (channelId === message.channelId && document.hasFocus()) {
+        return;
       }
+
+      addUnreadChannel(message.channelId);
+
+      const dmStore = useDmsStore.getState();
+
+      if (!message.guildId && !Object.values(dmStore.channels).some((channel) => channel.id === message.channelId)) {
+        dmStore.pullChannel(message.authorId);
+      }
+
+      if (useClientStore.getState().clientUser?.status === 'dnd') {
+        return;
+      }
+
+      playAudio(resolvePublicUrl('./audios/notification.mp3'));
+
+      toaster.create({
+        title: message.fallbackAuthor.displayName,
+        description: (
+          <Text width="100%" overflow="hidden" textOverflow="ellipsis" whiteSpace="nowrap">
+            {message.content}
+          </Text>
+        ),
+        action: {
+          label: 'View',
+          onClick: () =>
+            navigate(message.guildId ? `/guilds/${message.guildId}/${message.channelId}` : `/dm/${message.channelId}`),
+        },
+        closable: true,
+      });
+
+      window.ipcRenderer.invoke('flashFrame', true);
     });
 
     const unsubscribeMessageDelete = window.ipcRenderer.on('messageDelete', async (_, message) => {
