@@ -1,5 +1,5 @@
 import { User } from '@main/features/users/types';
-import { ActivityType, PresenceUpdateStatus } from 'discord.js';
+import { PresenceUpdateStatus } from 'discord.js';
 import { ClientIpcSlice } from '.';
 import { IpcApiResponse } from '..';
 import { structUser } from '../../features/users/utils';
@@ -14,15 +14,15 @@ export const handleIpcMainEvents = () => {
       await client.login(token);
       await new Promise((res) => client.once('clientReady', res));
 
-      client.user?.setPresence({
-        activities: [
-          {
-            name: 'github.com/Kokapuk/discord-bot-client',
-            url: 'https://github.com/Kokapuk/discord-bot-client',
-            type: ActivityType.Custom,
-          },
-        ],
-      });
+      // client.user?.setPresence({
+      //   activities: [
+      //     {
+      //       name: 'github.com/Kokapuk/discord-bot-client',
+      //       url: 'https://github.com/Kokapuk/discord-bot-client',
+      //       type: ActivityType.Custom,
+      //     },
+      //   ],
+      // });
 
       return { success: true } as IpcApiResponse;
     } catch (err: any) {

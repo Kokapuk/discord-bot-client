@@ -93,6 +93,18 @@ export default function PickAudioSourceModal(
     })();
   }, [props.open]);
 
+  useEffect(() => {
+    const handleBlur = () => {
+      props.onOpenChange?.({ open: false });
+    };
+
+    window.addEventListener('blur', handleBlur);
+
+    return () => {
+      window.removeEventListener('blur', handleBlur);
+    };
+  }, []);
+
   const startAudioOutput = async (stream: MediaStream, outputAudioSource: OutputAudioSource) => {
     setSendingWithAudioEffect(true);
     setActiveOutputAudioSource(outputAudioSource);
