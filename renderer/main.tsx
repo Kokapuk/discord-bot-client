@@ -6,6 +6,7 @@ import GlobalLayout from './layouts/GlobalLayout';
 import { ChakraProvider } from './ui/ChakraProvider';
 import { Toaster } from './ui/Toaster';
 
+const Error = lazy(() => import('./layouts/Error'));
 const Auth = lazy(() => import('./routes/Auth'));
 const AppLayout = lazy(() => import('./layouts/AppLayout'));
 const GuildLayout = lazy(() => import('./layouts/GuildLayout'));
@@ -17,6 +18,7 @@ const MiniBrowser = lazy(() => import('./routes/MiniBrowser'));
 const router = createHashRouter([
   {
     element: <GlobalLayout />,
+    errorElement: <Error />,
     children: [
       {
         path: '/auth',

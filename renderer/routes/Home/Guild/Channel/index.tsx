@@ -4,7 +4,6 @@ import { useParams } from 'react-router';
 
 export default function Channel() {
   const { guildId, channelId } = useParams();
-
   const channels = useGuildsStore((s) => s.channels);
 
   if (!guildId || !channelId) {

@@ -13,7 +13,7 @@ export default function Channel() {
   const activeChannel = Object.values(channels).find((channel) => channel.id === channelId);
 
   if (!activeChannel) {
-    throw Error('Channel do not exist');
+    throw Error('Channel does not exist');
   }
 
   return <ViewChannel channel={activeChannel} />;

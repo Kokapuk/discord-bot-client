@@ -25,7 +25,9 @@ const useMessagesStore = create<MessagesState>()((set, get) => ({
       return;
     }
 
-    const lastChannelMessageId = state.messages[channelId]?.[state.messages[channelId].length - 1].id;
+    const channelMessages = state.messages[channelId];
+    const lastChannelMessageId =
+      channelMessages && channelMessages.length > 0 ? channelMessages[channelMessages.length - 1].id : undefined;
 
     set({ isFetchingMessages: true });
     const response = await window.ipcRenderer.invoke('fetchChannelMessages', channelId, lastChannelMessageId);
