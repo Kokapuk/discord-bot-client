@@ -20,10 +20,10 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
 
-    "baseUrl": "./",
+    "rootDir": "./",
     "paths": {
       "@main/*": ["./main/*"],
-      "@renderer/*": ["renderer/*"]
+      "@renderer/*": ["./renderer/*"]
     }
   },
   "include": ["renderer", "main"],

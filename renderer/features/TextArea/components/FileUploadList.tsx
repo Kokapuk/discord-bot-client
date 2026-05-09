@@ -8,18 +8,20 @@ export type FileUploadListProps = FileUploadListBaseProps & StackProps & RefAttr
 export default function FileUploadList({ fileUpload, ...props }: FileUploadListProps) {
   return (
     <Stack direction="row" {...props}>
-      {fileUpload.acceptedFiles.map((file, index) => (
-        <ChakraFileUpload.Item w="auto" maxWidth="40" p="2" file={file} key={`${file.name}-${index}`}>
-          <Text width="100%" overflow="hidden" whiteSpace="nowrap" textOverflow="ellipsis">
-            {file.name}
-          </Text>
-          <Float placement="top-end">
-            <ChakraFileUpload.ItemDeleteTrigger boxSize="4" layerStyle="fill.solid">
-              <FaX />
-            </ChakraFileUpload.ItemDeleteTrigger>
-          </Float>
-        </ChakraFileUpload.Item>
-      ))}
+      <ChakraFileUpload.ItemGroup>
+        {fileUpload.acceptedFiles.map((file, index) => (
+          <ChakraFileUpload.Item w="auto" maxWidth="40" p="2" file={file} key={`${file.name}-${index}`}>
+            <Text width="100%" overflow="hidden" whiteSpace="nowrap" textOverflow="ellipsis">
+              {file.name}
+            </Text>
+            <Float placement="top-end">
+              <ChakraFileUpload.ItemDeleteTrigger boxSize="4" layerStyle="fill.solid">
+                <FaX />
+              </ChakraFileUpload.ItemDeleteTrigger>
+            </Float>
+          </ChakraFileUpload.Item>
+        ))}
+      </ChakraFileUpload.ItemGroup>
     </Stack>
   );
 }
