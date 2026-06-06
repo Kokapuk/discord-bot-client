@@ -1,4 +1,5 @@
-import { Box, Card, Image, Stack, Text } from '@chakra-ui/react';
+import { Box, Card, Stack, Text } from '@chakra-ui/react';
+import ImageWithPreview from '@renderer/ui/ImageWithPreview';
 import Link from '@renderer/ui/Link';
 import { RefAttributes } from 'react';
 import { EmbedProps } from './Embed';
@@ -40,13 +41,24 @@ export default function EmbedRich({ embed }: RichEmbedProps) {
       backgroundColor="bg.transparentPanel"
     >
       {!!embed.hexColor && (
-        <Box position="absolute" left="0" top="0" bottom="0" width="1" backgroundColor={embed.hexColor} />
+        <Box
+          position="absolute"
+          left="0"
+          top="0"
+          bottom="0"
+          width="1"
+          backgroundColor={embed.hexColor}
+        />
       )}
 
       <Card.Body padding="0">
         <Stack
           direction="row"
-          marginBottom={!!embed.fields.length || !!embed.image || !!embed.footer || !!embed.timestamp ? '4' : undefined}
+          marginBottom={
+            !!embed.fields.length || !!embed.image || !!embed.footer || !!embed.timestamp
+              ? '4'
+              : undefined
+          }
           gap="6"
         >
           <Stack width="100%">
@@ -54,7 +66,13 @@ export default function EmbedRich({ embed }: RichEmbedProps) {
 
             {embed.title &&
               (embed.url ? (
-                <Link to={embed.url} target="_blank" fontSize="md" fontWeight="600" width="fit-content">
+                <Link
+                  to={embed.url}
+                  target="_blank"
+                  fontSize="md"
+                  fontWeight="600"
+                  width="fit-content"
+                >
                   {embed.title}
                 </Link>
               ) : (
@@ -67,7 +85,14 @@ export default function EmbedRich({ embed }: RichEmbedProps) {
           </Stack>
 
           {!!embed.thumbnail && (
-            <Image loading="lazy" src={embed.thumbnail.url} width="16" height="16" flexShrink="0" borderRadius="md" />
+            <ImageWithPreview
+              loading="lazy"
+              src={embed.thumbnail.url}
+              width="16"
+              height="16"
+              flexShrink="0"
+              borderRadius="md"
+            />
           )}
         </Stack>
 
@@ -83,11 +108,21 @@ export default function EmbedRich({ embed }: RichEmbedProps) {
                 />
               ))}
             </Box>
-            {!!embed.image && <Image loading="lazy" src={embed.image.url} width="40" height="40" borderRadius="md" />}
+            {!!embed.image && (
+              <ImageWithPreview
+                loading="lazy"
+                src={embed.image.url}
+                width="40"
+                height="40"
+                borderRadius="md"
+              />
+            )}
           </Stack>
         )}
 
-        {(!!embed.footer || !!embed.timestamp) && <EmbedFooter footer={embed.footer} timestamp={embed.timestamp} />}
+        {(!!embed.footer || !!embed.timestamp) && (
+          <EmbedFooter footer={embed.footer} timestamp={embed.timestamp} />
+        )}
       </Card.Body>
     </Card.Root>
   );

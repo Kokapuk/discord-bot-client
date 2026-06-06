@@ -1,6 +1,6 @@
-import { Image, ImageProps } from '@chakra-ui/react';
+import { ImageProps } from '@chakra-ui/react';
 import { Attachment } from '@main/features/messages/types';
-import Link from '@renderer/ui/Link';
+import ImageWithPreview from '@renderer/ui/ImageWithPreview';
 import useClampedSize from '@renderer/utils/useClampedSize';
 import { RefAttributes } from 'react';
 
@@ -17,16 +17,14 @@ export default function ImageAttachment({ attachment, ...props }: ImageAttachmen
   });
 
   return (
-    <Link to={attachment.url} target="_blank" width="fit-content">
-      <Image
-        src={attachment.url}
-        loading="lazy"
-        alt={attachment.name}
-        borderRadius="md"
-        width={`${clampedWidth}px`}
-        height={`${clampedHeight}px`}
-        {...props}
-      />
-    </Link>
+    <ImageWithPreview
+      src={attachment.url}
+      loading="lazy"
+      alt={attachment.name}
+      borderRadius="md"
+      width={`${clampedWidth}px`}
+      height={`${clampedHeight}px`}
+      {...props}
+    />
   );
 }
